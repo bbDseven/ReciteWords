@@ -4,14 +4,163 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="recitewords.apj.com.recitewords.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="recitewords.apj.com.recitewords.activity.MainActivity">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp">
+
+
+    <recitewords.apj.com.recitewords.view.CircleImageView
+        android:id="@+id/main_img_circle"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/login_background_define01"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="正式版" />
+        android:layout_toRightOf="@id/main_img_circle"
+        android:textColor="#ffffff"
+        android:text="游客"
+        android:textSize="22sp"
+        android:layout_marginLeft="10dp"
+        />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/main_tv_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="26sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:text="哈哈"
+        android:textColor="#ffffff"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/main_img_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/circle_img_shape"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="160dp"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/check_in"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="签到"
+            android:textSize="22sp"
+            android:textColor="#ffffff"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="好好学习，天天签到"
+            android:layout_marginTop="10dp"/>
+        <TextView
+            android:id="@+id/main_tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="嘿嘿"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/main_ll"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
+        android:background="#000000"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/main_tv_learn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LEARN"
+                android:textSize="22sp"
+                android:textColor="#ffffff"
+                android:layout_marginRight="10dp"/>
+            <TextView
+                android:id="@+id/main_tv_learn_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/main_tv_learn"
+                android:layout_alignBottom="@id/main_tv_learn"
+                android:text="0"
+                android:textSize="18sp"
+                android:textColor="#ffff33"
+                />
+        </RelativeLayout>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#666666"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            />
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/main_tv_review"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REVIEW"
+                android:textSize="22sp"
+                android:textColor="#ffffff"
+                android:layout_marginLeft="20dp"/>
+            <TextView
+                android:id="@+id/main_tv_review_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/main_tv_review"
+                android:text="0"
+                android:textSize="18sp"
+                android:textColor="#ffff33"
+                />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/main_img_menu"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ico_home_menu"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"/>
+
+    <ImageView
+        android:id="@+id/main_img_dict"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ico_home_dict"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="5dp"/>
 </RelativeLayout>
