@@ -26,6 +26,7 @@ import recitewords.apj.com.recitewords.R;
 /**
  * 圆形头像
  * Created by Seven on 2016/11/18.
+ * 作者：李学文
  */
 public class CircleImageView extends ImageView {
 
