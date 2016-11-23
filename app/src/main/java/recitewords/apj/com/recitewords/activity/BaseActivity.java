@@ -31,8 +31,8 @@ public class BaseActivity extends Activity {
 
     }
 
-    public <E extends View>E findViewByIds(int id){
-        return (E)findViewById(id);
+    public <E extends View> E findViewByIds(int id) {
+        return (E) findViewById(id);
     }
 
     @Override
