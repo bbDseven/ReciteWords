@@ -93,18 +93,23 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     //状态改变
     @Override
     public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-
+            Log.e("haha","mainActivity状态"+newState);
+        //状态由EXPANDED变成COLLAPSED，设置字体颜色为白色
+        if (newState== SlidingUpPanelLayout.PanelState.COLLAPSED){
+            FragmentManager fragmentManager = getFragmentManager();
+            SlidingFragment fragment = (SlidingFragment) fragmentManager.
+                    findFragmentByTag(FRAGMENT_SLIDING);
+            fragment.setTextWhite();
+        }
     }
 
     //setOnTouchListener监听触摸事件的回调方法
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDownY = event.getY();
-                Log.e(TAG, "点击了主页面");
                 break;
             case MotionEvent.ACTION_MOVE:
                 mMoveY = event.getY();
@@ -136,8 +141,10 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
 
                 break;
             case MotionEvent.ACTION_UP:
-                if (height < NavigateHeight / 2 - 10 && height > 0) {
+               // Log.e(TAG,"height: "+height);
+                if (height < (NavigateHeight / 2 - 10) && height > 0) {
                     holder.mLayout.scrollTo(0, 0);
+                    //mScroller.startScroll(0,0,0,160,1000);
                     height = 0;
                     show_state = false;   //改变显示状态
                 } else if (height < NavigateHeight && height > 0) {
@@ -183,6 +190,13 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     public void setNavigateShow() {
         holder.mLayout.scrollTo(0, NavigateHeight);
         height=NavigateHeight;
+    }
+
+    /**
+     * 设置导航菜单栏高度
+     */
+    public void setNavigateHeight(int height){
+        NavigateHeight=height;
     }
 
 

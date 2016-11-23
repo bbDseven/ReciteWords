@@ -9,9 +9,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -30,12 +32,16 @@ import recitewords.apj.com.recitewords.adapter.MyViewPagerAdapter;
  */
 public class SlidingFragment extends BaseFragment {
 
-    private class ViewHolder {
+    private class holder {
         private ViewPager menu_viewPager;//用于显示4个子菜单界面的ViewPager
         private View view_settings, view_themes, view_library, view_statistics; //4个ViewPager里面的View
         private ImageView img_set, img_the, img_lib, img_sta, cursor; //4张图片，和一张显示游标的图片
         private TextView text_set, text_the, text_lib, text_sta;// 4个TextView菜单的名称
+        private LinearLayout ll_setting, ll_theme, ll_library, ll_statistics;  //菜单导航栏
+        private LinearLayout ll_top;  //导航栏父控件
     }
+
+    private static final String TAG = "SlidingFragment";
 
     public Context mContext;
     private int offset = 0;// 动画图片偏移量
@@ -44,11 +50,11 @@ public class SlidingFragment extends BaseFragment {
 
     private MainActivity mainActivity;
     private List<View> viewList;//用于存放4个View的集合
-    private ViewHolder viewHolder;
-    private OnMyClickListerner mOnMyClickListerner;
+    private holder holder;
     private SlidingUpPanelLayout.PanelState panelState;  //滑动页面状态
     private int clickSlidinMenugSum = 1;  //一个菜单的点击次数
     private int oldClickIndex = -1;  //上一次点击的菜单位置
+    private int NavigateHeight = 0;  //导航栏高度
 
 
     public SlidingFragment(Context context) {
@@ -57,20 +63,44 @@ public class SlidingFragment extends BaseFragment {
 
     @Override
     public View initView() {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_sliding, null);
-        viewHolder = new ViewHolder();
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_sliding, null);
+        holder = new holder();
         mainActivity = (MainActivity) mActivity;
 
-        viewHolder.menu_viewPager = findViewByIds(view, R.id.menu_viewpager);
-        viewHolder.img_set = findViewByIds(view, R.id.img_set);
-        viewHolder.img_the = findViewByIds(view, R.id.img_the);
-        viewHolder.img_lib = findViewByIds(view, R.id.img_lib);
-        viewHolder.img_sta = findViewByIds(view, R.id.img_sta);
-        viewHolder.text_set = findViewByIds(view, R.id.text_set);
-        viewHolder.text_the = findViewByIds(view, R.id.text_the);
-        viewHolder.text_lib = findViewByIds(view, R.id.text_lib);
-        viewHolder.text_sta = findViewByIds(view, R.id.text_sta);
-        viewHolder.cursor = findViewByIds(view, R.id.cursor);
+        holder.menu_viewPager = findViewByIds(view, R.id.menu_viewpager);
+        holder.img_set = findViewByIds(view, R.id.img_set);
+        holder.img_the = findViewByIds(view, R.id.img_the);
+        holder.img_lib = findViewByIds(view, R.id.img_lib);
+        holder.img_sta = findViewByIds(view, R.id.img_sta);
+        holder.text_set = findViewByIds(view, R.id.text_set);
+        holder.text_the = findViewByIds(view, R.id.text_the);
+        holder.text_lib = findViewByIds(view, R.id.text_lib);
+        holder.text_sta = findViewByIds(view, R.id.text_sta);
+        holder.cursor = findViewByIds(view, R.id.cursor);
+        holder.ll_setting = findViewByIds(view, R.id.ll_setting);
+        holder.ll_theme = findViewByIds(view, R.id.ll_theme);
+        holder.ll_library = findViewByIds(view, R.id.ll_library);
+        holder.ll_statistics = findViewByIds(view, R.id.ll_statistics);
+
+
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            @Override
+            public void onGlobalLayout() {
+                view.postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        holder.ll_top = findViewByIds(view, R.id.ll_top);
+                        NavigateHeight = holder.ll_top.getHeight();
+//                        Log.e(TAG, "大小：" + NavigateHeight);
+                        mainActivity.setNavigateHeight(NavigateHeight);
+                    }
+                }, 300);
+                view.getViewTreeObserver()
+                        .removeOnGlobalLayoutListener(this);  //移除监听
+            }
+        });
 
         InitImageView();
         InitViewPager();
@@ -89,7 +119,7 @@ public class SlidingFragment extends BaseFragment {
         offset = (screenW / 4 - bmpW) / 2;// 计算偏移量
         Matrix matrix = new Matrix();
         matrix.postTranslate(offset, 0);
-        viewHolder.cursor.setImageMatrix(matrix);// 设置动画初始位置
+        holder.cursor.setImageMatrix(matrix);// 设置动画初始位置
     }
 
     /**
@@ -98,33 +128,38 @@ public class SlidingFragment extends BaseFragment {
     private void InitViewPager() {
         viewList = new ArrayList<View>();
         LayoutInflater inflater = mActivity.getLayoutInflater();
-        viewHolder.view_settings = inflater.inflate(R.layout.viewpager_settings, null);
-        viewHolder.view_themes = inflater.inflate(R.layout.viewpager_themes, null);
-        viewHolder.view_library = inflater.inflate(R.layout.viewpager_library, null);
-        viewHolder.view_statistics = inflater.inflate(R.layout.viewpager_statistics, null);
+        holder.view_settings = inflater.inflate(R.layout.viewpager_settings, null);
+        holder.view_themes = inflater.inflate(R.layout.viewpager_themes, null);
+        holder.view_library = inflater.inflate(R.layout.viewpager_library, null);
+        holder.view_statistics = inflater.inflate(R.layout.viewpager_statistics, null);
         //把4个View都放在集合里
-        viewList.add(viewHolder.view_settings);
-        viewList.add(viewHolder.view_themes);
-        viewList.add(viewHolder.view_library);
-        viewList.add(viewHolder.view_statistics);
+        viewList.add(holder.view_settings);
+        viewList.add(holder.view_themes);
+        viewList.add(holder.view_library);
+        viewList.add(holder.view_statistics);
         MyViewPagerAdapter myViewPager = new MyViewPagerAdapter(mActivity, viewList);
-        viewHolder.menu_viewPager.setAdapter(myViewPager);
-        viewHolder.menu_viewPager.setCurrentItem(0);
-        viewHolder.text_set.setTextColor(Color.CYAN);
-        viewHolder.menu_viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
+        holder.menu_viewPager.setAdapter(myViewPager);
+        holder.menu_viewPager.setCurrentItem(0);
+        //holder.text_set.setTextColor(Color.CYAN);
+        holder.menu_viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
     }
 
     @Override
     public void initEvent() {
-        viewHolder.img_set.setOnClickListener(new MyOnClickListener(0));
-        viewHolder.img_the.setOnClickListener(new MyOnClickListener(1));
-        viewHolder.img_lib.setOnClickListener(new MyOnClickListener(2));
-        viewHolder.img_sta.setOnClickListener(new MyOnClickListener(3));
+//        holder.img_set.setOnClickListener(new MyOnClickListener(0));
+//        holder.img_the.setOnClickListener(new MyOnClickListener(1));
+//        holder.img_lib.setOnClickListener(new MyOnClickListener(2));
+//        holder.img_sta.setOnClickListener(new MyOnClickListener(3));
+//
+//        holder.text_set.setOnClickListener(new MyOnClickListener(0));
+//        holder.text_the.setOnClickListener(new MyOnClickListener(1));
+//        holder.text_lib.setOnClickListener(new MyOnClickListener(2));
+//        holder.text_sta.setOnClickListener(new MyOnClickListener(3));
 
-        viewHolder.text_set.setOnClickListener(new MyOnClickListener(0));
-        viewHolder.text_the.setOnClickListener(new MyOnClickListener(1));
-        viewHolder.text_lib.setOnClickListener(new MyOnClickListener(2));
-        viewHolder.text_sta.setOnClickListener(new MyOnClickListener(3));
+        holder.ll_setting.setOnClickListener(new MyOnClickListener(0));
+        holder.ll_theme.setOnClickListener(new MyOnClickListener(1));
+        holder.ll_library.setOnClickListener(new MyOnClickListener(2));
+        holder.ll_statistics.setOnClickListener(new MyOnClickListener(3));
     }
 
     /**
@@ -139,26 +174,36 @@ public class SlidingFragment extends BaseFragment {
 
         @Override
         public void onClick(View v) {
-            //监听点击导航菜单
-            // mOnMyClickListerner.onclick(index);
-
             panelState = mainActivity.holder.mLayout.getPanelState();
-            Log.e("ha", "点击了第：" + index + "   状态为：" + panelState);
-            int currentItem = viewHolder.menu_viewPager.getVisibility();
-            Log.e("ha", "currentItem：" + currentItem);
-            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            if (panelState == SlidingUpPanelLayout.PanelState.COLLAPSED ||
+                    panelState == SlidingUpPanelLayout.PanelState.ANCHORED) {
                 mainActivity.holder.mLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                //当用户点击返回首页后，再次点击导航栏，进入滑动菜单页面，
+                // 返回时和再次进去同一个页面就需要设置字体颜色
+                switch (v.getId()) {
+                    case R.id.ll_setting:
+                        holder.text_set.setTextColor(Color.CYAN);
+                        break;
+                    case R.id.ll_theme:
+                        holder.text_the.setTextColor(Color.CYAN);
+                        break;
+                    case R.id.ll_library:
+                        holder.text_lib.setTextColor(Color.CYAN);
+                        break;
+                    case R.id.ll_statistics:
+                        holder.text_sta.setTextColor(Color.CYAN);
+                        break;
+                }
             } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 if (oldClickIndex == index) {
-//                    clickSlidinMenugSum++;
-//                    if(clickSlidinMenugSum==2){
                     mainActivity.holder.mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                     oldClickIndex = -1;
-//                    }
+                    clickSlidinMenugSum = 1;
                 }
             }
-            viewHolder.menu_viewPager.setCurrentItem(index);
+            holder.menu_viewPager.setCurrentItem(index);
             oldClickIndex = index;
+            clickSlidinMenugSum++;
         }
 
 
@@ -189,32 +234,43 @@ public class SlidingFragment extends BaseFragment {
      * 文字颜色改变的方法
      */
     public void TextColorChange(int position) {
+        Log.e(TAG, "position:  " + position);
         switch (position) {
             case 0:
-                viewHolder.text_set.setTextColor(Color.CYAN);
-                viewHolder.text_the.setTextColor(Color.WHITE);
-                viewHolder.text_lib.setTextColor(Color.WHITE);
-                viewHolder.text_sta.setTextColor(Color.WHITE);
+                holder.text_set.setTextColor(Color.CYAN);
+                holder.text_the.setTextColor(Color.WHITE);
+                holder.text_lib.setTextColor(Color.WHITE);
+                holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 1:
-                viewHolder.text_set.setTextColor(Color.WHITE);
-                viewHolder.text_the.setTextColor(Color.CYAN);
-                viewHolder.text_lib.setTextColor(Color.WHITE);
-                viewHolder.text_sta.setTextColor(Color.WHITE);
+                holder.text_set.setTextColor(Color.WHITE);
+                holder.text_the.setTextColor(Color.CYAN);
+                holder.text_lib.setTextColor(Color.WHITE);
+                holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 2:
-                viewHolder.text_set.setTextColor(Color.WHITE);
-                viewHolder.text_the.setTextColor(Color.WHITE);
-                viewHolder.text_lib.setTextColor(Color.CYAN);
-                viewHolder.text_sta.setTextColor(Color.WHITE);
+                holder.text_set.setTextColor(Color.WHITE);
+                holder.text_the.setTextColor(Color.WHITE);
+                holder.text_lib.setTextColor(Color.CYAN);
+                holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 3:
-                viewHolder.text_set.setTextColor(Color.WHITE);
-                viewHolder.text_the.setTextColor(Color.WHITE);
-                viewHolder.text_lib.setTextColor(Color.WHITE);
-                viewHolder.text_sta.setTextColor(Color.CYAN);
+                holder.text_set.setTextColor(Color.WHITE);
+                holder.text_the.setTextColor(Color.WHITE);
+                holder.text_lib.setTextColor(Color.WHITE);
+                holder.text_sta.setTextColor(Color.CYAN);
                 break;
         }
+    }
+
+    /**
+     * 设置文字全部为白色
+     */
+    public void setTextWhite() {
+        holder.text_set.setTextColor(Color.WHITE);
+        holder.text_the.setTextColor(Color.WHITE);
+        holder.text_lib.setTextColor(Color.WHITE);
+        holder.text_sta.setTextColor(Color.WHITE);
     }
 
     /**
@@ -265,23 +321,21 @@ public class SlidingFragment extends BaseFragment {
                 break;
         }
         currIndex = position;
+        oldClickIndex = position;  //更新当前显示的index
         animation.setFillAfter(true);// True:图片停在动画结束位置
         animation.setDuration(300);
-        viewHolder.cursor.startAnimation(animation);
+        holder.cursor.startAnimation(animation);
     }
 
     /**
-     * 点击导航菜单回调方法发
+     * 获取菜单导航栏高度
      *
-     * @param onMyClickListerner 监听者
-     * @return 点击位置
+     * @return
      */
-    public void setOnMyClickListerner(OnMyClickListerner onMyClickListerner) {
-        this.mOnMyClickListerner = onMyClickListerner;
+    public int getNavigateHeight() {
+        return NavigateHeight;
     }
 
-    public interface OnMyClickListerner {
-        void onclick(int index);
-    }
+
 
 }
