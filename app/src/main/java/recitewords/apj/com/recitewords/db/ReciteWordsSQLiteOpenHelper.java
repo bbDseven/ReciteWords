@@ -13,6 +13,16 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
 
+    // 创建词库表的sql语句
+    private final String LEXICON_SQL = "create table lexicon (book_name text, book_desc text, " +
+            "word_num integer, word_num_study integer, word_num_grasp integer, word_num_review integer, userID integer)";
+
+    // 创建词书表的sql语句
+    private final String BOOK_SQL = "create table book (word text, soundmark_american text, " +
+            "pronounce_american text, soundmark_british text, pronounce_british text, word_property text, word_mean text, " +
+            "word_img text, word_is_study integer, word_is_grasp integer, book_name text, userID integer)";
+
+    //创建单词学习表的sql语句
     private final String WORD_STUDY_SQL="create table word_study(word text," +
             "option_A text,option_B text,option_C text,option_D text,answer_right text," +
             "answer_user text,asterisk integer,date text,book_name text，userID integer)";
