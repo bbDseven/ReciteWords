@@ -12,14 +12,16 @@ import android.database.sqlite.SQLiteOpenHelper;
  * 数据库库打开帮助类
  */
 public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
-    public ReciteWordsSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    private final String WORD_EXAMPLE_SENTENCE = "create table word_example_sentence(word text, example_sentence text, example_sentence_mean," +
+            "example_sentence_pronounce text, example_sentence_resource text)";
+    public ReciteWordsSQLiteOpenHelper(Context context, String name, int version) {
         //创建数据库时，写死数据库名字为ReciteWords.db，版本为1
-        super(context, "ReciteWords.db", factory, 1);
+        super(context, name, null, version);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        db.execSQL(WORD_EXAMPLE_SENTENCE);
     }
 
     @Override
