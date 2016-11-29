@@ -1,7 +1,9 @@
 package recitewords.apj.com.recitewords.activity;
 
+import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -76,6 +78,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     /**
      * 初始化Fragment布局
      */
+
     private void initFragment() {
         fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();  // 开启事务
@@ -118,9 +121,11 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
                 mMoveY = event.getY();
                 diffY = (int) (mDownY - mMoveY + 0.5);
 //                Log.e("ha","diffY:  "+diffY);
+                //防止向上滑出屏幕
                 if ((holder.mLayout.getScrollY() + diffY) > NavigateHeight) {
                     holder.mLayout.scrollTo(0, NavigateHeight);
                 } else if ((holder.mLayout.getScrollY() + diffY) < 0) {
+                    //防止向下滑出屏幕
                     holder.mLayout.scrollTo(0, 0);
                 } else {
                     holder.mLayout.scrollBy(0, diffY);

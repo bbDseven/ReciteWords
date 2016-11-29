@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.MainActivity;
+import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.util.DateUtil;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -74,9 +77,44 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.activity_main.setBackgroundResource(imgs[num]);
         holder.tv_word.setText(img_words[num]);
         //设置签到里的日期和星期
-        String date = DateUtil.getMonthAndDay() + " " + DateUtil.getWeek();
+        String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
 
+        SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
+        boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记
+        if (1==1){
+
+            insertWordStudy();
+
+            PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
+        }
+    }
+
+    /**
+     * 插入学习单词
+     */
+    public void insertWordStudy(){
+        WordStudyDao dao = new WordStudyDao(mContext);
+        dao.addWord("economic","","","","","","",0,"","CET4",0);
+        dao.addWord("election","","","","","","",0,"","CET4",0);
+        dao.addWord("murder","","","","","","",0,"","CET4",0);
+        dao.addWord("progress","","","","","","",0,"","CET4",0);
+        dao.addWord("religious","","","","","","",0,"","CET4",0);
+        dao.addWord("smart","","","","","","",0,"","CET4",0);
+        dao.addWord("barber","","","","","","",0,"","CET4",0);
+        dao.addWord("animal","","","","","","",0,"","CET4",0);
+        dao.addWord("abandon","","","","","","",0,"","CET4",0);
+        dao.addWord("ability","","","","","","",0,"","CET4",0);
+        dao.addWord("able","","","","","","",0,"","CET4",0);
+        dao.addWord("aboard","","","","","","",0,"","CET4",0);
+        dao.addWord("about","","","","","","",0,"","CET4",0);
+        dao.addWord("abroad","","","","","","",0,"","CET4",0);
+        dao.addWord("absorb","","","","","","",0,"","CET4",0);
+        dao.addWord("angry","","","","","","",0,"","CET4",0);
+        dao.addWord("anniversary","","","","","","",0,"","CET4",0);
+        dao.addWord("announce","","","","","","",0,"","CET4",0);
+        dao.addWord("bankrupt","","","","","","",0,"","CET4",0);
+        dao.addWord("computer","","","","","","",0,"","CET4",0);
     }
 
 

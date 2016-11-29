@@ -5,11 +5,11 @@ package recitewords.apj.com.recitewords.bean;
  */
 
 public class WordExampleSentence {
-    private String word;
-    private String example_sentence;
-    private String example_sentence_mean;
-    private String example_sentence_pronounce;
-    private String example_sentence_resource;
+    private String word;   //单词
+    private String example_sentence;  //例句
+    private String example_sentence_mean;  //例句意思
+    private String example_sentence_pronounce;  //例句发音
+    private String example_sentence_resource;  //例句来源
 
     public String getWord() {
         return word;

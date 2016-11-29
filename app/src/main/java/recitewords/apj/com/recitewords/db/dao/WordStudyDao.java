@@ -26,25 +26,49 @@ public class WordStudyDao {
     /**
      * 增加单词
      *
-     * @param values 要插入的数据
+     * @param userID  id
+     * @param word  单词
+     * @param option_A  A
+     * @param option_B  B
+     * @param option_C  C
+     * @param option_D  D
+     * @param answer_right  正确答案
+     * @param answer_user  用户答案
+     * @param asterisk  星号，记录记住次数
+     * @param date  日期
+     * @param book_name  单词所属词书名字
      * @return 受影响行数
      */
-    public long addWord(ContentValues values) {
+    public long addWord(String word,String option_A,String option_B,String option_C,String option_D,
+                        String answer_right,String answer_user,int asterisk,
+                        String date,String book_name,int userID) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        ContentValues mValues = new ContentValues();
-        mValues.put("userID", values.getAsInteger("userID"));
-        mValues.put("word", values.getAsString("word"));
-        mValues.put("option_A", values.getAsString("option_A"));
-        mValues.put("option_B", values.getAsString("option_B"));
-        mValues.put("option_C", values.getAsString("option_C"));
-        mValues.put("option_D", values.getAsString("option_D"));
-        mValues.put("answer_right", values.getAsString("answer_right"));
-        mValues.put("answer_user", values.getAsString("answer_user"));
-        mValues.put("asterisk", values.getAsInteger("asterisk"));
-        mValues.put("date", values.getAsString("date"));
-        mValues.put("book_name", values.getAsString("book_name"));
-        long num = db.insert("word_study", null, mValues);
-        mValues.clear();
+        ContentValues values = new ContentValues();
+        values.put("word",word);
+        values.put("option_A",option_A);
+        values.put("option_B",option_B);
+        values.put("option_C",option_C);
+        values.put("option_D",option_D);
+        values.put("answer_right",answer_right);
+        values.put("answer_user",answer_user);
+        values.put("asterisk",asterisk);
+        values.put("date",date);
+        values.put("book_name",book_name);
+        values.put("userID",userID);
+//        ContentValues mValues = new ContentValues();
+//        mValues.put("word", values.getAsString("word"));
+//        mValues.put("option_A", values.getAsString("option_A"));
+//        mValues.put("option_B", values.getAsString("option_B"));
+//        mValues.put("option_C", values.getAsString("option_C"));
+//        mValues.put("option_D", values.getAsString("option_D"));
+//        mValues.put("answer_right", values.getAsString("answer_right"));
+//        mValues.put("answer_user", values.getAsString("answer_user"));
+//        mValues.put("asterisk", values.getAsInteger("asterisk"));
+//        mValues.put("date", values.getAsString("date"));
+//        mValues.put("book_name", values.getAsString("book_name"));
+//        mValues.put("userID", values.getAsInteger("userID"));
+        long num = db.insert("word_study", null, values);
+        values.clear();
         db.close();
         return num;
     }
