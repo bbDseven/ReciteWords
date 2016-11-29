@@ -44,6 +44,8 @@ public class WordStudyDao {
         mValues.put("date", values.getAsString("date"));
         mValues.put("book_name", values.getAsString("book_name"));
         long num = db.insert("word_study", null, mValues);
+        mValues.clear();
+        db.close();
         return num;
     }
 
@@ -60,6 +62,8 @@ public class WordStudyDao {
         mValues.put("asterisk", asterisk);
         SQLiteDatabase db = helper.getWritableDatabase();
         int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        mValues.clear();
+        db.close();
         return num;
     }
 
@@ -76,6 +80,8 @@ public class WordStudyDao {
         mValues.put("date", date);
         SQLiteDatabase db = helper.getWritableDatabase();
         int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        mValues.clear();
+        db.close();
         return num;
     }
 
@@ -105,8 +111,8 @@ public class WordStudyDao {
             wordStudy.setBook_name(cursor.getString(cursor.getColumnIndex("book_name")));
             wordStudy.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
         }
+        cursor.close();
+        db.close();
         return wordStudy;
     }
-
-
 }

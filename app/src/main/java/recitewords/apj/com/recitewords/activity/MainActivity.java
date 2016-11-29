@@ -3,7 +3,6 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -27,8 +26,8 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     private static final String FRAGMENT_MAIN = "fragment_main";  //主页面Fragment标识,Tag
     private static final String FRAGMENT_SLIDING = "fragment_sliding";  //滑动页面Fragment标识
 
-    public static int userID=0;  //userID,用户的登陆ID
-    public static String dbName="ReciteWords_"+ userID+".db";   //数据库名字
+    public static int userID = 0;  //userID,用户的登陆ID
+    public static String dbName = "ReciteWords_" + userID + ".db";   //数据库名字
 
     private static final String TAG = "MainActivity";
     public ViewHolder holder;
@@ -96,9 +95,8 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     //状态改变
     @Override
     public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-            Log.e("haha","mainActivity状态"+newState);
         //状态由EXPANDED变成COLLAPSED，设置字体颜色为白色
-        if (newState== SlidingUpPanelLayout.PanelState.COLLAPSED){
+        if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             FragmentManager fragmentManager = getFragmentManager();
             SlidingFragment fragment = (SlidingFragment) fragmentManager.
                     findFragmentByTag(FRAGMENT_SLIDING);
@@ -113,55 +111,44 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDownY = event.getY();
+//                Log.e("mDownY","mDownY:  "+mDownY);
+//                Log.e("mDownX","mDownX:  "+event.getX());
                 break;
             case MotionEvent.ACTION_MOVE:
                 mMoveY = event.getY();
-                diffY = (int) (mMoveY - mDownY + 0.5);
-                mDownY = mMoveY;
-                if (diffY <= 0) {
-                    if (height >= NavigateHeight) {
-                        show_state = true;
-                    } else if (height < NavigateHeight) {
-                        height += Math.abs(diffY);   //计算总偏移量
-                        if (height <= NavigateHeight) {  //总偏移量小于导航栏高度
-                            holder.mLayout.scrollBy(0, Math.abs(diffY));
-                        } else {
-                            holder.mLayout.scrollTo(0, NavigateHeight);
-                        }
-                    }
+                diffY = (int) (mDownY - mMoveY + 0.5);
+//                Log.e("ha","diffY:  "+diffY);
+                if ((holder.mLayout.getScrollY() + diffY) > NavigateHeight) {
+                    holder.mLayout.scrollTo(0, NavigateHeight);
+                } else if ((holder.mLayout.getScrollY() + diffY) < 0) {
+                    holder.mLayout.scrollTo(0, 0);
                 } else {
-                    if (height == 0) {
-                        show_state = false;
-                    } else if (height > 0) {
-                        height -= Math.abs(diffY);   //计算总偏移量
-                        if (height >= 0) {
-                            holder.mLayout.scrollBy(0, -diffY);
-                        } else {
-                            holder.mLayout.scrollTo(0, 0);
-                        }
-                    }
+                    holder.mLayout.scrollBy(0, diffY);
                 }
 
+                mDownY = mMoveY;
                 break;
             case MotionEvent.ACTION_UP:
-               // Log.e(TAG,"height: "+height);
-                if (height < (NavigateHeight / 2 - 10) && height > 0) {
+                if (holder.mLayout.getScrollY() < (NavigateHeight / 2)) {
+                    //隐藏底部菜单栏
+//                    int startY=holder.mLayout.getScrollY();
+//                    int dy=startY;
+//                    mScroller.startScroll(0,startY,0,dy,1000);
                     holder.mLayout.scrollTo(0, 0);
-                    //mScroller.startScroll(0,0,0,160,1000);
-                    height = 0;
-                    show_state = false;   //改变显示状态
-                } else if (height < NavigateHeight && height > 0) {
+                } else {
+                    //显示底部菜单栏
+//                    int startY=holder.mLayout.getScrollY();
+//                    int dy=NavigateHeight-startY;
+//                    mScroller.startScroll(0,startY,0,dy,1000);
                     holder.mLayout.scrollTo(0, NavigateHeight);
-                    height = NavigateHeight;
-                    show_state = true;
                 }
-
                 break;
             default:
                 break;
         }
         return true;
     }
+
 
     /**
      * 底部导航菜单栏显示状态
@@ -184,7 +171,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
      */
     public void setNavigateHide() {
         holder.mLayout.scrollTo(0, 0);
-        height=0;
+        height = 0;
     }
 
     /**
@@ -192,14 +179,14 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
      */
     public void setNavigateShow() {
         holder.mLayout.scrollTo(0, NavigateHeight);
-        height=NavigateHeight;
+        height = NavigateHeight;
     }
 
     /**
      * 设置导航菜单栏高度
      */
-    public void setNavigateHeight(int height){
-        NavigateHeight=height;
+    public void setNavigateHeight(int height) {
+        NavigateHeight = height;
     }
 
 

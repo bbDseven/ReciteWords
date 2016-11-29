@@ -18,7 +18,7 @@ public class BookDao {
         helper = new ReciteWordsSQLiteOpenHelper(context, MainActivity.dbName, 1);
     }
 
-    /*
+    /**
     * 增加单词的方法
     *  包括增加英语单词，美式音标，美式发音，英式音标，英式发音
     *  词性，词义，是否已学习，是否已掌握
