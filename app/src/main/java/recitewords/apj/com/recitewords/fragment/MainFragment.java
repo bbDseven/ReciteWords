@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.util.DateUtil;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -77,6 +79,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         String date = DateUtil.getMonthAndDay() + " " + DateUtil.getWeek();
         holder.tv_date.setText(date);
 
+        SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
+        boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记
+        if (dbFlag){
+            
+            PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
+        }
     }
 
 

@@ -35,9 +35,6 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        //单词学习表word_study
-
         db.execSQL(WORD_STUDY_SQL);
         db.execSQL(WORD_EXAMPLE_SENTENCE);
         db.execSQL(LEXICON_SQL);
