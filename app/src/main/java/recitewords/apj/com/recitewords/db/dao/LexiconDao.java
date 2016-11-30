@@ -7,6 +7,7 @@ import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
 
 /**
  * 词库表的Dao方法
+ *
  * Created by 陈金振 on 2016/11/28 0028.
  */
 public class LexiconDao {

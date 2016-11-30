@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="例句来自："/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="网上"
+        android:textSize="18sp"
+        android:textColor="#ffffff"
+        android:layout_marginTop="5dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#666666"
+        android:layout_marginTop="10dp"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="50dp">
+        <TextView
+            android:id="@+id/vp_example_sentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="i am a sb."
+            android:textSize="18sp"
+            />
+        <TextView
+            android:layout_marginTop="15dp"
+            android:id="@+id/vp_example_sentence_mean"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="我是个煞笔。"
+            android:textSize="18sp"
+            android:textColor="#ffffff"/>
+    </LinearLayout>
+</LinearLayout>
