@@ -23,14 +23,14 @@ public class ExampleSentenceDao {
     }
 
     //插入例句数据
-    public void insert(ContentValues value){
+    public void insert(String word, String example_sentence, String example_sentence_mean, String example_sentence_pronounce, String example_sentence_resource){
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("word", value.getAsString("word"));
-        values.put("example_sentence", value.getAsString("example_sentence"));
-        values.put("example_sentence_mean", value.getAsString("example_sentence_mean"));
-        values.put("example_sentence_pronounce", value.getAsString("example_sentence_pronounce"));
-        values.put("example_sentence_resource", value.getAsString("example_sentence_resource"));
+        values.put("word", word);
+        values.put("example_sentence", example_sentence);
+        values.put("example_sentence_mean", example_sentence_mean);
+        values.put("example_sentence_pronounce", example_sentence_pronounce);
+        values.put("example_sentence_resource", example_sentence_resource);
         db.insert("word_example_sentence", null, values);
         values.clear();
         db.close();
