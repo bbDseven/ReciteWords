@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import recitewords.apj.com.recitewords.R;
+import recitewords.apj.com.recitewords.activity.LearnActivity;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.util.DateUtil;
@@ -37,6 +39,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         ImageView img_sign;
         TextView tv_date;
         ImageView iv_menu;
+        RelativeLayout main_rl_learn;
     }
 
     private ViewHolder holder;
@@ -61,12 +64,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.img_sign = findViewByIds(view, R.id.main_img_sign);
         holder.tv_date = findViewByIds(view, R.id.main_tv_date);
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
+        holder.main_rl_learn=findViewByIds(view,R.id.main_rl_learn);
         return view;
     }
 
     @Override
     public void initEvent() {
         holder.iv_menu.setOnClickListener(this);
+        holder.main_rl_learn.setOnClickListener(this);
     }
 
     @Override
@@ -131,6 +136,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 }
                 mainActivity.setNavigateShowState(!navigateShowState);
                 Log.e("ha", "点击了，状态后为：" + navigateShowState);
+                break;
+            case R.id.main_rl_learn:
+                //跳转到学习界面
+                startActivity(new Intent(mActivity, LearnActivity.class));
                 break;
             default:
                 break;

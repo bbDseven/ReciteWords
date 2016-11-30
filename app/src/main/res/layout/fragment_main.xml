@@ -90,6 +90,7 @@
         android:background="#000000"
         android:orientation="horizontal">
         <RelativeLayout
+            android:id="@+id/main_rl_learn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

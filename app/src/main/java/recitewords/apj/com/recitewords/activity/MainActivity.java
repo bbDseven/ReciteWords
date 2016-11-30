@@ -1,9 +1,7 @@
 package recitewords.apj.com.recitewords.activity;
 
-import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
