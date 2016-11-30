@@ -87,8 +87,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
         SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
         boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记
-        if (1==1){
-
+        if (dbFlag){
             insertWordStudy();
 
             PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
