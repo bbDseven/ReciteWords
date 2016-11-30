@@ -15,7 +15,6 @@ import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
  * 单词学习表工具类
  */
 public class WordStudyDao {
-
     public ReciteWordsSQLiteOpenHelper helper;
 
     public WordStudyDao(Context context) {
