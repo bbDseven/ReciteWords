@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:id="@+id/ll_show_word"
     android:layout_height="0dp"
     android:layout_weight="1">
 
@@ -8,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
+        <!--学习情况，头部显示-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -63,11 +64,16 @@
                     android:layout_centerInParent="true"
                     android:layout_marginTop="10dp">
 
-                    <Button
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                    <!--英式音标，美式音标切换-->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="UK"
-                        android:textSize="12sp" />
+                        android:padding="2dp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="#919191"
+                        android:textSize="13sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -85,6 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="vertical">
 
                 <ImageView

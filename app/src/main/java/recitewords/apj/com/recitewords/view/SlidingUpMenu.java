@@ -1,8 +1,6 @@
 package recitewords.apj.com.recitewords.view;
-
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +18,7 @@ public class SlidingUpMenu extends ViewGroup {
     private int mUpHeight;  //头部菜单的高度
     private float mDownX;
     private float mDownY;
+    private boolean mUpMenuOpen=false;  //是否打开头部菜单栏
 
     private Scroller scroller;
 
@@ -49,9 +48,10 @@ public class SlidingUpMenu extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         //合成32位数值
         int topWidthMeasureSpec = MeasureSpec.makeMeasureSpec(widthMeasureSpec, MeasureSpec.EXACTLY);
-        int topHeightMeasureSpec = MeasureSpec.makeMeasureSpec(mUpHeight, MeasureSpec.EXACTLY);
+        int topHeightMeasureSpec = MeasureSpec.makeMeasureSpec(mUpHeight, MeasureSpec.UNSPECIFIED);
         //给头部菜单测量
         mTopView.measure(topWidthMeasureSpec, topHeightMeasureSpec);
         //给主页面内容测量
@@ -95,7 +95,6 @@ public class SlidingUpMenu extends ViewGroup {
                 float mMoveY = event.getY();
                 int diffY = (int) (mDownY - mMoveY + 0.5);
 
-                Log.e("ha","getScrollY():  "+getScrollY());
                 // 防止划出屏幕
                 if (getScrollY() + diffY < -mTopView.getHeight()) {
                     //防止向上划出屏幕
@@ -129,13 +128,11 @@ public class SlidingUpMenu extends ViewGroup {
      * @param isTop  true --显示头部菜单
      */
     private void switchMenu(boolean isTop) {
+
+        this.mUpMenuOpen=isTop;
+
         if (isTop) {
-            // scrollTo(-mLeftView.getMeasuredWidth(), 0);
-
-            // 更改左侧是否打开状态，让调用者可以很好地知道是否打开
-            //this.mIsLeftOpen = isTop;
-
-            // 开启时的XY坐标
+            // 开始移动时的X，Y坐标
             int startX = getScrollX();
             int startY = getScrollY();
             // XY的偏移量
@@ -147,11 +144,7 @@ public class SlidingUpMenu extends ViewGroup {
             }
             scroller.startScroll(startX, startY, dx, dy, duration);
         } else {
-            // scrollTo(0, 0);
-
-           // this.mIsLeftOpen = isLeft;
-
-            // 开启时的XY坐标
+            // 开始移动时的X，Y坐标
             int startX = getScrollX();
             int startY = getScrollY();
             // XY的偏移量
@@ -179,4 +172,26 @@ public class SlidingUpMenu extends ViewGroup {
         invalidate();
     }
 
+    /**
+     * 获取头部菜单状态
+     * @return
+     */
+    public boolean getMenuState(){
+        return mUpMenuOpen;
+    }
+
+    /**
+     * 打开头部菜单
+     */
+    public void openMenu(){
+        switchMenu(true);
+    }
+
+    /**
+     * 关闭头部菜单
+     */
+
+    public void closeMenu(){
+        switchMenu(false);
+    }
 }
