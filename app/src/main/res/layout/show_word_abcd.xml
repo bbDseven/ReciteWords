@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/ll_abcd"
+    android:gravity="center_vertical"
+    android:visibility="visible"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_A"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="A"
+            android:textColor="#FF0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_A"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="n.谋杀;杀戮;极艰难[令人沮丧]的经历"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:background="#CCCCCC"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_height="1dp"/>
+    <LinearLayout
+        android:id="@+id/ll_"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="B"
+            android:textColor="#FF0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_B"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="n.动物，兽，牲畜,畜生,兽性"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:background="#CCCCCC"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_height="1dp"/>
+    <LinearLayout
+        android:id="@+id/ll_C"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="C"
+            android:textColor="#FF0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_C"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="prep.上车;在（船、飞机、车）上，上（船、飞机、车）"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:background="#CCCCCC"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/ll_D"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="D"
+            android:textColor="#FF0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_D"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="adj.在附近的;四处走动的;在起作用的;在流行中的"
+            android:textColor="#FFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

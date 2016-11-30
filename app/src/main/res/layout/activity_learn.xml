@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_learn"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/background_color"
+    tools:context="recitewords.apj.com.recitewords.activity.LearnActivity">
+
+    <recitewords.apj.com.recitewords.view.SlidingUpMenu
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/example_sentence" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--显示单词及学习情况-->
+            <include layout="@layout/learn_show_word" />
+
+            <!--横线-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="#CCCCCC" />
+
+            <!--中间认识，不认识等选项-->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/ll_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="不认识"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/ll_incognizance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
+
+                    <TextView
+                        android:id="@+id/tv_incognizance_next"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="下一个"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tv_incognizance_example"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="看例句"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/ll_memory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
+
+                    <TextView
+                        android:id="@+id/tv_memory_cognize"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="认识"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tv_memory_incognizance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="不认识"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!--横线-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="#CCCCCC" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!--选项模式的选项或记忆模式的加载中或词义-->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <!--选择题模式-->
+                    <include layout="@layout/show_word_abcd" />
+                    <!--显示词性词义-->
+                    <include layout="@layout/show_word_information" />
+                </FrameLayout>
+
+                <!--底部返回，评写，删除-->
+                <include layout="@layout/learn_buttom" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </recitewords.apj.com.recitewords.view.SlidingUpMenu>
+
+</RelativeLayout>
