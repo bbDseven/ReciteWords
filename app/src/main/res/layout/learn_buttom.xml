@@ -11,33 +11,31 @@
         android:layout_marginRight="10dp"
         android:layout_height="1dp"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView
             android:id="@+id/tv_back"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingLeft="8dp"
+            android:layout_alignParentLeft="true"
             android:drawableLeft="@mipmap/back_to"/>
 
         <TextView
-            android:id="@+id/ib_spell"
-            android:layout_width="0dp"
+            android:id="@+id/tv_spell"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:gravity="center"
+            android:layout_centerInParent="true"
             android:drawableBottom="@mipmap/ico_spell"/>
 
 
         <TextView
             android:id="@+id/tv_delete"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:drawableRight="@mipmap/delete"
-            android:paddingRight="8dp"/>
-    </LinearLayout>
+            android:drawableRight="@mipmap/delete" />
+    </RelativeLayout>
 
 </LinearLayout>

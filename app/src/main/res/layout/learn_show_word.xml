@@ -53,7 +53,7 @@
                     android:layout_centerInParent="true"
                     android:gravity="center"
                     android:text="target"
-                    android:textColor="#FF0"
+                    android:textColor="#d1f57f"
                     android:textSize="38sp" />
 
                 <!--音标-->

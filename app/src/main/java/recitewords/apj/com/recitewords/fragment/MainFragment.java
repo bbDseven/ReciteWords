@@ -1,10 +1,8 @@
 package recitewords.apj.com.recitewords.fragment;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,9 +31,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     //主页面背景图片对应单词数组
     private String[] img_words = new String[]{"antler", "ferry", "lotus pond", "mist", "moon", "reading time", "scarecrow", "twinkling",};
     //定义好的8张背景图id数组
-    private int[] imgs = new int[]{R.mipmap.login_background_define01, R.mipmap.login_background_define02, R.mipmap.login_background_define03,
-            R.mipmap.login_background_define04, R.mipmap.login_background_define05, R.mipmap.login_background_define06,
-            R.mipmap.login_background_define07, R.mipmap.login_background_define08,};
+    private int[] imgs = new int[]{R.mipmap.haixin_bg_01, R.mipmap.haixin_bg_02, R.mipmap.haixin_bg_03,
+            R.mipmap.haixin_bg_04, R.mipmap.haixin_bg_05, R.mipmap.haixin_bg_06};
 
     private class ViewHolder {
         RelativeLayout activity_main;
@@ -83,10 +80,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     @Override
     public void initData() {
-        //生成一个随机数
-        num = randomNum();
+            num = randomNum();
         //为主界面设置随机图片和图片对应单词
         holder.activity_main.setBackgroundResource(imgs[num]);
+
         holder.tv_word.setText(img_words[num]);
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
@@ -274,7 +271,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 //跳转到学习界面
                 Intent intent = new Intent(mActivity, LearnActivity.class);
                 intent.putExtra("backgroundNum",num);
-                intent.putExtra("images",imgs);
                 startActivity(intent);
                 break;
             default:
@@ -283,12 +279,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     /**
-     * 生成0 - 7的随机数
+     * 生成0 - 5的随机数
      *
      * @return 随机数
      */
     private int randomNum() {
-        int num = (int) (Math.random() * 8);
+        int num = (int) (Math.random() * 6);
         return num;
     }
 
