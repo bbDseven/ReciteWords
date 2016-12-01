@@ -15,7 +15,7 @@
         android:id="@+id/fl_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#44BB74">
+        >
     </FrameLayout>
 
     <!-- SLIDING LAYOUT -->
@@ -23,6 +23,6 @@
         android:id="@+id/fl_sliding"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#DD22DD">
+        >
     </FrameLayout>
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

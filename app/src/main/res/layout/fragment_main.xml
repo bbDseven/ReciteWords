@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/main_tv_learn"
                 android:layout_alignBottom="@id/main_tv_learn"
-                android:text="0"
+                android:text="20"
                 android:textSize="18sp"
                 android:textColor="#ffff33"
                 />

@@ -42,6 +42,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         TextView tv_word;
         LinearLayout linearLayout;
         ImageView img_sign;
+        ImageView main_img_sign;
         TextView tv_date;
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
@@ -67,6 +68,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.tv_word = findViewByIds(view, R.id.main_tv_word);
         holder.linearLayout = findViewByIds(view, R.id.main_ll);
         holder.img_sign = findViewByIds(view, R.id.main_img_sign);
+        holder.main_img_sign = findViewByIds(view, R.id.main_img_sign);
         holder.tv_date = findViewByIds(view, R.id.main_tv_date);
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn=findViewByIds(view,R.id.main_rl_learn);
@@ -89,6 +91,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
+
+        holder.main_img_sign.setAlpha(150);//主界面签到那里设置透明度
+        holder.linearLayout.getBackground().setAlpha(150);  //主界面学习复习按钮设置透明度
 
         SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
         boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记

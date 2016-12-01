@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
+import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
 public class LearnActivity extends BaseActivity implements View.OnClickListener {
 
@@ -34,6 +35,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener 
         public RelativeLayout rl_learn;   //学习的根布局
         public FrameLayout ll_example;  //例句的根布局
         public LinearLayout ll_show_word;  //顶部显示的单词，音标和学习情况根布局
+        public SlidingUpMenu learn_sliding;
     }
 
     private ViewHolder holder;
@@ -60,6 +62,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener 
         holder.pb_loading=findViewByIds(R.id.pb_loading);
         holder.tv_word_information=findViewByIds(R.id.tv_word_information);
         holder.ll_show_word=findViewByIds(R.id.ll_show_word);
+        holder.learn_sliding = findViewByIds(R.id.learn_sliding);
 
         holder.ll_show_word.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -77,12 +80,13 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener 
         int backgroundNum = intent.getIntExtra("backgroundNum", 0);
         int[] images = intent.getIntArrayExtra("images");
         holder.rl_learn.setBackgroundResource(images[backgroundNum]);
-        holder.rl_learn.getBackground().setAlpha(70);  //更改学习界面透明度
+        holder.learn_sliding.getBackground().setAlpha(150);  //更改学习界面透明度
         holder.ll_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
+        //用Fragment替换帧布局来显示例句
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.ll_example, new ExampleSentenceFragment("aboard"), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.ll_example, new ExampleSentenceFragment("absorb"), FRAGMENT_SENTENCE);
         transaction.commit();
     }
 

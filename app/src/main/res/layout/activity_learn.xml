@@ -8,8 +8,11 @@
     tools:context="recitewords.apj.com.recitewords.activity.LearnActivity">
 
     <recitewords.apj.com.recitewords.view.SlidingUpMenu
+        android:id="@+id/learn_sliding"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#000000"
+        >
 
         <include layout="@layout/example_sentence" />
 

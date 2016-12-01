@@ -16,14 +16,15 @@ import recitewords.apj.com.recitewords.bean.WordExampleSentence;
 import recitewords.apj.com.recitewords.db.dao.ExampleSentenceDao;
 
 /**
+ * 例句的展示
  * Created by Seven on 2016/11/30.
  */
 
 public class ExampleSentenceFragment extends BaseFragment {
     private ViewPager vp;
-    private String word;
-    private ImageView cursor;
-    private List<View> list;
+    private String word;    //单词
+    private ImageView cursor;   //游标图片
+    private List<View> list;    //装View的集合
 
     public ExampleSentenceFragment(String word){
         this.word = word;
@@ -39,12 +40,13 @@ public class ExampleSentenceFragment extends BaseFragment {
     @Override
     public void initData() {
         super.initData();
+        //从数据库获取单词例句
         WordExampleSentence bean = querySentence(word);
         String example_sentence = bean.getExample_sentence();
         String example_sentence_mean = bean.getExample_sentence_mean();
         String[] example_sentence_means = example_sentence_mean.split("。");
         String[] example_sentences = example_sentence.split("\\.");
-//        Log.d("seven", bean.getWord()+bean.getExample_sentence()+bean.getExample_sentence_mean()+example_sentences.length+example_sentences[0]);
+        //将例句设置到View控件中并放入集合
         list = new ArrayList<>();
         for (int i=0; i<example_sentence_means.length; i++){
             View view = View.inflate(mActivity, R.layout.viewpager_example_sentence, null);
@@ -54,8 +56,8 @@ public class ExampleSentenceFragment extends BaseFragment {
             vp_example_sentence_mean.setText(example_sentence_means[i]);
             list.add(view);
         }
-
-        vp.setAdapter(new MyPagerAdapter());
+        vp.setAdapter(new MyPagerAdapter());//ViewPager设置适配器
+        //ViewPager设置页面改变监听
         vp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -64,6 +66,7 @@ public class ExampleSentenceFragment extends BaseFragment {
 
             @Override
             public void onPageSelected(int position) {
+                //如果是ViewPager第二页则将游标设置到最后
                 if (position == 1){
                     cursor.setScaleType(ImageView.ScaleType.FIT_END);
                 }else {
@@ -78,12 +81,14 @@ public class ExampleSentenceFragment extends BaseFragment {
         });
     }
 
+    //查询数据库例句获取实体对象
     private WordExampleSentence querySentence(String word) {
         ExampleSentenceDao dao = new ExampleSentenceDao(mActivity);
         WordExampleSentence bean = dao.query(word);
         return bean;
     }
 
+    //适配器
     class MyPagerAdapter extends PagerAdapter{
 
         @Override
