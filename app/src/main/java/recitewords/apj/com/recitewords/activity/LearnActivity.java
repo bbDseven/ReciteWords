@@ -19,18 +19,19 @@ import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
 /**
  * Created by CGT on 2016/11/31.
- *
+ * <p/>
  * 学习界面的Activity
  */
 
-public class LearnActivity extends BaseActivity implements View.OnClickListener, ViewTreeObserver.OnGlobalLayoutListener {
+public class LearnActivity extends BaseActivity implements View.OnClickListener,
+        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener {
 
     //定义好的8张背景图id数组
     private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
-            R.mipmap.haixin_bg_dim_03,R.mipmap.haixin_bg_dim_04,
+            R.mipmap.haixin_bg_dim_03, R.mipmap.haixin_bg_dim_04,
             R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
 
-    public class ViewHolder {
+    public static class ViewHolder {
         public LinearLayout ll_choice;  //选择题模式--中间按钮--不认识
         public LinearLayout ll_incognizance;   //不认识--中间按钮
         public LinearLayout ll_memory;   //回忆模式--中间按钮
@@ -51,13 +52,14 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         public TextView tv_spell;  //底部拼写按钮
         public TextView tv_delete;  //底部删除按钮
 
-        public SlidingUpMenu learn_sliding;  //上下滑动控件
+        public static SlidingUpMenu learn_sliding;  //上下滑动控件
 
     }
 
     private ViewHolder holder;
     private final String FRAGMENT_SENTENCE = "fragment_sentence";
     private int backgroundNum;  //背景图片序号
+    private OnToggleListner mOnToggleListner;  //监听例句显示状态
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,11 +86,9 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_back = findViewByIds(R.id.tv_back);
         holder.tv_spell = findViewByIds(R.id.tv_spell);
         holder.tv_delete = findViewByIds(R.id.tv_delete);
-
     }
 
     private void initData() {
-
         Intent intent = getIntent();
         backgroundNum = intent.getIntExtra("backgroundNum", 0);
         //设置学习界面的背景图片与主页面的背景图片动态一致
@@ -115,6 +115,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_spell.setOnClickListener(this);
         //监听底部删除单词按钮
         holder.tv_delete.setOnClickListener(this);
+        //监听例句是否显示
+        holder.learn_sliding.setOnToggleListener(this);
     }
 
     //点击事件回调方法
@@ -158,5 +160,23 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.fl_example.setMinimumHeight(height);  //设置例句高度
         holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);
     }
+
+    //监听例句是否显示
+    @Override
+    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
+        if (mOnToggleListner != null) {
+            mOnToggleListner.onToggleChange(view,isOpen);
+        }
+    }
+
+
+    public void setOnToggleListener(OnToggleListner listener) {
+        this.mOnToggleListner = listener;
+    }
+
+    public interface OnToggleListner {
+        void onToggleChange(SlidingUpMenu view, boolean isOpen);
+    }
+
 
 }
