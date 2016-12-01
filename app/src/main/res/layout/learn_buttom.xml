@@ -19,7 +19,6 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingLeft="8dp"
             android:drawableLeft="@mipmap/back_to"/>
 
         <TextView
@@ -36,8 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:drawableRight="@mipmap/delete"
-            android:paddingRight="8dp"/>
+            android:drawableRight="@mipmap/delete" />
     </LinearLayout>
 
 </LinearLayout>

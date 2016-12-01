@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:id="@+id/ll_abcd"
     android:gravity="center_vertical"
     android:visibility="visible"
@@ -9,8 +9,10 @@
 
     <LinearLayout
         android:id="@+id/ll_A"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -18,8 +20,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="A"
-            android:textColor="#FF0"
-            android:textSize="26sp" />
+            android:textColor="#d1f57f"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_A"
@@ -42,8 +44,10 @@
         android:layout_height="1dp"/>
     <LinearLayout
         android:id="@+id/ll_"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -51,8 +55,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="B"
-            android:textColor="#FF0"
-            android:textSize="26sp" />
+            android:textColor="#d1f57f"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_B"
@@ -76,8 +80,10 @@
         android:layout_height="1dp"/>
     <LinearLayout
         android:id="@+id/ll_C"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -85,8 +91,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="C"
-            android:textColor="#FF0"
-            android:textSize="26sp" />
+            android:textColor="#d1f57f"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_C"
@@ -103,16 +109,18 @@
     </LinearLayout>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:background="#CCCCCC"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_height="1dp"/>
+    android:layout_width="match_parent"
+    android:background="#CCCCCC"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_height="1dp"/>
 
     <LinearLayout
         android:id="@+id/ll_D"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -120,8 +128,8 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="D"
-            android:textColor="#FF0"
-            android:textSize="26sp" />
+            android:textColor="#d1f57f"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_D"
