@@ -115,8 +115,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 , "我们应该能够应付各种困难。她和我打20英镑的赌，说我戒不了烟", "[ˈebəl]", "网上");
         dao_example_sentence.insert("aboard","Little Tom and the sailors spent two months aboard.All passengers aboard fell into the river"
                 , "小汤姆和水手们在船上过了两个月。船上所有乘客皆落入河中", "[əˈbɔ:rd]", "网上");
-        dao_example_sentence.insert("about","No matter where you go in life or how old you get, there's always something new to learnabout,After all, life is full of surprises.Instead of complaining about what's wrong, be grateful for what's right"
-                , "不管你生活在哪里，你有多少岁，总有新东西要学习，毕竟，生活总是充满惊喜。别抱怨不好的事，要对好的事心存感恩", "[əˈbaʊt]", "网上");
+        dao_example_sentence.insert("about","If you're not satisfied with the life you're living, don't just complain,Do something about it.Instead of complaining about what's wrong, be grateful for what's right"
+                , "对于现况的不满，不能只是抱怨，要有勇气作出改变。别抱怨不好的事，要对好的事心存感恩", "[əˈbaʊt]", "网上");
         dao_example_sentence.insert("abroad","He is travelling abroad.The news spread abroad"
                 , "他要到国外旅行。那消息四处传播", "[əˈbrɔd]", "网上");
         dao_example_sentence.insert("absorb","The material can absorb outward-going radiation from the Earth. The banks would be forced to absorb large losses"

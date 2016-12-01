@@ -1,19 +1,24 @@
 package recitewords.apj.com.recitewords.fragment;
 
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.bean.WordExampleSentence;
 import recitewords.apj.com.recitewords.db.dao.ExampleSentenceDao;
+import recitewords.apj.com.recitewords.util.MediaUtils;
 
 /**
  * 例句的展示
@@ -25,6 +30,8 @@ public class ExampleSentenceFragment extends BaseFragment {
     private String word;    //单词
     private ImageView cursor;   //游标图片
     private List<View> list;    //装View的集合
+    private LinearLayout sentence_pronounce; //例句点击发音
+
 
     public ExampleSentenceFragment(String word){
         this.word = word;
@@ -52,6 +59,8 @@ public class ExampleSentenceFragment extends BaseFragment {
             View view = View.inflate(mActivity, R.layout.viewpager_example_sentence, null);
             TextView vp_example_sentence = (TextView) view.findViewById(R.id.vp_example_sentence);
             TextView vp_example_sentence_mean = (TextView) view.findViewById(R.id.vp_example_sentence_mean);
+            sentence_pronounce = (LinearLayout) view.findViewById(R.id.sentence_pronounce);
+            setSentence_pronounce();
             vp_example_sentence.setText(example_sentences[i]);
             vp_example_sentence_mean.setText(example_sentence_means[i]);
             list.add(view);
@@ -77,6 +86,17 @@ public class ExampleSentenceFragment extends BaseFragment {
             @Override
             public void onPageScrollStateChanged(int state) {
 
+            }
+        });
+
+    }
+
+    //例句设置监听，点击播放单词
+    private void setSentence_pronounce(){
+        sentence_pronounce.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MediaUtils.playWord(mActivity, 5);
             }
         });
     }
