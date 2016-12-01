@@ -1,11 +1,15 @@
 package recitewords.apj.com.recitewords.activity;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import recitewords.apj.com.recitewords.R;
+import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 
 public class LearnActivity extends BaseActivity {
 
@@ -19,6 +23,7 @@ public class LearnActivity extends BaseActivity {
         public TextView tv_memory_cognize;  //回忆模式--认识
         public TextView tv_memory_incognizance;  //回忆模式--不认识
         public RelativeLayout rl_learn;   //学习的根布局
+        public LinearLayout ll_example;  //例句的根布局
     }
 
     private ViewHolder holder;
@@ -27,7 +32,6 @@ public class LearnActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn);
-
         initView();
         initData();
         initEvent();
@@ -36,13 +40,22 @@ public class LearnActivity extends BaseActivity {
     private void initView() {
         holder=new ViewHolder();
         holder.rl_learn=findViewByIds(R.id.rl_learn);
-
+        holder.ll_example = (LinearLayout) findViewById(R.id.ll_example);
     }
 
     private void initData() {
 
-        holder.rl_learn.getBackground().setAlpha(100);
+        Intent intent = getIntent();
+        int backgroundNum = intent.getIntExtra("backgroundNum", 0);
+        int[] images = intent.getIntArrayExtra("images");
+        holder.rl_learn.setBackgroundResource(images[backgroundNum]);
+        holder.rl_learn.getBackground().setAlpha(70);  //更改学习界面透明度
+        holder.ll_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.ll_example, new ExampleSentenceFragment("target"));
+        transaction.commit();
     }
 
     private void initEvent() {

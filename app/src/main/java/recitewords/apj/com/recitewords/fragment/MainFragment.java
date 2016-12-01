@@ -51,6 +51,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private Context mContext;
     private boolean show_navigate_state = false;
     private MainActivity mainActivity;
+    private  int num;  //背景图片的序号
 
     //带参构造方法
     public MainFragment(Context context) {
@@ -81,7 +82,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     @Override
     public void initData() {
         //生成一个随机数
-        int num = randomNum();
+        num = randomNum();
         //为主界面设置随机图片和图片对应单词
         holder.activity_main.setBackgroundResource(imgs[num]);
         holder.tv_word.setText(img_words[num]);
@@ -266,7 +267,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.main_tv_learn:
                 //跳转到学习界面
-                startActivity(new Intent(mActivity, LearnActivity.class));
+                Intent intent = new Intent(mActivity, LearnActivity.class);
+                intent.putExtra("backgroundNum",num);
+                intent.putExtra("images",imgs);
+                startActivity(intent);
                 break;
             default:
                 break;
@@ -282,5 +286,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int num = (int) (Math.random() * 8);
         return num;
     }
+
+
 
 }
