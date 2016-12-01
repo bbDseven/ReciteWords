@@ -22,6 +22,11 @@
         android:layout_marginTop="10dp"
         />
     <LinearLayout
+        android:id="@+id/sentence_pronounce"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -41,5 +46,6 @@
             android:text="我是个煞笔。"
             android:textSize="18sp"
             android:textColor="#ffffff"/>
+    </LinearLayout>
     </LinearLayout>
 </LinearLayout>

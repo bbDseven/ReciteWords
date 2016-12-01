@@ -86,7 +86,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener 
         //用Fragment替换帧布局来显示例句
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.ll_example, new ExampleSentenceFragment("absorb"), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.ll_example, new ExampleSentenceFragment("about"), FRAGMENT_SENTENCE);
         transaction.commit();
     }
 
