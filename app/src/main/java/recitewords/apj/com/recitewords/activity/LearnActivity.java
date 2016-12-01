@@ -31,6 +31,10 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         public RelativeLayout rl_learn;   //学习的根布局
         public FrameLayout fl_example;  //例句的根布局
         public LinearLayout ll_show_word;  //顶部显示的单词，音标和学习情况根布局
+
+        public TextView tv_back;  //底部返回按钮
+        public TextView tv_spell;  //底部拼写按钮
+        public TextView tv_delete;  //底部删除按钮
     }
 
     private ViewHolder holder;
@@ -56,6 +60,10 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.pb_loading=findViewByIds(R.id.pb_loading);
         holder.tv_word_information=findViewByIds(R.id.tv_word_information);
         holder.ll_show_word=findViewByIds(R.id.ll_show_word);
+
+        holder.tv_back=findViewByIds(R.id.tv_back);
+        holder.tv_spell=findViewByIds(R.id.tv_back);
+        holder.tv_delete=findViewByIds(R.id.tv_back);
 
     }
 
