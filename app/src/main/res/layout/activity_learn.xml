@@ -4,15 +4,13 @@
     android:id="@+id/rl_learn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/background_color"
     tools:context="recitewords.apj.com.recitewords.activity.LearnActivity">
 
     <recitewords.apj.com.recitewords.view.SlidingUpMenu
+        android:background="#000"
         android:id="@+id/learn_sliding"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000000"
-        >
+        android:layout_height="match_parent">
 
         <include layout="@layout/example_sentence" />
 

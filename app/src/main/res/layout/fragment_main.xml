@@ -18,7 +18,7 @@
             android:id="@+id/main_img_circle"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@mipmap/login_background_define01"
+            android:src="@mipmap/haixin_bg_02"
             app:civ_border_width="2dp"
             app:civ_border_color="#ffffff" />
 

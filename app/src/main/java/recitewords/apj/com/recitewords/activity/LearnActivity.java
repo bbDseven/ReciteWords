@@ -19,6 +19,11 @@ import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
 public class LearnActivity extends BaseActivity implements View.OnClickListener, ViewTreeObserver.OnGlobalLayoutListener {
 
+    //定义好的8张背景图id数组
+    private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
+            R.mipmap.haixin_bg_dim_03,R.mipmap.haixin_bg_dim_04,
+            R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
+
     public class ViewHolder {
         public LinearLayout ll_choice;  //选择题模式--中间按钮--不认识
         public LinearLayout ll_incognizance;   //不认识--中间按钮
@@ -46,6 +51,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
 
     private ViewHolder holder;
     private final String FRAGMENT_SENTENCE = "fragment_sentence";
+    private int backgroundNum;  //背景图片序号
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +84,11 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     private void initData() {
 
         Intent intent = getIntent();
-        int backgroundNum = intent.getIntExtra("backgroundNum", 0);
-        int[] images = intent.getIntArrayExtra("images");
+        backgroundNum = intent.getIntExtra("backgroundNum", 0);
+        //设置学习界面的背景图片与主页面的背景图片动态一致
         holder.rl_learn.setBackgroundResource(images[backgroundNum]);
 
-        holder.learn_sliding.getBackground().setAlpha(70);  //更改学习界面透明度
+        holder.learn_sliding.getBackground().setAlpha(100);  //更改学习界面透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
         //用Fragment替换帧布局来显示例句
@@ -121,7 +127,10 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.tv_back:
                 //保存数据，显示progressbar,返回主页面
-                startActivity(new Intent(LearnActivity.this, MainActivity.class));
+//                Intent intent = new Intent(LearnActivity.this, MainActivity.class);
+//                intent.putExtra("backgroundNum",backgroundNum);
+//                startActivity(intent);
+                finish();
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
@@ -143,6 +152,5 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.fl_example.setMinimumHeight(height);  //设置例句高度
         holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);
     }
-
 
 }
