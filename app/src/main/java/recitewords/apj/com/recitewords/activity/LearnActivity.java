@@ -17,6 +17,12 @@ import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
+/**
+ * Created by CGT on 2016/11/31.
+ *
+ * 学习界面的Activity
+ */
+
 public class LearnActivity extends BaseActivity implements View.OnClickListener, ViewTreeObserver.OnGlobalLayoutListener {
 
     //定义好的8张背景图id数组
@@ -88,7 +94,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         //设置学习界面的背景图片与主页面的背景图片动态一致
         holder.rl_learn.setBackgroundResource(images[backgroundNum]);
 
-        holder.learn_sliding.getBackground().setAlpha(100);  //更改学习界面透明度
+        holder.learn_sliding.getBackground().setAlpha(120);  //更改学习界面透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
         //用Fragment替换帧布局来显示例句
