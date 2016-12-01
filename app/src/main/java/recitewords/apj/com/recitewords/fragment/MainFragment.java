@@ -265,7 +265,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 mainActivity.setNavigateShowState(!navigateShowState);
                 Log.e("ha", "点击了，状态后为：" + navigateShowState);
                 break;
-            case R.id.main_tv_learn:
+            case R.id.main_rl_learn:
                 //跳转到学习界面
                 Intent intent = new Intent(mActivity, LearnActivity.class);
                 intent.putExtra("backgroundNum",num);
