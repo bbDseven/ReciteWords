@@ -1,8 +1,10 @@
 package recitewords.apj.com.recitewords.fragment;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +42,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         TextView tv_word;
         LinearLayout linearLayout;
         ImageView img_sign;
+        ImageView main_img_sign;
         TextView tv_date;
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
@@ -61,11 +64,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder = new ViewHolder();
         mainActivity = (MainActivity) mActivity;
         View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_main, null);
-
         holder.activity_main = findViewByIds(view, R.id.activity_main);
         holder.tv_word = findViewByIds(view, R.id.main_tv_word);
         holder.linearLayout = findViewByIds(view, R.id.main_ll);
         holder.img_sign = findViewByIds(view, R.id.main_img_sign);
+        holder.main_img_sign = findViewByIds(view, R.id.main_img_sign);
         holder.tv_date = findViewByIds(view, R.id.main_tv_date);
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn=findViewByIds(view,R.id.main_rl_learn);
@@ -88,6 +91,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
+
+        holder.main_img_sign.setAlpha(150);//主界面签到那里设置透明度
+        holder.linearLayout.getBackground().setAlpha(150);  //主界面学习复习按钮设置透明度
 
         SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
         boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记
@@ -112,14 +118,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 , "我们应该能够应付各种困难。她和我打20英镑的赌，说我戒不了烟", "[ˈebəl]", "网上");
         dao_example_sentence.insert("aboard","Little Tom and the sailors spent two months aboard.All passengers aboard fell into the river"
                 , "小汤姆和水手们在船上过了两个月。船上所有乘客皆落入河中", "[əˈbɔ:rd]", "网上");
-        dao_example_sentence.insert("about","No matter where you go in life or how old you get, there's always something new to learnabout. After all, life is full of surprises.Instead of complaining about what's wrong, be grateful for what's right.If you're not satisfied with the life you're living, don't just complain, Do something about it."
-                , "不管你生活在哪里，你有多少岁，总有新东西要学习，毕竟，生活总是充满惊喜。别抱怨不好的事，要对好的事心存感恩。对于现况的不满，不能只是抱怨，要有勇气作出改变", "[əˈbaʊt]", "网上");
+        dao_example_sentence.insert("about","No matter where you go in life or how old you get, there's always something new to learnabout,After all, life is full of surprises.Instead of complaining about what's wrong, be grateful for what's right"
+                , "不管你生活在哪里，你有多少岁，总有新东西要学习，毕竟，生活总是充满惊喜。别抱怨不好的事，要对好的事心存感恩", "[əˈbaʊt]", "网上");
         dao_example_sentence.insert("abroad","He is travelling abroad.The news spread abroad"
                 , "他要到国外旅行。那消息四处传播", "[əˈbrɔd]", "网上");
-        dao_example_sentence.insert("absorb","The material can absorb outward-going radiation from the Earth. The banks would be forced to absorb large losses.His ability to absorb bits of disconnected information was astonishing"
-                , "该物质可以吸收地球向外辐射的能量。银行将被迫承受巨大的损失。他吸收利用互不相关的零碎信息的能耐惊人", "[əbˈsɔ:rb]", "网上");
-        dao_example_sentence.insert("angry","They get angry if they think they are being treated disrespectfully.Sarah came forward with a tight and angry face.I felt incredibly ashamed of myself for getting so angry"
-                , "他们要是觉得受到了怠慢，就会大动肝火。萨拉走上前来，紧绷着脸，怒气冲冲。我对自己发那么大的火而深感惭愧", "[ˈæŋɡri]", "网上");
+        dao_example_sentence.insert("absorb","The material can absorb outward-going radiation from the Earth. The banks would be forced to absorb large losses"
+                , "该物质可以吸收地球向外辐射的能量。银行将被迫承受巨大的损失", "[əbˈsɔ:rb]", "网上");
+        dao_example_sentence.insert("angry","They get angry if they think they are being treated disrespectfully.Sarah came forward with a tight and angry face"
+                , "他们要是觉得受到了怠慢，就会大动肝火。萨拉走上前来，紧绷着脸，怒气冲冲", "[ˈæŋɡri]", "网上");
         dao_example_sentence.insert("animal","The jackal is a wild animal in Africa and Asia.This small animal has a pair of brown eyes"
                 , "豺狼是产于亚非的一种野生动物。这只小动物有一双棕色的眼睛", "[ˈænəməl]", "网上");
         dao_example_sentence.insert("anniversary","He gave me a necklace as an anniversary gift.How did you celebrate your wedding anniversary?"
@@ -128,8 +134,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 , "她正计划宣布她和彼得订婚一事。她急不可待想宣布这个消息，但却发过誓要守口如瓶", "[əˈnaʊns]", "网上");
         dao_example_sentence.insert("bankrupt","If your liabilities exceed your assets, you may go bankrupt.I was bankrupt and unable to pay his debts"
                 , "如果你所负的债超过你的资产，你就会破产。我破产了，不能偿还他的债务", "[ˈbæŋkˌrʌpt, -rəpt]", "网上");
-        dao_example_sentence.insert("barber","She had to call a barber to shave him.She asked the barber to crop her hair short.The barber gave him a shave and a haircut"
-                , "她不得不叫个理发师来给他刮脸。她叫理发师把她的头发剪短了。理发师给他修面理发", "[ˈbɑ:rbə(r)]", "网上");
+        dao_example_sentence.insert("barber","She had to call a barber to shave him.She asked the barber to crop her hair short"
+                , "她不得不叫个理发师来给他刮脸。她叫理发师把她的头发剪短了", "[ˈbɑ:rbə(r)]", "网上");
         dao_example_sentence.insert("computer","I'm getting a new computer for birthday present.This computer company was established last year"
                 , "我得到一台电脑作生日礼物。这家电脑公司是去年成立的", "[kəmˈpjutɚ]", "网上");
         dao_example_sentence.insert("economic","Economic analysis displays its effectiveness in tackling pollution.They had led the country into economic disaster"
@@ -140,8 +146,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 , "他因谋杀未遂罪坐了很长时间的牢。警察来到谋杀现场", "[ˈmɜ:rdə(r)]", "网上");
         dao_example_sentence.insert("progress","The student is showing rapid progress in his studies.Physics has made enormous progress in this century"
                 , "这个学生学习上进步很快。本世纪物理学的发展突飞猛进", "[ˈprɑ:gres]", "网上");
-        dao_example_sentence.insert("religious","She was a fairly rigid person who had strong religious views.The teenager may have been abducted by a religious cult.A religious psychotic in Las Vegas has killed four people"
-                , "她相当顽固，宗教观念极强。这个少年可能被一个异教组织绑架了。拉斯维加斯一名患有精神病的宗教狂热分子已经杀死了4人", "[rɪˈlɪdʒəs]", "网上");
+        dao_example_sentence.insert("religious","She was a fairly rigid person who had strong religious views.The teenager may have been abducted by a religious cult"
+                , "她相当顽固，宗教观念极强。这个少年可能被一个异教组织绑架了", "[rɪˈlɪdʒəs]", "网上");
         dao_example_sentence.insert("smart","I'm a smart girl that speaks with a smart accent.A few months ago they opened a new shop catering exclusively to the smart set"
                 , "我是个机灵的姑娘，说话带有时髦的腔调。几个月前他们新开了一家商店，专门向最时髦的人士出售物品", "[smɑ:rt]", "网上");
     }
