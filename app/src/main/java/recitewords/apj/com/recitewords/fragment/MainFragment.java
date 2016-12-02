@@ -14,6 +14,7 @@ import android.widget.TextView;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LearnActivity;
 import recitewords.apj.com.recitewords.activity.MainActivity;
+import recitewords.apj.com.recitewords.activity.ReviewActivity;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.ExampleSentenceDao;
 import recitewords.apj.com.recitewords.db.dao.LexiconDao;
@@ -43,6 +44,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         TextView tv_date;
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
+        RelativeLayout main_rl_review;
     }
 
     private ViewHolder holder;
@@ -69,6 +71,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.tv_date = findViewByIds(view, R.id.main_tv_date);
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn=findViewByIds(view,R.id.main_rl_learn);
+        holder.main_rl_review = findViewByIds(view, R.id.main_rl_review);
         return view;
     }
 
@@ -76,6 +79,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public void initEvent() {
         holder.iv_menu.setOnClickListener(this);
         holder.main_rl_learn.setOnClickListener(this);
+        holder.main_rl_review.setOnClickListener(this);
     }
 
     @Override
@@ -272,6 +276,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 Intent intent = new Intent(mActivity, LearnActivity.class);
                 intent.putExtra("backgroundNum",num);
                 startActivity(intent);
+                break;
+            case R.id.main_rl_review:
+                //跳转到复习界面
+                Intent intent_review = new Intent(mActivity, ReviewActivity.class);
+                intent_review.putExtra("backgroundNum",num);
+                startActivity(intent_review);
                 break;
             default:
                 break;
