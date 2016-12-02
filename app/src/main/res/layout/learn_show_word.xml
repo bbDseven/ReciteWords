@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--学习页面上部分布局，显示单词信息，及学习情况-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:id="@+id/ll_show_word"
