@@ -1,31 +1,29 @@
 package recitewords.apj.com.recitewords.fragment;
 
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
+import recitewords.apj.com.recitewords.activity.LearnActivity;
 import recitewords.apj.com.recitewords.bean.WordExampleSentence;
 import recitewords.apj.com.recitewords.db.dao.ExampleSentenceDao;
 import recitewords.apj.com.recitewords.util.MediaUtils;
+import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
 /**
  * 例句的展示
  * Created by Seven on 2016/11/30.
  */
 
-public class ExampleSentenceFragment extends BaseFragment {
+public class ExampleSentenceFragment extends BaseFragment implements LearnActivity.OnToggleListner {
     private ViewPager vp;
     private String word;    //单词
     private ImageView cursor;   //游标图片
@@ -33,9 +31,10 @@ public class ExampleSentenceFragment extends BaseFragment {
     private LinearLayout sentence_pronounce; //例句点击发音
 
 
-    public ExampleSentenceFragment(String word){
+    public ExampleSentenceFragment(String word) {
         this.word = word;
     }
+
     @Override
     public View initView() {
         View view = View.inflate(mActivity, R.layout.fragment_example_sentence, null);
@@ -43,6 +42,7 @@ public class ExampleSentenceFragment extends BaseFragment {
         cursor = (ImageView) view.findViewById(R.id.vp_cursor);
         return view;
     }
+
 
     @Override
     public void initData() {
@@ -55,7 +55,7 @@ public class ExampleSentenceFragment extends BaseFragment {
         String[] example_sentences = example_sentence.split("\\.");
         //将例句设置到View控件中并放入集合
         list = new ArrayList<>();
-        for (int i=0; i<example_sentence_means.length; i++){
+        for (int i = 0; i < example_sentence_means.length; i++) {
             View view = View.inflate(mActivity, R.layout.viewpager_example_sentence, null);
             TextView vp_example_sentence = (TextView) view.findViewById(R.id.vp_example_sentence);
             TextView vp_example_sentence_mean = (TextView) view.findViewById(R.id.vp_example_sentence_mean);
@@ -66,6 +66,11 @@ public class ExampleSentenceFragment extends BaseFragment {
             list.add(view);
         }
         vp.setAdapter(new MyPagerAdapter());//ViewPager设置适配器
+
+        //监听例句是否显示，显示自动播放例句
+        LearnActivity learnActivity = (LearnActivity) mActivity;
+        learnActivity.setOnToggleListener(this);
+
         //ViewPager设置页面改变监听
         vp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -76,9 +81,9 @@ public class ExampleSentenceFragment extends BaseFragment {
             @Override
             public void onPageSelected(int position) {
                 //如果是ViewPager第二页则将游标设置到最后
-                if (position == 1){
+                if (position == 1) {
                     cursor.setScaleType(ImageView.ScaleType.FIT_END);
-                }else {
+                } else {
                     cursor.setScaleType(ImageView.ScaleType.FIT_START);
                 }
             }
@@ -92,7 +97,7 @@ public class ExampleSentenceFragment extends BaseFragment {
     }
 
     //例句设置监听，点击播放单词
-    private void setSentence_pronounce(){
+    private void setSentence_pronounce() {
         sentence_pronounce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,8 +113,19 @@ public class ExampleSentenceFragment extends BaseFragment {
         return bean;
     }
 
+
+    //监听例句显示状态回调方法
+    @Override
+    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
+        if (isOpen) {
+            //显示例句
+            MediaUtils.playWord(mActivity, 5);
+        }
+        // Toast.makeText(mActivity,"当前状态为："+isOpen,Toast.LENGTH_LONG).show();
+    }
+
     //适配器
-    class MyPagerAdapter extends PagerAdapter{
+    class MyPagerAdapter extends PagerAdapter {
 
         @Override
         public int getCount() {

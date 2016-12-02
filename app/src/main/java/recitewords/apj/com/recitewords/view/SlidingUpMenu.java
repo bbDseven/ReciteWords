@@ -19,6 +19,7 @@ public class SlidingUpMenu extends ViewGroup {
     private float mDownX;
     private float mDownY;
     private boolean mUpMenuOpen=false;  //是否打开头部菜单栏
+    private OnToggleListener mListener;
 
     private Scroller scroller;
 
@@ -129,6 +130,9 @@ public class SlidingUpMenu extends ViewGroup {
      */
     private void switchMenu(boolean isTop) {
 
+        if (mListener!=null){
+            mListener.onToggleChange(this,isTop);
+        }
         this.mUpMenuOpen=isTop;
 
         if (isTop) {
@@ -194,4 +198,17 @@ public class SlidingUpMenu extends ViewGroup {
     public void closeMenu(){
         switchMenu(false);
     }
+
+    /**
+     * 监听头部菜单状态
+     * @param listener  监听者
+     */
+    public void setOnToggleListener(OnToggleListener listener){
+        this.mListener=listener;
+    }
+
+    public interface  OnToggleListener{
+        void onToggleChange(SlidingUpMenu view,boolean isOpen);
+    }
+
 }
