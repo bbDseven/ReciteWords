@@ -16,10 +16,12 @@ import android.widget.Toast;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
+import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
 import recitewords.apj.com.recitewords.view.CircleProgressView;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
-public class ReviewActivity extends BaseActivity implements View.OnClickListener, ViewTreeObserver.OnGlobalLayoutListener{
+public class ReviewActivity extends BaseActivity implements View.OnClickListener,
+        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener {
     //定义好的8张背景图id数组
     private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
             R.mipmap.haixin_bg_dim_03,R.mipmap.haixin_bg_dim_04,
@@ -28,7 +30,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private ViewHolder holder;
     private int num = 4; //定义4秒
     private Message msg;
-    private final String FRAGMENT_SENTENCE = "fragment_sentence";
+    private final String FRAGMENT_SENTENCE = "fragment_sentence_review";
+    private OnmToggleListener mOnToggleListener;   //监听例句显示状态
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -59,9 +62,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             return false;
         }
     });
-
-
-
 
     private class ViewHolder{
         RelativeLayout rl_review;   //复习页面根布局
@@ -128,6 +128,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_back.setOnClickListener(this);
         holder.tv_spell.setOnClickListener(this);
         holder.tv_delete.setOnClickListener(this);
+        holder.review_sliding.setOnToggleListener(this);
     }
 
     private void init_data(){
@@ -187,7 +188,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 holder.progress.setVisibility(View.VISIBLE);   //显示进度条
                 break;
             case R.id.tv_back:
-                finish();
+                Toast.makeText(this, "点击了返回按钮，功能还没写", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.tv_spell:
                 Toast.makeText(this, "点击了拼写按钮，功能还没写", Toast.LENGTH_SHORT).show();
@@ -218,7 +219,22 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private void init_fragment(){
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment("abroad"), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review("abroad"), FRAGMENT_SENTENCE);
         transaction.commit();
     }
+
+
+    @Override
+    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
+        if (mOnToggleListener != null) {
+            mOnToggleListener.onmToggleChange(view,isOpen);
+        }
+    }
+    public void setmOnToggleListener(OnmToggleListener listener){
+        this.mOnToggleListener = listener;
+    }
+    public interface OnmToggleListener{
+        void onmToggleChange(SlidingUpMenu view, boolean isOpen);
+    }
+
 }
