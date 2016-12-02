@@ -1,19 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?><!--拼写界面布局-->
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/spell_rl_root"
-    android:background="@mipmap/haixin_bg_dim_03"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="recitewords.apj.com.recitewords.activity.SpellActivity">
 
-    <RelativeLayout
-        android:id="@+id/spell_rl_back"
-        android:background="#000"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-
-    </RelativeLayout>
 
     <!--关闭-->
     <TextView
@@ -31,18 +22,9 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="50dp"
-        android:textCursorDrawable="@drawable/edit_color_cursor"
         android:gravity="center"
-        android:background="@null"
+        android:text="哈哈哈哈"
         android:textSize="26sp" />
-    <ImageView
-        android:layout_below="@id/spell_et_input"
-        android:layout_width="match_parent"
-        android:background="#FFFFFF"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_height="1dp"/>
-
 
     <TextView
         android:id="@+id/spell_tv_correct"
@@ -51,12 +33,10 @@
         android:layout_below="@+id/spell_et_input"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:visibility="invisible"
         android:text="哈哈哈哈"
         android:textSize="26sp" />
 
     <RelativeLayout
-        android:id="@+id/spell_rl_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -82,5 +62,6 @@
             android:layout_marginRight="15dp"
             android:background="@mipmap/ic_spell_confirm" />
     </RelativeLayout>
+
 
 </RelativeLayout>

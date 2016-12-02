@@ -18,6 +18,7 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
             android:layout_alignParentLeft="true"
             android:drawableLeft="@mipmap/back_to"/>
 
@@ -26,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:clickable="true"
             android:layout_centerInParent="true"
             android:drawableBottom="@mipmap/ico_spell"/>
 
@@ -34,6 +36,7 @@
             android:id="@+id/tv_delete"
             android:layout_width="wrap_content"
             android:layout_alignParentRight="true"
+            android:clickable="true"
             android:layout_height="match_parent"
             android:drawableRight="@mipmap/delete" />
     </RelativeLayout>
