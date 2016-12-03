@@ -116,7 +116,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         //设置学习界面的背景图片与主页面的背景图片动态一致
         holder.rl_learn.setBackgroundResource(images[backgroundNum]);
 
-        holder.learn_sliding.getBackground().setAlpha(120);  //更改学习界面透明度
+        holder.learn_sliding.getBackground().setAlpha(180);  //更改学习界面透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
         //用Fragment替换帧布局来显示例句
@@ -176,12 +176,11 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 holder.spell_tv_confirm = UIUtil.findViewByIds(view, R.id.spell_tv_confirm);
                 holder.spell_tv_prompt = UIUtil.findViewByIds(view, R.id.spell_tv_prompt);
                 holder.spell_rl_back = UIUtil.findViewByIds(view, R.id.spell_rl_back);
-                holder.spell_rl_root.setBackgroundResource(images[backgroundNum]);
-                holder.spell_rl_back = UIUtil.findViewByIds(view, R.id.spell_rl_back);
                 holder.spell_rl_bottom = UIUtil.findViewByIds(view, R.id.spell_rl_bottom);
 
+                holder.spell_rl_root.setBackgroundResource(images[backgroundNum]);
                 //设置黑色背景透明度，模糊化背景图片
-                holder.spell_rl_back.getBackground().setAlpha(210);
+               // holder.spell_rl_back.getBackground().setAlpha(210);
                 //底部暗灰色导航条，使背景模糊化
                 holder.spell_rl_bottom.getBackground().setAlpha(170);
 
@@ -231,7 +230,6 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                     MediaUtils.playWord(this, 5);  //播放单词
                     holder.spell_tv_correct.setText(mWord);  //显示正确的单词
                     holder.spell_tv_correct.setVisibility(View.VISIBLE);
-
                 }
                 havaing_comfirm = true;  //改变是否比较状态
                 break;
