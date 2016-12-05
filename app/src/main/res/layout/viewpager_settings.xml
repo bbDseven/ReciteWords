@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@mipmap/background_color">
 
     <TextView
@@ -11,4 +9,12 @@
         android:layout_height="wrap_content"
         android:text="view_settings"
         android:textColor="@android:color/white"/>
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_banner_settings"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+    </LinearLayout>
+</RelativeLayout>

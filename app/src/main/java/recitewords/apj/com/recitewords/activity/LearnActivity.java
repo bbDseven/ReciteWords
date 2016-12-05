@@ -202,7 +202,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.spell_tv_prompt:
                 //提示用户的单词信息，显示音标和读音
-                MediaUtils.playWord(this, 5);  //播放单词
+                MediaUtils.playWord(this, "abroad");  //播放单词
                 //获取底部导航栏高度，让土司显示在中间
                 int height = holder.spell_rl_bottom.getHeight();
                 int time=3000;  //提示时间3秒
@@ -224,11 +224,11 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 if (word.equals(mWord)) {
                     //改变文字颜色--淡黄
                     holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
-                    MediaUtils.playWord(this, 5);  //播放单词
+                    MediaUtils.playWord(this, "abroad");  //播放单词
                 } else {
                     //改变文字颜色--红色
                     holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
-                    MediaUtils.playWord(this, 5);  //播放单词
+                    MediaUtils.playWord(this, "abroad");  //播放单词
                     holder.spell_tv_correct.setText(mWord);  //显示正确的单词
                     holder.spell_tv_correct.setVisibility(View.VISIBLE);
 
