@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -20,10 +22,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import recitewords.apj.com.recitewords.R;
+import recitewords.apj.com.recitewords.bean.Book;
+import recitewords.apj.com.recitewords.bean.WordReview;
+import recitewords.apj.com.recitewords.db.dao.BookDao;
+import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
 import recitewords.apj.com.recitewords.util.MediaUtils;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 import recitewords.apj.com.recitewords.util.UIUtil;
 import recitewords.apj.com.recitewords.view.CircleProgressView;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
@@ -35,15 +44,23 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             R.mipmap.haixin_bg_dim_03, R.mipmap.haixin_bg_dim_04,
             R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
     private int backgroundNum;
+    private final String TAG = "ReviewActivity";
     private ViewHolder holder;
     private int num = 4; //定义4秒
     private Message msg;
     private final String FRAGMENT_SENTENCE = "fragment_sentence_review";
     private OnmToggleListener mOnToggleListener;   //监听例句显示状态
     private AlertDialog alertDialog;  //评写界面弹窗
-    private boolean havaing_comfirm=false;  //拼写确认比较单词
+    private boolean havaing_comfirm = false;  //拼写确认比较单词
     private String mWord = "target";  //显示的单词
     private String mPhonogram = "[ 'shabi: ]";  //显示的单词的音标
+    private boolean is_US_Phonogram=true;  //英式音标或者美式音标
+    private int complete_review_word;  //已完成复习的单词个数
+    private int need_review_word;  //需要复习的单词个数
+    private boolean review_is_complete ;   //是否已经完成了本次20个单词的复习
+    private int review_word_index=0;  //当前学习单词位置
+    private WordReviewDao wordReviewDao;
+    private List<WordReview> wordReviews;  //当前复习的20个单词
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -104,6 +121,12 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         TextView spell_tv_prompt;  //拼写单词提示
         RelativeLayout spell_rl_back;  //评写界面黑色背景
         RelativeLayout spell_rl_bottom;  //评写界面底部背景
+
+        TextView tv_complete;  //头部显示已完成单词
+        TextView tv_need_complete;  //头部显示未完成单词
+        TextView learn_tv_word;  //单词
+        TextView learn_tv_soundmark; //音标
+        TextView learn_tv_changesound;  //切换音标按钮
     }
 
     @Override
@@ -136,6 +159,11 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_back = findViewByIds(R.id.tv_back);
         holder.tv_spell = findViewByIds(R.id.tv_spell);
         holder.tv_delete = findViewByIds(R.id.tv_delete);
+        holder.tv_complete = findViewByIds(R.id.tv_complete);
+        holder.tv_need_complete = findViewByIds(R.id.tv_need_complete);
+        holder.learn_tv_word=findViewByIds(R.id.learn_tv_word);
+        holder.learn_tv_soundmark=findViewByIds(R.id.learn_tv_soundmark);
+        holder.learn_tv_changesound=findViewByIds(R.id.learn_tv_changesound);
     }
 
     private void init_event() {
@@ -150,6 +178,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_spell.setOnClickListener(this);
         holder.tv_delete.setOnClickListener(this);
         holder.review_sliding.setOnToggleListener(this);
+        holder.learn_tv_changesound.setOnClickListener(this);
     }
 
     private void init_data() {
@@ -160,8 +189,50 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
         holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
         holder.ll_star.setVisibility(View.GONE);        //隐藏学习页的星星
+
+        wordReviewDao = new WordReviewDao(this);
+        getDataForBook();  //从词书表获取数据插入复习表中
+        //获取复习表中单词
+        wordReviews = wordReviewDao.queryAll("CET4");
+
+        need_review_word = wordReviews.size();      //未复习单词（20个剩下的）
+        complete_review_word = 20-need_review_word;  //已复习单词
+
+        if (review_word_index<need_review_word){
+            mWord=wordReviews.get(review_word_index).getWord(); //获取单词
+            mPhonogram=wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+        }
+        holder.tv_complete.setText(complete_review_word+"");
+        holder.tv_need_complete.setText(need_review_word+"");
+        holder.learn_tv_word.setText(mWord);
+        holder.learn_tv_soundmark.setText(mPhonogram);
+
+//        for (WordReview wo : wordReviews) {
+//            Log.e(TAG, "单词：" + wo.getWord());
+//        }
+
+
         setProgress();        //设置进度条进度
-        init_fragment();    //例句Fragment替换布局文件
+        init_fragment();     //例句Fragment替换布局文件
+    }
+
+    //判断是否需要把从字库表中获取到需要复习的单词添加到复习表中
+    public void getDataForBook() {
+        wordReviewDao = new WordReviewDao(this);
+        SharedPreferences pref = PrefUtils.getPref(this);
+        review_is_complete= PrefUtils.getDBFlag(pref,"review_is_complete",true);
+        if (review_is_complete) {
+            BookDao bookDao = new BookDao(this);
+            List<Book> books = bookDao.queryReviewWOrd();
+            for (Book book : books) {
+                //把从字库表中获取到需要复习的单词添加到复习表中
+                wordReviewDao.addWord(book.getWord(), "", "", "", "", book.getSoundmark_american(),
+                        book.getSoundmark_british(), book.getWord_mean(), "", 0, "",
+                        book.getBook_name(), book.getUserID());
+            }
+            //当前复习的单词没有完成，暂时不需要重新获取复习单词
+            PrefUtils.setDBFlag(pref,"review_is_complete",false);
+        }
     }
 
     //发送handler消息倒数4秒显示单词信息
@@ -183,6 +254,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             case R.id.tv_know:   //认识
                 holder.progress.setVisibility(View.VISIBLE);   //显示进度条
                 holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
+                //标记为已掌握
+
                 reset();
                 setProgress();
                 break;
@@ -218,6 +291,22 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 mLoadingAlertDialog.setView(mLoadingView);
                 mLoadingAlertDialog.show();
 //                finish();
+                break;
+            case R.id.learn_tv_changesound:  //切换音标
+                if (is_US_Phonogram){//英式
+                    mPhonogram= wordReviews.get(review_word_index).getSoundmark_british();
+                    holder.learn_tv_soundmark.setText(mPhonogram);
+                    holder.learn_tv_changesound.setText("US");
+                    MediaUtils.playWord(this,15);  //读单词
+                    is_US_Phonogram=false;
+
+                }else {//美式
+                    mPhonogram= wordReviews.get(review_word_index).getSoundmark_american();
+                    holder.learn_tv_soundmark.setText(mPhonogram);
+                    holder.learn_tv_changesound.setText("UK");
+                    MediaUtils.playWord(this,15);  //读单词
+                    is_US_Phonogram=true;
+                }
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
@@ -258,9 +347,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 MediaUtils.playWord(this, 5);  //播放单词
                 //获取底部导航栏高度，让土司显示在中间
                 int height = holder.spell_rl_bottom.getHeight();
-                int time=3000;  //提示时间3秒
+                int time = 3000;  //提示时间3秒
                 //自定义土司，设置土司显示位置
-                UIUtil.toast(this,mPhonogram,time, Gravity.BOTTOM,0,height/2-20);
+                UIUtil.toast(this, mPhonogram, time, Gravity.BOTTOM, 0, height / 2 - 20);
                 //改变背景图片
                 holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
                 mHandler.postDelayed(new Runnable() {
@@ -268,7 +357,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                     public void run() {
                         holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt);
                     }
-                },time);
+                }, time);
 
                 break;
             case R.id.spell_tv_confirm:
@@ -314,11 +403,12 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         transaction.commit();
     }
 
-    String input="";
+    String input = "";
+
     //文本框变化前
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        input=s.toString();  //内容默认为
+        input = s.toString();  //内容默认为
     }
 
     //文本框变化中
@@ -327,15 +417,15 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         if (havaing_comfirm) {
             input = s.toString().substring(start, (start + count));  //获取用户重新输入的值
         } else {
-            input=s.toString();
+            input = s.toString();
         }
     }
 
     //文本框变化后
     @Override
     public void afterTextChanged(Editable s) {
-        if (havaing_comfirm){
-            havaing_comfirm=false;
+        if (havaing_comfirm) {
+            havaing_comfirm = false;
             //隐藏正确单词
             holder.spell_tv_correct.setVisibility(View.INVISIBLE);
             //用户在比较单词后会改变输入文字颜色，在此处确保用户再次输入的文字为白色

@@ -118,7 +118,7 @@ public class WordStudyDao {
     public WordStudy findWordDetailByWord(String word, String book_name) {
         WordStudy wordStudy=null;
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.query("word_study", null, "book_name=?",
+        Cursor cursor = db.query("word_review", null, "book_name=?",
                 new String[]{book_name}, null, null, null);
         while (cursor.moveToNext()) {
             wordStudy = new WordStudy();

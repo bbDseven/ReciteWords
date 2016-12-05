@@ -35,4 +35,12 @@ public class MediaUtils {
             player.start();
         }
     }
+
+    /**
+     * 获取当前单词的语音位置
+     * @return
+     */
+    public int getPronounceIndex(){
+        return  0;
+    }
 }
