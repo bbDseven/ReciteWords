@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -9,9 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -116,7 +120,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         //设置学习界面的背景图片与主页面的背景图片动态一致
         holder.rl_learn.setBackgroundResource(images[backgroundNum]);
 
-        holder.learn_sliding.getBackground().setAlpha(180);  //更改学习界面透明度
+        holder.learn_sliding.getBackground().setAlpha(170);  //更改学习界面透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
         //用Fragment替换帧布局来显示例句
@@ -160,15 +164,21 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
 //                Intent intent = new Intent(LearnActivity.this, MainActivity.class);
 //                intent.putExtra("backgroundNum",backgroundNum);
 //                startActivity(intent);
-                finish();
+
+                AlertDialog.Builder mLoadingBuilder=new AlertDialog.Builder(this);
+                AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
+                View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
+                mLoadingAlertDialog.setView(mLoadingView);
+                mLoadingAlertDialog.show();
+               // finish();
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Dialog_Fullscreen);
 
-                alertDialog = builder.create();
+                this.alertDialog = builder.create();
                 View view = getLayoutInflater().inflate(R.layout.dialog_spell, null);
-                alertDialog.setView(view, 0, 0, 0, 0);
+                this.alertDialog.setView(view, 0, 0, 0, 0);
                 holder.spell_tv_close = UIUtil.findViewByIds(view, R.id.spell_tv_close);
                 holder.spell_rl_root = UIUtil.findViewByIds(view, R.id.spell_rl_root);
                 holder.spell_et_input = UIUtil.findViewByIds(view, R.id.spell_et_input);
@@ -180,7 +190,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
 
                 holder.spell_rl_root.setBackgroundResource(images[backgroundNum]);
                 //设置黑色背景透明度，模糊化背景图片
-               // holder.spell_rl_back.getBackground().setAlpha(210);
+//                holder.spell_rl_back.getBackground().setAlpha(210);
                 //底部暗灰色导航条，使背景模糊化
                 holder.spell_rl_bottom.getBackground().setAlpha(170);
 
@@ -188,8 +198,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 holder.spell_tv_prompt.setOnClickListener(this);  //监听评写提示按钮
                 holder.spell_tv_confirm.setOnClickListener(this);  //监听评写确认按钮
                 holder.spell_et_input.addTextChangedListener(this);  //监听文本框内容变化
-                alertDialog.show();
-
+                this.alertDialog.show();
                 break;
             case R.id.tv_delete:
                 //从学习单词表中删除单词，表示已经掌握
@@ -197,7 +206,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.spell_tv_close:
                 //关闭拼写界面
-                alertDialog.dismiss();
+                this.alertDialog.dismiss();
                 break;
             case R.id.spell_tv_prompt:
                 //提示用户的单词信息，显示音标和读音
@@ -253,13 +262,13 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             mOnToggleListner.onToggleChange(view, isOpen);
         }
     }
-
+    String input="";
     //文本框变化前
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         input=s.toString();  //内容默认为
     }
-    String input="";
+
     //文本框变化中
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {

@@ -26,10 +26,8 @@ import recitewords.apj.com.recitewords.R;
 /**
  * 圆形头像
  * Created by Seven on 2016/11/18.
-<<<<<<< HEAD
-=======
+ *
  * 作者：李学文
->>>>>>> 5a33458796bb696278ffd300da0d85e1bc32472e
  */
 public class CircleImageView extends ImageView {
 
