@@ -89,6 +89,7 @@ public class SlidingFragment extends BaseFragment {
         holder.ll_statistics = findViewByIds(view, R.id.ll_statistics);
 
 
+        //获取菜单导航栏高度，设置用户向上的最大高度
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @Override

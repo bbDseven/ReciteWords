@@ -90,6 +90,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     //SlidingUpPanelLayout页面滑动addPanelSlideListener的回调方法
     @Override
     public void onPanelSlide(View panel, float slideOffset) {
+        //由于控件移动的是控件内容，需要滑动原来状态
         holder.mLayout.scrollTo(0, 0);
         height = 0;
     }
@@ -98,7 +99,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     //状态改变
     @Override
     public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-        //状态由EXPANDED变成COLLAPSED，设置字体颜色为白色
+        //状态由EXPANDED（打开）变成COLLAPSED（关闭），设置字体颜色为白色
         if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             FragmentManager fragmentManager = getFragmentManager();
             SlidingFragment fragment = (SlidingFragment) fragmentManager.
@@ -130,7 +131,6 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
                 } else {
                     holder.mLayout.scrollBy(0, diffY);
                 }
-
                 mDownY = mMoveY;
                 break;
             case MotionEvent.ACTION_UP:

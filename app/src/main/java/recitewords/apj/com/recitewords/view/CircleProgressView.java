@@ -14,9 +14,10 @@ import android.util.AttributeSet;
 import android.view.View;
 
 
-
 /**
  * Created by Seven on 2016/12/2.
+ * <p>
+ * 记忆模式加载进度条
  */
 
 public class CircleProgressView extends View {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--拼写界面布局-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/spell_rl_root"
-    android:background="@mipmap/haixin_bg_dim_03"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
