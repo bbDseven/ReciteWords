@@ -18,6 +18,11 @@ import android.widget.TextView;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import net.youmi.android.listener.Interface_ActivityListener;
+import net.youmi.android.normal.banner.BannerManager;
+import net.youmi.android.normal.banner.BannerViewListener;
+import net.youmi.android.offers.OffersManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +68,7 @@ public class SlidingFragment extends BaseFragment {
 
     @Override
     public View initView() {
+        OffersManager.getInstance(mActivity).onAppExit();//广告积分墙资源释放
         final View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_sliding, null);
         holder = new holder();
         mainActivity = (MainActivity) mActivity;
@@ -133,6 +139,8 @@ public class SlidingFragment extends BaseFragment {
         holder.view_themes = inflater.inflate(R.layout.viewpager_themes, null);
         holder.view_library = inflater.inflate(R.layout.viewpager_library, null);
         holder.view_statistics = inflater.inflate(R.layout.viewpager_statistics, null);
+        //设置4个view广告
+        setAdv();
         //把4个View都放在集合里
         viewList.add(holder.view_settings);
         viewList.add(holder.view_themes);
@@ -337,6 +345,37 @@ public class SlidingFragment extends BaseFragment {
         return NavigateHeight;
     }
 
+    //设置广告条
+    private void setAdv(){
+        // 获取广告条
+        View bannerView = BannerManager.getInstance(mActivity)
+                .getBannerView(new BannerViewListener() {
+                    @Override
+                    public void onRequestSuccess() {
 
+                    }
+
+                    @Override
+                    public void onSwitchBanner() {
+
+                    }
+
+                    @Override
+                    public void onRequestFailed() {
+
+                    }
+                });
+        LinearLayout ll_banner_settings = findViewByIds(holder.view_settings, R.id.ll_banner_settings);
+        TextView app_recommend = findViewByIds(holder.view_statistics, R.id.app_recommend);
+        app_recommend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OffersManager.getInstance(mActivity).showOffersWall();
+            }
+        });
+
+        // 将广告条加入到布局中
+        ll_banner_settings.addView(bannerView);
+    }
 
 }

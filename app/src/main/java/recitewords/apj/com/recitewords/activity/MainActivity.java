@@ -11,6 +11,8 @@ import android.widget.Scroller;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
+import net.youmi.android.offers.OffersManager;
+
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.MainFragment;
 import recitewords.apj.com.recitewords.fragment.SlidingFragment;
@@ -192,4 +194,9 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         NavigateHeight = height;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        OffersManager.getInstance(this).onAppExit();//广告积分墙资源释放
+    }
 }

@@ -1,7 +1,11 @@
 package recitewords.apj.com.recitewords.fragment;
 
+import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -30,6 +34,8 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
     private ImageView cursor;   //游标图片
     private List<View> list;    //装View的集合
     private LinearLayout sentence_pronounce; //例句点击发音
+    private String str; //例句
+    private SpannableStringBuilder style;   //设置字体颜色
 
 
     public ExampleSentenceFragment_review(String word) {
@@ -62,7 +68,12 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
             TextView vp_example_sentence_mean = (TextView) view.findViewById(R.id.vp_example_sentence_mean);
             sentence_pronounce = (LinearLayout) view.findViewById(R.id.sentence_pronounce);
             setSentence_pronounce();
-            vp_example_sentence.setText(example_sentences[i]);
+            str = example_sentences[i];
+            style = new SpannableStringBuilder(str);
+            int start = str.indexOf(word);  //单词第一次出现的索引
+            int end = start + word.length();
+            style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            vp_example_sentence.setText(style);
             vp_example_sentence_mean.setText(example_sentence_means[i]);
             list.add(view);
         }
@@ -102,7 +113,7 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
         sentence_pronounce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MediaUtils.playWord(mActivity, 5);
+                MediaUtils.playWord(mActivity, "abroad");
             }
         });
     }
@@ -118,7 +129,7 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
     public void onmToggleChange(SlidingUpMenu view, boolean isOpen) {
         if (isOpen) {
             //显示例句
-            MediaUtils.playWord(mActivity, 5);
+            MediaUtils.playWord(mActivity, "abroad");
         }
     }
 
