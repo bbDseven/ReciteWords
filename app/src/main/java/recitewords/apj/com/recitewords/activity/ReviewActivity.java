@@ -29,6 +29,7 @@ import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.bean.WordReview;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
+import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
@@ -68,6 +69,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private WordReviewDao wordReviewDao;
     private List<WordReview> wordReviews;  //当前复习的20个单词
     private int answer_right;  //正确答案的位置
+    private int mGraspWord = 0;  //这次学习中，掌握的的单词
+
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -297,9 +300,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.tv_know:   //认识
                 //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
-                completeIndex.add(review_word_index-1);
+                completeIndex.add(review_word_index - 1);
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
-                   // if (num < 4) {
+                    if (num < 4) {
                         //更新词书表为已掌握
 //                        BookDao bookDao = new BookDao(this);
 //                         bookDao.updateGraspWord(book_name,mWord);
@@ -310,7 +313,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                         //更新头部学习情况信息
                         need_review_word--;
                         complete_review_word++;
-                 //   }
+                    }
                     //显示下一个单词
                     showNextWord();
                     if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
@@ -382,23 +385,36 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 choice(3);
                 break;
             case R.id.tv_back:
+                //制造假的保存数据
                 AlertDialog.Builder mLoadingBuilder = new AlertDialog.Builder(this);
-                AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
+                final AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
                 View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
                 mLoadingAlertDialog.setView(mLoadingView);
                 mLoadingAlertDialog.show();
-//                finish();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        LexiconDao lexiconDao = new LexiconDao(ReviewActivity.this);
+                        int graspWord = lexiconDao.getGraspWord(book_name);  //原已掌握单词
+                        int reviewWord = lexiconDao.getReviewWord(book_name);  //原需复习单词
+
+                        lexiconDao.updateGraspWord(graspWord + mGraspWord, book_name);  //更新已掌握单词
+                        lexiconDao.updateReviewWord(reviewWord - mGraspWord, book_name);  //更新需学习的单词数
+
+                        mLoadingAlertDialog.dismiss();
+                        finish();
+                    }
+                }, 1000);
                 break;
             case R.id.learn_tv_changesound:  //切换音标
                 if (is_US_Phonogram) {//英式
-                    mPhonogram = wordReviews.get(review_word_index-1).getSoundmark_british();
+                    mPhonogram = wordReviews.get(review_word_index - 1).getSoundmark_british();
                     holder.learn_tv_soundmark.setText(mPhonogram);
                     holder.learn_tv_changesound.setText("US");
                     MediaUtils.playWord(this, mWord);  //读单词
                     is_US_Phonogram = false;
-
                 } else {//美式
-                    mPhonogram = wordReviews.get(review_word_index-1).getSoundmark_american();
+                    mPhonogram = wordReviews.get(review_word_index - 1).getSoundmark_american();
                     holder.learn_tv_soundmark.setText(mPhonogram);
                     holder.learn_tv_changesound.setText("UK");
                     MediaUtils.playWord(this, mWord);  //读单词
@@ -433,7 +449,28 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 this.alertDialog.show();
                 break;
             case R.id.tv_delete:
-                Toast.makeText(this, "点击了删除按钮，功能还没写", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "点击了删除按钮，功能还没写", Toast.LENGTH_SHORT).show();
+                mGraspWord++;
+                completeIndex.add(review_word_index - 1);  //增加到已复习中
+                //从复习表中标记为已复习,在这次复习中不再出现
+                WordReviewDao dao = new WordReviewDao(this);
+                int i = dao.updateReviewState(mWord, book_name);
+                BookDao bookDao = new BookDao(this);  //更新词书表，已掌握
+                bookDao.updateGraspWord(book_name, mWord);
+
+                //更新头部学习情况信息
+                need_review_word--;
+                complete_review_word++;
+                //显示下一个单词
+                showNextWord();
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+                    holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
+                    reset();
+                    setProgress();
+                }
+
+
                 break;
             case R.id.spell_tv_close:
                 //关闭拼写界面
@@ -558,7 +595,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 review_mode = Mode.MODE_MEMORY_MEAN;
                 setProgress();        //设置进度条进度
             }
-            if (review_word_index < wordReviews.size()){
+            if (review_word_index < wordReviews.size()) {
                 mWord = wordReviews.get(review_word_index).getWord(); //获取单词
                 mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
                 mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
