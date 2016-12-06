@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
@@ -32,6 +33,7 @@ import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
 import recitewords.apj.com.recitewords.util.MediaUtils;
+import recitewords.apj.com.recitewords.util.NumUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
 import recitewords.apj.com.recitewords.util.UIUtil;
 import recitewords.apj.com.recitewords.view.CircleProgressView;
@@ -53,14 +55,19 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private AlertDialog alertDialog;  //评写界面弹窗
     private boolean havaing_comfirm = false;  //拼写确认比较单词
     private String mWord = "target";  //显示的单词
+    private String book_name = "CET4";  //词书名字
     private String mPhonogram = "[ 'shabi: ]";  //显示的单词的音标
-    private boolean is_US_Phonogram=true;  //英式音标或者美式音标
+    private String mWordMean;  //单词词性词义
+    private boolean is_US_Phonogram = true;  //英式音标或者美式音标
     private int complete_review_word;  //已完成复习的单词个数
+    private List<Integer> completeIndex;  //已完成复习的单词的位置
     private int need_review_word;  //需要复习的单词个数
-    private boolean review_is_complete ;   //是否已经完成了本次20个单词的复习
-    private int review_word_index=0;  //当前学习单词位置
+    private boolean review_is_complete;   //是否已经完成了本次20个单词的复习
+    private int review_word_index = 0;  //当前学习单词位置
+    private String review_mode = Mode.MODE_MEMORY_MEAN;  //选择题模式
     private WordReviewDao wordReviewDao;
     private List<WordReview> wordReviews;  //当前复习的20个单词
+    private int answer_right;  //正确答案的位置
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -92,6 +99,14 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         }
     });
 
+    //复习模式
+    public static class Mode {
+        //复习模式,三种模式，选择题模式（Choice）,词义回想模式（Memory_Mean）,单词回想模式（Memory_word）
+        static String MODE_CHOICE = "choice";
+        static String MODE_MEMORY_MEAN = "memory_mean";
+        static String MODE_MEMORY_WORD = "memory_word";
+    }
+
     private class ViewHolder {
         RelativeLayout rl_review;   //复习页面根布局
         SlidingUpMenu review_sliding;   //sliding
@@ -100,8 +115,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         LinearLayout ll_star;   //学习页星星的布局
         CircleProgressView progress; //圆形进度条
         FrameLayout fl_progress_click;  //圆形进度条的点击
-        LinearLayout ll_choice;     //认识的父布局
+        LinearLayout ll_memory;     //认识的父布局
         LinearLayout ll_incognizance;   //看例句的父布局
+        LinearLayout ll_choice;  //下一个的父布局
         TextView tv_know;   //认识
         TextView tv_dim;    //模糊
         TextView tv_unknow;     //不认识
@@ -127,6 +143,12 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         TextView learn_tv_word;  //单词
         TextView learn_tv_soundmark; //音标
         TextView learn_tv_changesound;  //切换音标按钮
+        TextView tv_word_information;  //显示词性词义
+
+        TextView tv_A;  //A选项
+        TextView tv_B;  //B选项
+        TextView tv_C;  //C选项
+        TextView tv_D;  //D选项
     }
 
     @Override
@@ -147,8 +169,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.ll_star = findViewByIds(R.id.ll_star);
         holder.progress = findViewByIds(R.id.review_progress);
         holder.fl_progress_click = findViewByIds(R.id.fl_progress_click);
-        holder.ll_choice = findViewByIds(R.id.ll_choice);
+        holder.ll_memory = findViewByIds(R.id.ll_memory);
         holder.ll_incognizance = findViewByIds(R.id.ll_incognizance);
+        holder.ll_choice = findViewByIds(R.id.ll_choice);
         holder.tv_incognizance_next = findViewByIds(R.id.tv_incognizance_next);
         holder.tv_incognizance_example = findViewByIds(R.id.tv_incognizance_example);
         holder.tv_know = findViewByIds(R.id.tv_know);
@@ -161,9 +184,15 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_delete = findViewByIds(R.id.tv_delete);
         holder.tv_complete = findViewByIds(R.id.tv_complete);
         holder.tv_need_complete = findViewByIds(R.id.tv_need_complete);
-        holder.learn_tv_word=findViewByIds(R.id.learn_tv_word);
-        holder.learn_tv_soundmark=findViewByIds(R.id.learn_tv_soundmark);
-        holder.learn_tv_changesound=findViewByIds(R.id.learn_tv_changesound);
+        holder.learn_tv_word = findViewByIds(R.id.learn_tv_word);
+        holder.learn_tv_soundmark = findViewByIds(R.id.learn_tv_soundmark);
+        holder.learn_tv_changesound = findViewByIds(R.id.learn_tv_changesound);
+        holder.tv_word_information = findViewByIds(R.id.tv_word_information);
+        holder.tv_A = findViewByIds(R.id.tv_A);
+        holder.tv_B = findViewByIds(R.id.tv_B);
+        holder.tv_C = findViewByIds(R.id.tv_C);
+        holder.tv_D = findViewByIds(R.id.tv_D);
+
     }
 
     private void init_event() {
@@ -179,6 +208,11 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_delete.setOnClickListener(this);
         holder.review_sliding.setOnToggleListener(this);
         holder.learn_tv_changesound.setOnClickListener(this);
+        holder.ll_choice.setOnClickListener(this);
+        holder.tv_A.setOnClickListener(this);
+        holder.tv_B.setOnClickListener(this);
+        holder.tv_C.setOnClickListener(this);
+        holder.tv_D.setOnClickListener(this);
     }
 
     private void init_data() {
@@ -187,40 +221,33 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.rl_review.setBackgroundResource(images[backgroundNum]);//获取随机数设置复习页面背景图片
         holder.review_sliding.getBackground().setAlpha(170);        //设置SlidingUpMenu的透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
-        holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
         holder.ll_star.setVisibility(View.GONE);        //隐藏学习页的星星
 
         wordReviewDao = new WordReviewDao(this);
         getDataForBook();  //从词书表获取数据插入复习表中
         //获取复习表中单词
-        wordReviews = wordReviewDao.queryAll("CET4");
+        wordReviews = wordReviewDao.queryAll(book_name);
 
-        need_review_word = wordReviews.size();      //未复习单词（20个剩下的）
-        complete_review_word = 20-need_review_word;  //已复习单词
+        complete_review_word = getNeed_review_word();      //已复习单词
+        need_review_word = wordReviews.size() - complete_review_word;     //未复习单词（20个剩下的）
 
-        if (review_word_index<need_review_word){
-            mWord=wordReviews.get(review_word_index).getWord(); //获取单词
-            mPhonogram=wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+        if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {  //回忆词义模式
+            showNextWord();
+            setProgress();        //设置进度条进度
+        } else if (review_mode.equals(Mode.MODE_CHOICE)) {  //选择题模式
+            showNextWord();
+        } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {  //单词回忆模式
+
         }
-        holder.tv_complete.setText(complete_review_word+"");
-        holder.tv_need_complete.setText(need_review_word+"");
-        holder.learn_tv_word.setText(mWord);
-        holder.learn_tv_soundmark.setText(mPhonogram);
 
-//        for (WordReview wo : wordReviews) {
-//            Log.e(TAG, "单词：" + wo.getWord());
-//        }
-
-
-        setProgress();        //设置进度条进度
-        init_fragment();     //例句Fragment替换布局文件
+        init_fragment();     //例句Fragment替换例句布局文件
     }
 
     //判断是否需要把从字库表中获取到需要复习的单词添加到复习表中
     public void getDataForBook() {
         wordReviewDao = new WordReviewDao(this);
         SharedPreferences pref = PrefUtils.getPref(this);
-        review_is_complete= PrefUtils.getDBFlag(pref,"review_is_complete",true);
+        review_is_complete = PrefUtils.getDBFlag(pref, "review_is_complete", true);
         if (review_is_complete) {
             BookDao bookDao = new BookDao(this);
             List<Book> books = bookDao.queryReviewWOrd();
@@ -231,8 +258,23 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                         book.getBook_name(), book.getUserID());
             }
             //当前复习的单词没有完成，暂时不需要重新获取复习单词
-            PrefUtils.setDBFlag(pref,"review_is_complete",false);
+            PrefUtils.setDBFlag(pref, "review_is_complete", false);
         }
+    }
+
+    //获取已经完成的复习的单词数量
+    public int getNeed_review_word() {
+        completeIndex = new ArrayList<>();
+        int mCompleteNum = 0;
+        int i = 0;
+        for (WordReview wr : wordReviews) {
+            if (wr.getWord_is_review() == 1) {
+                mCompleteNum++;
+                completeIndex.add(i);
+            }
+            i++;
+        }
+        return mCompleteNum;
     }
 
     //发送handler消息倒数4秒显示单词信息
@@ -248,41 +290,96 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fl_progress_click:
-                holder.progress.setVisibility(View.GONE);   //隐藏进度条
-                holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    holder.progress.setVisibility(View.GONE);   //隐藏进度条
+                    holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                }
                 break;
             case R.id.tv_know:   //认识
-                holder.progress.setVisibility(View.VISIBLE);   //显示进度条
-                holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
-                //标记为已掌握
+                //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
+                completeIndex.add(review_word_index-1);
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                   // if (num < 4) {
+                        //更新词书表为已掌握
+//                        BookDao bookDao = new BookDao(this);
+//                         bookDao.updateGraspWord(book_name,mWord);
 
-                reset();
-                setProgress();
+                        //从复习表中标记为已复习,在这次复习中不再出现
+                        WordReviewDao dao = new WordReviewDao(this);
+                        int i = dao.updateReviewState(mWord, book_name);
+                        //更新头部学习情况信息
+                        need_review_word--;
+                        complete_review_word++;
+                 //   }
+                    //显示下一个单词
+                    showNextWord();
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+                        holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
+                        reset();
+                        setProgress();
+                    }
+                }
                 break;
             case R.id.tv_dim:  //模糊
-                holder.progress.setVisibility(View.GONE);   //隐藏进度条
-                holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
-                holder.ll_choice.setVisibility(View.GONE);  //隐藏认识布局
-                holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
-                reset();
+                //显示下一个单词
+                showNextWord();
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    holder.progress.setVisibility(View.GONE);   //隐藏进度条
+                    holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                    holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
+                    holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
+                    reset();
+                }
                 break;
             case R.id.tv_unknow:  //不认识
-                holder.progress.setVisibility(View.GONE);   //隐藏进度条
-                holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
-                holder.ll_choice.setVisibility(View.GONE);  //隐藏认识布局
-                holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
-                reset();
+                //显示下一个单词
+                showNextWord();
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    holder.progress.setVisibility(View.GONE);   //隐藏进度条
+                    holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                    holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
+                    holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
+                    reset();
+                }
                 break;
-            case R.id.tv_incognizance_next:  //下一个
-                reset();
-                setProgress();
-                holder.ll_choice.setVisibility(View.VISIBLE);  //隐藏认识布局
-                holder.ll_incognizance.setVisibility(View.GONE); //显示例句布局
-                holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
-                holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+            case R.id.tv_incognizance_next:  //不认识--》》下一个
+                showNextWord();
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    //显示下一个单词
+                    if (holder.review_sliding.getMenuState()) {
+                        holder.review_sliding.closeMenu();
+                    }
+                    reset();
+                    setProgress();
+                    holder.ll_memory.setVisibility(View.VISIBLE);  //隐藏认识布局
+                    holder.ll_incognizance.setVisibility(View.GONE); //显示例句布局
+                    holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
+                    holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+                }
                 break;
             case R.id.tv_incognizance_example:  //看例句
-                holder.review_sliding.openMenu();
+                if (holder.review_sliding.getMenuState()) {
+                    holder.review_sliding.closeMenu();
+                } else {
+                    holder.review_sliding.openMenu();
+                }
+                break;
+            case R.id.ll_choice:  //选择题模式--》》不认识
+                showNextWord();
+                break;
+
+            case R.id.tv_A:
+                choice(0);
+                break;
+            case R.id.tv_B:
+                choice(1);
+                break;
+            case R.id.tv_C:
+                choice(2);
+                break;
+            case R.id.tv_D:
+                choice(3);
                 break;
             case R.id.tv_back:
                 AlertDialog.Builder mLoadingBuilder = new AlertDialog.Builder(this);
@@ -293,19 +390,19 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
 //                finish();
                 break;
             case R.id.learn_tv_changesound:  //切换音标
-                if (is_US_Phonogram){//英式
-                    mPhonogram= wordReviews.get(review_word_index).getSoundmark_british();
+                if (is_US_Phonogram) {//英式
+                    mPhonogram = wordReviews.get(review_word_index-1).getSoundmark_british();
                     holder.learn_tv_soundmark.setText(mPhonogram);
                     holder.learn_tv_changesound.setText("US");
-                    MediaUtils.playWord(this,15);  //读单词
-                    is_US_Phonogram=false;
+                    MediaUtils.playWord(this, mWord);  //读单词
+                    is_US_Phonogram = false;
 
-                }else {//美式
-                    mPhonogram= wordReviews.get(review_word_index).getSoundmark_american();
+                } else {//美式
+                    mPhonogram = wordReviews.get(review_word_index-1).getSoundmark_american();
                     holder.learn_tv_soundmark.setText(mPhonogram);
                     holder.learn_tv_changesound.setText("UK");
-                    MediaUtils.playWord(this,15);  //读单词
-                    is_US_Phonogram=true;
+                    MediaUtils.playWord(this, mWord);  //读单词
+                    is_US_Phonogram = true;
                 }
                 break;
             case R.id.tv_spell:
@@ -379,14 +476,112 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    //视图树的回调方法
-    @Override
-    public void onGlobalLayout() {
-        int height = holder.ll_show_word.getHeight();  //获取例句显示的高度
-        holder.fl_example.setMinimumHeight(height);
-        holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);//取消视图树监听
+    /**
+     * 显示下一个单词
+     */
+    public void showNextWord() {
+        getWordData();  //重新获取数据
+        holder.tv_complete.setText(complete_review_word + "");
+        holder.tv_need_complete.setText(need_review_word + "");
+        holder.learn_tv_word.setText(mWord);  //单词
+        holder.learn_tv_soundmark.setText(mPhonogram);  //音标
+        holder.tv_word_information.setText(mWordMean);  //设置单词详细信息
+        //词义回忆模式
+        if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+            holder.progress.setVisibility(View.VISIBLE);  //显示加载进度条
+            holder.ll_choice.setVisibility(View.INVISIBLE);  //隐藏下一个按钮
+            holder.ll_memory.setVisibility(View.VISIBLE);  //显示回忆模式下的中间选项
+            holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
+        } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+
+            holder.ll_information.setVisibility(View.INVISIBLE);  //隐藏词义
+            holder.progress.setVisibility(View.INVISIBLE);  //隐藏加载进度条
+            holder.ll_abcd.setVisibility(View.VISIBLE);  //显示选项
+            holder.ll_memory.setVisibility(View.INVISIBLE);  //隐藏回忆模式下的中间选项
+            holder.ll_incognizance.setVisibility(View.INVISIBLE);  //隐藏不认识下的选项
+            holder.ll_choice.setVisibility(View.VISIBLE);  //显示下一个按钮
+
+            int[] ints = NumUtil.random3(wordReviews.size(), review_word_index);
+            answer_right = NumUtil.random(4);
+
+            //动态显示选项
+            if (answer_right == 0) {
+                holder.tv_A.setText(wordReviews.get(review_word_index).getAnswer_right());
+                holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
+                holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
+                holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
+            } else if (answer_right == 1) {
+                holder.tv_B.setText(wordReviews.get(review_word_index).getAnswer_right());
+                holder.tv_A.setText(wordReviews.get(ints[0]).getAnswer_right());
+                holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
+                holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
+            } else if (answer_right == 2) {
+                holder.tv_C.setText(wordReviews.get(review_word_index).getAnswer_right());
+                holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
+                holder.tv_A.setText(wordReviews.get(ints[1]).getAnswer_right());
+                holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
+            } else if (answer_right == 3) {
+                holder.tv_D.setText(wordReviews.get(review_word_index).getAnswer_right());
+                holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
+                holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
+                holder.tv_A.setText(wordReviews.get(ints[2]).getAnswer_right());
+            }
+        }
+        review_word_index++;  //学习单词的位置增加1
     }
 
+    //获取单词详细信息
+    public void getWordData() {
+
+        while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
+            review_word_index++;
+        }
+        if (completeIndex.size() == 20) {  //已完成学复习
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("恭喜你");
+            builder.setMessage("你已经复习完了本次的任务，赶快去玩吧");
+            builder.setPositiveButton("确定", null);
+            builder.show();
+        } else if (review_word_index < wordReviews.size()) {  //还没有完成一轮学习
+            mWord = wordReviews.get(review_word_index).getWord(); //获取单词
+            mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+            mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+        } else {  //完成一轮学习，切换学习模式
+            review_word_index = 0;
+            while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
+                review_word_index++;
+            }
+            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) { //选择完一篇后，改变复习模式
+                review_mode = Mode.MODE_CHOICE;
+                reset();
+            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+                review_mode = Mode.MODE_MEMORY_MEAN;
+                setProgress();        //设置进度条进度
+            }
+            if (review_word_index < wordReviews.size()){
+                mWord = wordReviews.get(review_word_index).getWord(); //获取单词
+                mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+                mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+            }
+
+        }
+    }
+
+    /**
+     * 选择题模式下选择ABCD
+     *
+     * @param index 点击位置
+     */
+    public void choice(int index) {
+        if (answer_right == index) {
+            showNextWord();
+        } else {
+            holder.ll_abcd.setVisibility(View.INVISIBLE);
+            holder.ll_information.setVisibility(View.VISIBLE);
+            holder.ll_choice.setVisibility(View.INVISIBLE);
+            holder.ll_incognizance.setVisibility(View.VISIBLE);
+        }
+    }
 
     //取消handler处理，并设置进度条为0，时间重置为4秒
     private void reset() {
@@ -402,6 +597,15 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review("abroad"), FRAGMENT_SENTENCE);
         transaction.commit();
     }
+
+    //视图树的回调方法
+    @Override
+    public void onGlobalLayout() {
+        int height = holder.ll_show_word.getHeight();  //获取例句显示的高度
+        holder.fl_example.setMinimumHeight(height);
+        holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);//取消视图树监听
+    }
+
 
     String input = "";
 

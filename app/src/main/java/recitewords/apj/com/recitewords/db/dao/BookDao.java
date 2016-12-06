@@ -43,7 +43,8 @@ public class BookDao {
 
     /**
      * 查询需要复习的单词，返回20条数据
-     * @return
+     *
+     * @return 单词信息
      */
     public List<Book> queryReviewWOrd() {
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -63,4 +64,17 @@ public class BookDao {
         return books;
     }
 
+
+    /**
+     * 更新单词是否为已掌握
+     * @param book_name  词书名字
+     * @param word  更新的单词
+     * @return  受影响行数
+     */
+    public int updateGraspWord(String book_name ,String word){
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("word_is_grasp ",1);
+       return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+    }
 }

@@ -16,7 +16,7 @@ public class WordReview {
     private String soundmark_british;  //英式英标
     private String answer_right;  //正确答案
     private String answer_user;  //用户答案
-    private int complete;  //20个单词中，已经完成复习的单词个数
+    private int word_is_review;  //是否已完成复习
     private String date;  //记住日期
     private String book_name;  //词书名字
     private int userID;  //用户ID
@@ -93,12 +93,13 @@ public class WordReview {
         this.answer_user = answer_user;
     }
 
-    public int getComplete() {
-        return complete;
+
+    public int getWord_is_review() {
+        return word_is_review;
     }
 
-    public void setComplete(int complete) {
-        this.complete = complete;
+    public void setWord_is_review(int word_is_review) {
+        this.word_is_review = word_is_review;
     }
 
     public String getDate() {

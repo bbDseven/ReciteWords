@@ -33,7 +33,7 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
     //创建单词复习表的sql语句
     private final String WORD_REVIEW_SQL="create table word_review(word text," +
             "option_A text,option_B text,option_C text,option_D text,soundmark_american text," +
-            "soundmark_british text,answer_right text,answer_user text,complete integer," +
+            "soundmark_british text,answer_right text,answer_user text,word_is_review  integer," +
             "date text,book_name text,userID integer)";
 
     public ReciteWordsSQLiteOpenHelper(Context context,String name,int version) {

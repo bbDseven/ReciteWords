@@ -84,7 +84,7 @@ public class WordStudyDao {
         ContentValues mValues = new ContentValues();
         mValues.put("asterisk", asterisk);
         SQLiteDatabase db = helper.getWritableDatabase();
-        int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        int num = db.update("word_study", mValues, "word=? and book_name=?", new String[]{word, book_name});
         mValues.clear();
         db.close();
         return num;
@@ -102,7 +102,7 @@ public class WordStudyDao {
         ContentValues mValues = new ContentValues();
         mValues.put("date", date);
         SQLiteDatabase db = helper.getWritableDatabase();
-        int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        int num = db.update("word_study", mValues, "word=? and book_name=?", new String[]{word, book_name});
         mValues.clear();
         db.close();
         return num;
