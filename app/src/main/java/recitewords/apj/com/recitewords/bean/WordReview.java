@@ -1,11 +1,13 @@
 package recitewords.apj.com.recitewords.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by CGT on 2016/11/28.
  * <p/>
  * 单词学习实体类
  */
-public class WordReview {
+public class WordReview implements Serializable {
 
     private String word;  //单词
     private String option_A;  //A选项
@@ -125,4 +127,5 @@ public class WordReview {
     public void setUserID(int userID) {
         this.userID = userID;
     }
+
 }

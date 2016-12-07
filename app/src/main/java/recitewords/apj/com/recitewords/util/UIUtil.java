@@ -36,13 +36,15 @@ public class UIUtil {
      * @param gravity  显示位置
      * @param xOffset  X偏移量
      * @param yOffset  Y轴偏移量
+     * @param size  字体大小
      */
     public static void toast(Context context, String content, int time,
-                             int gravity, int xOffset, int yOffset) {
+                             int gravity, int xOffset, int yOffset,int size) {
         Toast toast = new Toast(context);
         View mToastView = LayoutInflater.from(context).inflate(R.layout.toast_util, null);
         TextView toast_tv_tip = (TextView) mToastView.findViewById(R.id.toast_tv_tip);
         toast_tv_tip.setText(content);
+        toast_tv_tip.setTextSize(size);
         toast.setView(mToastView);
         toast.setDuration(time);
         toast.setGravity(gravity, xOffset, yOffset);

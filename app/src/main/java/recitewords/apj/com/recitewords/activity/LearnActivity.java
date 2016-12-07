@@ -40,7 +40,7 @@ import recitewords.apj.com.recitewords.view.SlidingUpMenu;
  */
 
 public class LearnActivity extends BaseActivity implements View.OnClickListener,
-        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener, TextWatcher {
+        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener{
 
     //定义好的8张背景图id数组
     private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
@@ -68,15 +68,6 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         public TextView tv_spell;  //底部拼写按钮
         public TextView tv_delete;  //底部删除按钮
         public SlidingUpMenu learn_sliding;  //上下滑动控件
-
-        public TextView spell_tv_close;  //拼写关闭
-        public RelativeLayout spell_rl_root;  //拼写根布局
-        public EditText spell_et_input;  //拼写用户输入
-        public TextView spell_tv_correct;  //拼写显示正确单词
-        public TextView spell_tv_confirm;  //拼写确认单词
-        public TextView spell_tv_prompt;  //拼写单词提示
-        public RelativeLayout spell_rl_back;  //评写界面黑色背景
-        public RelativeLayout spell_rl_bottom;  //评写界面底部背景
 
         public TextView learn_tv_word;           //要学习的单词
         public TextView learn_tv_soundMark;     // 音标
@@ -279,73 +270,16 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Dialog_Fullscreen);
-
-                this.alertDialog = builder.create();
-                View view = getLayoutInflater().inflate(R.layout.dialog_spell, null);
-                this.alertDialog.setView(view, 0, 0, 0, 0);
-                holder.spell_tv_close = UIUtil.findViewByIds(view, R.id.spell_tv_close);
-                holder.spell_rl_root = UIUtil.findViewByIds(view, R.id.spell_rl_root);
-                holder.spell_et_input = UIUtil.findViewByIds(view, R.id.spell_et_input);
-                holder.spell_tv_correct = UIUtil.findViewByIds(view, R.id.spell_tv_correct);
-                holder.spell_tv_confirm = UIUtil.findViewByIds(view, R.id.spell_tv_confirm);
-                holder.spell_tv_prompt = UIUtil.findViewByIds(view, R.id.spell_tv_prompt);
-                holder.spell_rl_back = UIUtil.findViewByIds(view, R.id.spell_rl_back);
-                holder.spell_rl_bottom = UIUtil.findViewByIds(view, R.id.spell_rl_bottom);
-
-                holder.spell_rl_root.setBackgroundResource(images[backgroundNum]);
-                //设置黑色背景透明度，模糊化背景图片
-//                holder.spell_rl_back.getBackground().setAlpha(210);
-                //底部暗灰色导航条，使背景模糊化
-                holder.spell_rl_bottom.getBackground().setAlpha(170);
-
-                holder.spell_tv_close.setOnClickListener(this);  //监听拼写关闭按钮
-                holder.spell_tv_prompt.setOnClickListener(this);  //监听评写提示按钮
-                holder.spell_tv_confirm.setOnClickListener(this);  //监听评写确认按钮
-                holder.spell_et_input.addTextChangedListener(this);  //监听文本框内容变化
-                this.alertDialog.show();
+                Intent intent = new Intent(this, SpellTestActivity.class);
+                intent.putExtra("Word", studyWords.get(order).getWord());
+                intent.putExtra("Phonogram", studyWords.get(order).getSoundmark_american());
+                intent.putExtra("BanckgroundIndex", backgroundNum);
+                intent.putExtra("Mode", "spell");
+                startActivity(intent);
                 break;
             case R.id.tv_delete:
                 //从学习单词表中删除单词，表示已经掌握
                 Toast.makeText(LearnActivity.this, "点击删除按钮", Toast.LENGTH_LONG).show();
-                break;
-            case R.id.spell_tv_close:
-                //关闭拼写界面
-                this.alertDialog.dismiss();
-                break;
-            case R.id.spell_tv_prompt:
-                //提示用户的单词信息，显示音标和读音
-                MediaUtils.playWord(this, "abandon");  //播放单词
-                //获取底部导航栏高度，让土司显示在中间
-                int height = holder.spell_rl_bottom.getHeight();
-                int time=3000;  //提示时间3秒
-                //自定义土司，设置土司显示位置
-                UIUtil.toast(this,studyWords.get(order).getSoundmark_american(),time, Gravity.BOTTOM,0,height/2-20);
-                //改变背景图片
-                holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt);
-                    }
-                },time);
-
-                break;
-            case R.id.spell_tv_confirm:
-                //比较用户输入单词和正确单词
-                String word = holder.spell_et_input.getText().toString();  //获取用户输入的单词
-                if (word.equals(LearnWordsUtil.getWords(this).get(order).getWord())) {
-                    //改变文字颜色--淡黄
-                    holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
-                    MediaUtils.playWord(this, "abandon.mp3");  //播放单词
-                } else {
-                    //改变文字颜色--红色
-                    holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
-                    MediaUtils.playWord(this,"abandon.mp3");  //播放单词
-                    holder.spell_tv_correct.setText(LearnWordsUtil.getWords(this).get(order).getWord());  //显示正确的单词
-                    holder.spell_tv_correct.setVisibility(View.VISIBLE);
-                }
-                havaing_comfirm = true;  //改变是否比较状态
                 break;
             default:
                 break;
@@ -493,38 +427,6 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         if (mOnToggleListner != null) {
             mOnToggleListner.onToggleChange(view, isOpen);
         }
-    }
-    String input="";
-    //文本框变化前
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        input=s.toString();  //内容默认为
-    }
-
-    //文本框变化中
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (havaing_comfirm) {
-            input = s.toString().substring(start, (start + count));  //获取用户重新输入的值
-        } else {
-            input=s.toString();
-        }
-    }
-
-    //文本框变化后
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (havaing_comfirm){
-            havaing_comfirm=false;
-            //隐藏正确单词
-            holder.spell_tv_correct.setVisibility(View.INVISIBLE);
-            //用户在比较单词后会改变输入文字颜色，在此处确保用户再次输入的文字为白色
-            int color = Color.parseColor("#FFFFFF");
-            holder.spell_et_input.setTextColor(color);
-            holder.spell_et_input.setText(input);
-            holder.spell_et_input.setSelection(input.length());  //设置光标位置
-        }
-
     }
 
     /**

@@ -11,17 +11,15 @@ import android.os.Message;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,6 @@ import recitewords.apj.com.recitewords.bean.WordReview;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
-import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.NumUtil;
@@ -40,9 +37,15 @@ import recitewords.apj.com.recitewords.util.UIUtil;
 import recitewords.apj.com.recitewords.view.CircleProgressView;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
+
+/**
+ * Created by CGT on 2016/12/5.
+ * <p/>
+ * 复习界面的Activity
+ */
 public class ReviewActivity extends BaseActivity implements View.OnClickListener,
-        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener, TextWatcher {
-    //定义好的8张背景图id数组
+        ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener {
+    //定义好的6张背景图id数组
     private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
             R.mipmap.haixin_bg_dim_03, R.mipmap.haixin_bg_dim_04,
             R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
@@ -132,15 +135,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         TextView tv_spell;  //拼写按钮
         TextView tv_delete; //删除按钮
 
-        TextView spell_tv_close;  //拼写关闭
-        RelativeLayout spell_rl_root;  //拼写根布局
-        EditText spell_et_input;  //拼写用户输入
-        TextView spell_tv_correct;  //拼写显示正确单词
-        TextView spell_tv_confirm;  //拼写确认单词
-        TextView spell_tv_prompt;  //拼写单词提示
-        RelativeLayout spell_rl_back;  //评写界面黑色背景
-        RelativeLayout spell_rl_bottom;  //评写界面底部背景
-
         TextView tv_complete;  //头部显示已完成单词
         TextView tv_need_complete;  //头部显示未完成单词
         TextView learn_tv_word;  //单词
@@ -211,6 +205,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_delete.setOnClickListener(this);
         holder.review_sliding.setOnToggleListener(this);
         holder.learn_tv_changesound.setOnClickListener(this);
+        holder.tv_complete.setOnClickListener(this);
+        holder.tv_need_complete.setOnClickListener(this);
         holder.ll_choice.setOnClickListener(this);
         holder.tv_A.setOnClickListener(this);
         holder.tv_B.setOnClickListener(this);
@@ -229,6 +225,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         wordReviewDao = new WordReviewDao(this);
         getDataForBook();  //从词书表获取数据插入复习表中
         //获取复习表中单词
+        wordReviews=new ArrayList<>();
         wordReviews = wordReviewDao.queryAll(book_name);
 
         complete_review_word = getNeed_review_word();      //已复习单词
@@ -292,6 +289,13 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.tv_complete:
+                UIUtil.toast(this, "复习完成" + complete_review_word + "个", 3000, Gravity.TOP, 0, 0, 16);
+                startActivity(new Intent(this, SpellTestActivity.class));
+                break;
+            case R.id.tv_need_complete:
+                UIUtil.toast(this, "本组剩余" + need_review_word + "个", 3000, Gravity.TOP, 0, 0, 16);
+                break;
             case R.id.fl_progress_click:
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
                     holder.progress.setVisibility(View.GONE);   //隐藏进度条
@@ -423,30 +427,16 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Dialog_Fullscreen);
-
-                this.alertDialog = builder.create();
-                View view = getLayoutInflater().inflate(R.layout.dialog_spell, null);
-                this.alertDialog.setView(view, 0, 0, 0, 0);
-                holder.spell_tv_close = UIUtil.findViewByIds(view, R.id.spell_tv_close);
-                holder.spell_rl_root = UIUtil.findViewByIds(view, R.id.spell_rl_root);
-                holder.spell_et_input = UIUtil.findViewByIds(view, R.id.spell_et_input);
-                holder.spell_tv_correct = UIUtil.findViewByIds(view, R.id.spell_tv_correct);
-                holder.spell_tv_confirm = UIUtil.findViewByIds(view, R.id.spell_tv_confirm);
-                holder.spell_tv_prompt = UIUtil.findViewByIds(view, R.id.spell_tv_prompt);
-                holder.spell_rl_back = UIUtil.findViewByIds(view, R.id.spell_rl_back);
-                holder.spell_rl_bottom = UIUtil.findViewByIds(view, R.id.spell_rl_bottom);
-
-                holder.spell_rl_root.setBackgroundResource(images[backgroundNum]);
-
-                //底部暗灰色导航条，使背景模糊化
-                holder.spell_rl_bottom.getBackground().setAlpha(170);
-
-                holder.spell_tv_close.setOnClickListener(this);  //监听拼写关闭按钮
-                holder.spell_tv_prompt.setOnClickListener(this);  //监听评写提示按钮
-                holder.spell_tv_confirm.setOnClickListener(this);  //监听评写确认按钮
-                holder.spell_et_input.addTextChangedListener(this);  //监听文本框内容变化
-                this.alertDialog.show();
+                Intent intent = new Intent(this, SpellTestActivity.class);
+//                intent.putExtra("Word", mWord);
+//                intent.putExtra("Phonogram", mPhonogram);
+//                intent.putExtra("BanckgroundIndex", backgroundNum);
+//                intent.putExtra("Mode", "spell");
+                //拼写测试
+                intent.putExtra("BanckgroundIndex", backgroundNum);
+                intent.putExtra("words", (Serializable) wordReviews);
+                intent.putExtra("Mode", "spellTest");
+                startActivity(intent);
                 break;
             case R.id.tv_delete:
                 //Toast.makeText(this, "点击了删除按钮，功能还没写", Toast.LENGTH_SHORT).show();
@@ -469,46 +459,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                     reset();
                     setProgress();
                 }
-
-
                 break;
-            case R.id.spell_tv_close:
-                //关闭拼写界面
-                this.alertDialog.dismiss();
-                break;
-            case R.id.spell_tv_prompt:
-                //提示用户的单词信息，显示音标和读音
-                MediaUtils.playWord(this, "abroad");  //播放单词
-                //获取底部导航栏高度，让土司显示在中间
-                int height = holder.spell_rl_bottom.getHeight();
-                int time = 3000;  //提示时间3秒
-                //自定义土司，设置土司显示位置
-                UIUtil.toast(this, mPhonogram, time, Gravity.BOTTOM, 0, height / 2 - 20);
-                //改变背景图片
-                holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt);
-                    }
-                }, time);
-
-                break;
-            case R.id.spell_tv_confirm:
-                //比较用户输入单词和正确单词
-                String word = holder.spell_et_input.getText().toString();  //获取用户输入的单词
-                if (word.equals(mWord)) {
-                    //改变文字颜色--淡黄
-                    holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
-                    MediaUtils.playWord(this, "abroad");  //播放单词
-                } else {
-                    //改变文字颜色--红色
-                    holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
-                    MediaUtils.playWord(this, "abroad");  //播放单词
-                    holder.spell_tv_correct.setText(mWord);  //显示正确的单词
-                    holder.spell_tv_correct.setVisibility(View.VISIBLE);
-                }
-                havaing_comfirm = true;  //改变是否比较状态
+            default:
                 break;
         }
     }
@@ -642,42 +594,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.fl_example.setMinimumHeight(height);
         holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);//取消视图树监听
     }
-
-
-    String input = "";
-
-    //文本框变化前
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        input = s.toString();  //内容默认为
-    }
-
-    //文本框变化中
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (havaing_comfirm) {
-            input = s.toString().substring(start, (start + count));  //获取用户重新输入的值
-        } else {
-            input = s.toString();
-        }
-    }
-
-    //文本框变化后
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (havaing_comfirm) {
-            havaing_comfirm = false;
-            //隐藏正确单词
-            holder.spell_tv_correct.setVisibility(View.INVISIBLE);
-            //用户在比较单词后会改变输入文字颜色，在此处确保用户再次输入的文字为白色
-            int color = Color.parseColor("#FFFFFF");
-            holder.spell_et_input.setTextColor(color);
-            holder.spell_et_input.setText(input);
-            holder.spell_et_input.setSelection(input.length());  //设置光标位置
-        }
-
-    }
-
 
     //监听例句显示状态
     @Override
