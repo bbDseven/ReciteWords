@@ -12,12 +12,41 @@ public class WordStudy {
     private String option_B;  //B选项
     private String option_C;  //C选项
     private String option_D;  //D选项
+    private String soundmark_american;//美式音标
+    private String soundmark_british;//英式音标
     private String answer_right;  //正确答案
     private String answer_user;  //用户答案
     private int asterisk;  //记住次数（*号）
     private String date;  //记住日期
     private String book_name;  //词书名字
     private int userID;  //用户ID
+
+    public WordStudy(){
+    }
+
+    public WordStudy(String word,String soundmark_american,String soundmark_british,String answer_right,int asterisk){
+        this.word = word;
+        this.soundmark_american = soundmark_american;
+        this.soundmark_british = soundmark_british;
+        this.answer_right = answer_right;
+        this.asterisk = asterisk;
+    }
+
+    public String getSoundmark_american() {
+        return soundmark_american;
+    }
+
+    public String getSoundmark_british() {
+        return soundmark_british;
+    }
+
+    public void setSoundmark_american(String soundmark_american) {
+        this.soundmark_american = soundmark_american;
+    }
+
+    public void setSoundmark_british(String soundmark_british) {
+        this.soundmark_british = soundmark_british;
+    }
 
     public String getWord() {
         return word;
