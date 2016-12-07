@@ -101,24 +101,28 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/asterisk_four"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_there"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_two"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_one"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"

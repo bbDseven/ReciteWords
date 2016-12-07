@@ -23,6 +23,9 @@ public class BookDao {
             "word_mean,word_is_study,word_is_grasp,book_name,userID) values " +
             "(?,?,?,?,?,?,?,?)";
 
+    String add ="insert into word_study(word,soundmark_american,soundmark_british,answer_right,asterisk) values " +
+            "(?,?,?,?,?)";
+
     public BookDao(Context context) {
         helper = new ReciteWordsSQLiteOpenHelper(context, MainActivity.dbName, 1);
     }
@@ -64,6 +67,22 @@ public class BookDao {
         return books;
     }
 
+    /**
+     * 获取需要复习的单词总数
+     * @return 单词总数 int
+     */
+    public int queryAllReviewWordSize(){
+        int ReviewWordSum=0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ArrayList<Book> books = new ArrayList<>();
+        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
+                new String[]{"1", "0"}, null, null, null, null);
+        while (cursor.moveToNext()) {
+            ReviewWordSum++;
+        }
+        return ReviewWordSum;
+    }
+
 
     /**
      * 更新单词是否为已掌握
@@ -77,4 +96,61 @@ public class BookDao {
         values.put("word_is_grasp ",1);
        return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
     }
+
+    /**
+     *  更改单词的：是否已学习 word_is_study 字段 变为 1
+     *  表示已学习
+     * */
+    public void updateWord_is_study(String word){
+        String update_sql ="update book set word_is_study=? where word=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(update_sql,new Object[]{1,word});
+        db.close();
+    }
+
+    /**
+     * 从Book 词书表里获取20个单词
+     * 供给 word_study 学习表去学习
+     * */
+    public ArrayList<Book> getWord_study(){
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ArrayList<Book> wordList = new ArrayList<Book>();//存放20个单词信息的集合
+        Cursor cursor = db.rawQuery("select word, soundmark_american, soundmark_british, word_mean from book",null);
+        // 先获取
+        while (cursor.moveToNext()){
+            String word = cursor.getString(cursor.getColumnIndex("word"));
+            String soundmark_american = cursor.getString(cursor.getColumnIndex("soundmark_american"));
+            String soundmark_british = cursor.getString(cursor.getColumnIndex("soundmark_british"));
+            String word_mean = cursor.getString(cursor.getColumnIndex("word_mean"));
+            Book book = new Book(word,soundmark_american,soundmark_british,word_mean);
+            wordList.add(book);
+        }
+        cursor.close();
+        db.close();
+        return wordList;
+    }
+
+    /**
+     * 从 getWord_study 方法里获取到的20个单词集合
+     * 插入到 word_study 学习表里
+     * */
+    public void insertWord_study(){
+        ArrayList<Book> books = getWord_study();
+        for (int i=0;i<books.size();i++){
+            add(books.get(i).getWord(),
+                    books.get(i).getSoundmark_american(),
+                    books.get(i).getSoundmark_british(),
+                    books.get(i).getWord_mean(),0);
+        }
+    }
+
+    /**
+     * 插入，单词，美式音标，英式音标，词义，星号（认识次数）
+     * */
+    public void add(String word,String soundmark_american,String soundmark_british,String answer_right,int asterisk) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(add, new Object[]{word,soundmark_american,soundmark_british,answer_right,asterisk});
+        db.close();
+    }
+
 }

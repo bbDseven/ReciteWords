@@ -50,7 +50,7 @@
             android:name="net.youmi.android.ExpService"
             android:exported="false"></service>
 
-        <activity android:name=".activity.ReviewSpellActivity"></activity>
+        <activity android:name=".activity.SpellTestActivity"></activity>
     </application>
 
 </manifest>

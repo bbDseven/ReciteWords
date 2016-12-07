@@ -1,5 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,6 +49,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
         RelativeLayout main_rl_review;
+        TextView main_tv_review_num;  //需复习单词总数
     }
 
     private ViewHolder holder;
@@ -54,6 +57,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private boolean show_navigate_state = false;
     private MainActivity mainActivity;
     private int num;  //背景图片的序号
+    private int mReviewWordSum;  //需要复习的单词总数
 
     //带参构造方法
     public MainFragment(Context context) {
@@ -74,6 +78,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn = findViewByIds(view, R.id.main_rl_learn);
         holder.main_rl_review = findViewByIds(view, R.id.main_rl_review);
+        holder.main_tv_review_num = findViewByIds(view, R.id.main_tv_review_num);
         return view;
     }
 
@@ -104,10 +109,21 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             insertExampleSentence();//插入词书表book
             insertBook();//插入词书表book
             insertLexicon();//插入词库表lexicon*/
-            insertWordStudy();//插入学习单词
-           // insertWordReview();  //插入复习单词，模拟数据
+            //insertWordStudy();//插入学习单词
+            BookDao bookDao = new BookDao(mContext);
+            bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
+            // insertWordReview();  //插入复习单词，模拟数据
+
+
             PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
         }
+
+        //获取徐复习单词总数，并显示
+
+        BookDao bookDao = new BookDao(mActivity);
+        mReviewWordSum = bookDao.queryAllReviewWordSize();
+        holder.main_tv_review_num.setText(mReviewWordSum + "");
+
     }
 
 
@@ -157,94 +173,72 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     /**
-    * 插入词书表book
-    * */
+     * 插入词书表book
+     */
     private void insertBook() {
         BookDao bookDao = new BookDao(mContext);
         bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的", 1, 0, "CET4", 0);
         bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 1, 0, "CET4", 0);
-        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历\n" +
-                "vt.凶杀;糟蹋;打垮\n" +
-                "vi.杀人", 1, 0, "CET4", 0);
-        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长\n" +
-                "v.发展;（使）进步，（使）进行;促进\n" +
-                "vi.发展;（向更高方向）增进", 1, 0, "CET4", 0);
-        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的\n" +
-                "n.修士，修女，出家人", 1, 0, "CET4", 0);
-        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的\n" +
-                "vi.疼痛;感到刺痛;难过\n" +
-                "n.创伤;刺痛;疼痛;痛苦\n" +
-                "vt.引起…的疼痛（或痛苦、苦恼等）\n" +
-                "adv.聪明伶俐地，轻快地，漂亮地",1, 0, "CET4", 0);
-        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop)\n" +
-                "vt.为…理发剃须;修整\n" +
-                "vi.当理发师;给人理发", 1, 0, "CET4", 0);
-        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性\n" +
-                "adj.动物的;肉体的;肉欲的", 1, 0, "CET4", 0);
-        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止\n" +
-                "n.放任，放纵;完全屈从于压制\n", 1, 0, "CET4", 0);
+        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "CET4", 0);
+        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 1, 0, "CET4", 0);
+        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的 n.修士，修女，出家人", 1, 0, "CET4", 0);
+        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 1, 0, "CET4", 0);
+        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "CET4", 0);
+        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性 adj.动物的;肉体的;肉欲的", 1, 0, "CET4", 0);
+        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 n.放任，放纵;完全屈从于压制", 1, 0, "CET4", 0);
         bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "CET4", 0);
         bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 1, 0, "CET4", 0);
-        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车）\n" +
-                "adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "CET4", 0);
-        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围\n" +
-                "adv.大约;在附近;在四周;几乎\n" +
-                "adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "CET4", 0);
-        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地\n" +
-                "adj.往国外的\n" +
-                "n.海外，异国", 1, 0, "CET4", 0);
+        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车） adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "CET4", 0);
+        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "CET4", 0);
+        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地 adj.往国外的 n.海外，异国", 1, 0, "CET4", 0);
         bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;吞并，合并;忍受，承担（费用）", 1, 0, "CET4", 0);
         bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;（伤口等）发炎的", 1, 0, "CET4", 0);
-        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日\n" +
-                "adj.周年的;周年纪念的;年年的;每年的", 1, 0, "CET4", 0);
-        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员\n" +
-                "vt.宣布;述说;声称;预告", 1, 0, "CET4", 0);
-        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的\n" +
-                "n.破产者;无力偿还债务者;丧失（名誉，智力等）的人\n" +
-                "vt.使破产，使枯竭，使极端贫困", 1, 0, "CET4", 0);
+        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;周年纪念的;年年的;每年的", 1, 0, "CET4", 0);
+        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "CET4", 0);
+        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 1, 0, "CET4", 0);
         bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "CET4", 0);
     }
+
     /**
      * 插入复习单词
-     *
+     * <p/>
      * 模拟需要复习的单词
      */
     public void insertWordReview() {
         WordReviewDao dao = new WordReviewDao(mContext);
 
         dao.addWord("economic", "", "", "", "", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]",
-                "adj.经济的;经济学的;合算的;有经济效益的", "",0,  "", "CET4", 0);
+                "adj.经济的;经济学的;合算的;有经济效益的", "", 0, "", "CET4", 0);
 
         dao.addWord("election", "", "", "", "", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]",
-                "n.选举，当选;选举权;[神]神的选择", "",0, "", "CET4", 0);
+                "n.选举，当选;选举权;[神]神的选择", "", 0, "", "CET4", 0);
 
         dao.addWord("murder", "", "", "", "", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]",
                 "n.谋杀;杀戮;极艰难[令人沮丧]的经历\n" +
-                "vt.凶杀;糟蹋;打垮\n" +
-                "vi.杀人\n",  "",0,"", "CET4", 0);
+                        "vt.凶杀;糟蹋;打垮\n" +
+                        "vi.杀人\n", "", 0, "", "CET4", 0);
 
         dao.addWord("progress", "", "", "", "", "[ˈprɑ:gres]", "[ˈprəʊgres]",
                 "n.进步;前进;[生物学]进化;（向更高方向）增长\n" +
-                "v.发展;（使）进步，（使）进行;促进\n" +
-                "vi.发展;（向更高方向）增进\n","",0, "", "CET4", 0);
+                        "v.发展;（使）进步，（使）进行;促进\n" +
+                        "vi.发展;（向更高方向）增进\n", "", 0, "", "CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]",
                 "adj.宗教的;虔诚的;笃信宗教的;谨慎的\n" +
-                        "n.修士，修女，出家人\n","", 0,"", "CET4", 0);
+                        "n.修士，修女，出家人\n", "", 0, "", "CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[smɑ:rt]", "[smɑ:t]",
                 "adj.聪明的;敏捷的;漂亮的;整齐的\n" +
-                "vi.疼痛;感到刺痛;难过\n" +
-                "n.创伤;刺痛;疼痛;痛苦\n" +
-                "vt.引起…的疼痛（或痛苦、苦恼等）\n" +
-                "adv.聪明伶俐地，轻快地，漂亮地\n","", 0,"", "CET4", 0);
+                        "vi.疼痛;感到刺痛;难过\n" +
+                        "n.创伤;刺痛;疼痛;痛苦\n" +
+                        "vt.引起…的疼痛（或痛苦、苦恼等）\n" +
+                        "adv.聪明伶俐地，轻快地，漂亮地\n", "", 0, "", "CET4", 0);
 //        dao.addWord("religious", "", "", "", "", "", "", "","", "", "CET4", 0);
     }
 
     /**
-    * 插入词库表lexicon
-    *
-    * */
+     * 插入词库表lexicon
+     */
     private void insertLexicon() {
         LexiconDao lexiconDao = new LexiconDao(mContext);
         lexiconDao.addWord("CET4", "英语四级词汇 单词数4114", 20, 0, 0, 0, 0);
@@ -274,26 +268,26 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
      */
     public void insertWordStudy() {
         WordStudyDao dao = new WordStudyDao(mContext);
-        dao.addWord("economic", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("election", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("murder", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("progress", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("religious", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("smart", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("barber", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("animal", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("abandon", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("ability", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("able", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("aboard", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("about", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("abroad", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("absorb", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("angry", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("anniversary", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("announce", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("bankrupt", "", "", "", "", "", "", 0, "", "CET4", 0);
-        dao.addWord("computer", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("economic", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("election", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("murder", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("progress", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("religious", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("smart", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("barber", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("animal", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("abandon", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("ability", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("able", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("aboard", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("about", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("abroad", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("absorb", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("angry", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("anniversary", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("announce", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("bankrupt", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
+        dao.addWord("computer", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
     }
 
 
@@ -318,10 +312,21 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.main_rl_review:
-                //跳转到复习界面
-                Intent intent_review = new Intent(mActivity, ReviewActivity.class);
-                intent_review.putExtra("backgroundNum", num);
-                startActivity(intent_review);
+                //判断是否跳转到复习界面
+                if (mReviewWordSum > 0) {
+                    Intent intent_review = new Intent(mActivity, ReviewActivity.class);
+                    intent_review.putExtra("backgroundNum", num);
+                    startActivity(intent_review);
+                }else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("暂时还没有复习任务，你任性去吧");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+
+
                 break;
             default:
                 break;
@@ -337,6 +342,5 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int num = (int) (Math.random() * 6);
         return num;
     }
-
 
 }
