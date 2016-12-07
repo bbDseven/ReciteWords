@@ -1,15 +1,42 @@
 package recitewords.apj.com.recitewords.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LearnActivity;
@@ -21,6 +48,8 @@ import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
+import recitewords.apj.com.recitewords.util.UIUtil;
+import recitewords.apj.com.recitewords.view.CircleImageView;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -34,6 +63,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     //定义好的6张背景图id数组
     private int[] imgs = new int[]{R.mipmap.haixin_bg_01, R.mipmap.haixin_bg_02, R.mipmap.haixin_bg_03,
             R.mipmap.haixin_bg_04, R.mipmap.haixin_bg_05, R.mipmap.haixin_bg_06};
+    private int[] images = new int[]{R.mipmap.haixin_bg_dim_01, R.mipmap.haixin_bg_dim_02,
+            R.mipmap.haixin_bg_dim_03, R.mipmap.haixin_bg_dim_04,
+            R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
+    //单词集合
+    private static List<String> list = new ArrayList(){{add("abandon"); add("ability"); add("able");
+        add("aboard"); add("about"); add("abroad"); add("absorb"); add("angry"); add("animal");
+        add("anniversary"); add("announce"); add("bankrupt"); add("barber"); add("computer"); add("economic");
+        add("election"); add("murder"); add("progress"); add("religious"); add("smart"); }};
 
     private class ViewHolder {
         RelativeLayout activity_main;
@@ -45,6 +82,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
         RelativeLayout main_rl_review;
+        CircleImageView main_img_circle;
+        ImageView main_img_dict;
     }
 
     private ViewHolder holder;
@@ -52,6 +91,16 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private boolean show_navigate_state = false;
     private MainActivity mainActivity;
     private int num;  //背景图片的序号
+    private static final int TAKE_PHOTO = 1;    //打开相机的请求码
+    private static final int CROP_PHOTO = 2;    //裁剪图片的请求码
+    private static final int CHOICE_PHOTO = 3;    //选择图片的请求码
+    private Uri imageUri;   //图片uri地址
+    private AlertDialog dialog; //查询单词的对话框
+    private EditText et_query;  //查询单词的输入框
+    private MyAdapter mAdapter; //lv的适配器
+    private ImageView iv_query_delete;//输入框的叉叉按钮
+    private List<String> list_word = new ArrayList<>(); //lv的数据源
+
 
     //带参构造方法
     public MainFragment(Context context) {
@@ -72,6 +121,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn = findViewByIds(view, R.id.main_rl_learn);
         holder.main_rl_review = findViewByIds(view, R.id.main_rl_review);
+        holder.main_img_circle = findViewByIds(view, R.id.main_img_circle);
+        holder.main_img_dict = findViewByIds(view, R.id.main_img_dict);
         return view;
     }
 
@@ -80,6 +131,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.iv_menu.setOnClickListener(this);
         holder.main_rl_learn.setOnClickListener(this);
         holder.main_rl_review.setOnClickListener(this);
+        holder.main_img_circle.setOnClickListener(this);
+        holder.main_img_dict.setOnClickListener(this);
     }
 
     @Override
@@ -104,6 +157,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             insertLexicon();//插入词库表lexicon*/
             insertWordStudy();//插入学习单词
             PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
+        }
+
+        String sp_imageUri = PrefUtils.getImage(sp, "imageUri", "");
+        if (!TextUtils.isEmpty(sp_imageUri)) {
+            holder.main_img_circle.setImageURI(Uri.parse(sp_imageUri));
         }
     }
 
@@ -283,7 +341,221 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 intent_review.putExtra("backgroundNum", num);
                 startActivity(intent_review);
                 break;
+            case R.id.main_img_circle:
+                //头像的点击事件、弹出对话框
+                AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                AlertDialog dialog = builder.create();
+                dialog.setTitle("更换头像");
+                dialog.setButton("选择照片", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        choicePhoto();  //调用选择照片方法
+                    }
+                });
+                dialog.setButton2("拍摄", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        takePhoto();    //调用拍摄方法
+                    }
+                });
+                dialog.show();
+                break;
+            case R.id.main_img_dict:
+                //查询单词
+                AlertDialog.Builder builder_query = new AlertDialog.Builder(mActivity, R.style.Dialog_Fullscreen);
+                this.dialog = builder_query.create();
+                View view = View.inflate(mActivity, R.layout.dialog_query_word, null);
+                this.dialog.setView(view, 0, 0, 0, 0);
+                RelativeLayout ll_query_word = UIUtil.findViewByIds(view, R.id.rl_query_word);
+                RelativeLayout ll_query_bg = UIUtil.findViewByIds(view, R.id.rl_query_bg);
+                et_query = UIUtil.findViewByIds(view, R.id.et_query);
+                iv_query_delete = UIUtil.findViewByIds(view, R.id.iv_query_delete);//输入框的叉叉按钮
+                Button btn_cancel_query = UIUtil.findViewByIds(view, R.id.btn_cancel_query);//取消按钮
+                ListView lv_query = UIUtil.findViewByIds(view, R.id.lv_query);
+
+                ll_query_bg.getBackground().setAlpha(100);  //设置输入框所在布局透明度
+                et_query.getBackground().setAlpha(70);  //设置输入框背景透明度
+                ll_query_word.setBackgroundResource(images[num]);//设置对话框背景
+                mAdapter = new MyAdapter();
+                lv_query.setAdapter(mAdapter);  //listview设置适配器
+//                et_query.setOnKeyListener(onKeyListener);   //设置输入法软键盘右下角按钮监听器
+                //输入框添加文本变化监听器
+                et_query.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+                    //文本变化后
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (s.length() > 0){    //文本内容大于0
+                            iv_query_delete.setVisibility(View.VISIBLE);    //显示删除按钮
+                            list_word.clear();  //先清空lv集合数据
+                            showListViewData(); //再添加数据
+                            mAdapter.notifyDataSetChanged();    //通知lv更新
+                        }else {
+                            iv_query_delete.setVisibility(View.GONE);   //隐藏删除按钮
+                            list_word.clear();  //清空集合数据
+                            mAdapter.notifyDataSetChanged();    //通知lv更新
+                        }
+                    }
+                });
+
+                lv_query.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        et_query.setText(list_word.get(position));
+                        list_word.clear();
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                iv_query_delete.setOnClickListener(this);
+                btn_cancel_query.setOnClickListener(this);
+                this.dialog.show();
+                break;
+            case R.id.iv_query_delete:
+                //查询的叉叉的点击事件
+                et_query.setText("");
+                break;
+            case R.id.btn_cancel_query:
+                //取消查询的点击事件
+                this.dialog.dismiss();
+                break;
             default:
+                break;
+        }
+    }
+
+    //将总集合里的数据里包含文本框的数据添加到ListView数据集合
+    private void showListViewData() {
+        String data = et_query.getText().toString();
+        for (int i=0; i<list.size(); i++){
+            if (list.get(i).contains(data)){
+                list_word.add(list.get(i));
+            }
+        }
+    }
+
+//    //输入法软键盘右下角的监听器
+//    private View.OnKeyListener onKeyListener = new View.OnKeyListener() {
+//
+//        @Override
+//        public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+//                    et_query.setText("哈哈");
+//                    return false;
+//                }
+////                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+////                /*隐藏软键盘*/
+////                    InputMethodManager inputMethodManager = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+////                    if (inputMethodManager.isActive()) {
+////                        inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+////                    }
+////
+////                    et_query.setText("success");
+////
+////                    return true;
+////            }
+//            return false;
+//        }
+//    };
+
+    class MyAdapter extends BaseAdapter{
+
+        @Override
+        public int getCount() {
+            return list_word.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return list_word.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+                View view;
+                if (convertView != null) {
+                    view = convertView;
+                } else {
+                    view = View.inflate(mActivity, R.layout.listview_query, null);
+                }
+                TextView tv_lv = UIUtil.findViewByIds(view, R.id.tv_lv);
+                tv_lv.setText(list_word.get(position));
+                return view;
+        }
+    }
+
+    //拍摄方法
+    private void takePhoto() {
+        File outputImage = new File(Environment.getExternalStorageDirectory(), "tempImage.jpg"); //创建文件在sd卡并命名
+        try {
+            if (outputImage.exists()){
+                outputImage.delete();   //如果文件存在则删除文件
+            }
+            outputImage.createNewFile();    //创建文件
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        imageUri = Uri.fromFile(outputImage);   //将文件转化为Uri地址
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");   //设置Intent的action
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); //跳转到相机拍摄
+        startActivityForResult(intent, TAKE_PHOTO); //相机执行完回调到onActivityResult方法
+    }
+
+    //选择照片方法
+    private void choicePhoto() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_PICK);   //设置intent的action
+        intent.setType("image/*");  //设置类型
+        startActivityForResult(intent, CHOICE_PHOTO);   //照片选择完回调到onActivityResult方法
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode){
+            case TAKE_PHOTO:    //相机执行完的回调
+                if (resultCode == mActivity.RESULT_OK){
+                    Intent intent = new Intent("com.android.camera.action.CROP");   //跳转到图片裁剪
+                    intent.setDataAndType(imageUri, "image/*"); //设置数据和类型
+                    intent.putExtra("scale", true);     //设置可缩放
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); //设置位置
+                    startActivityForResult(intent, CROP_PHOTO); //裁剪执行完同样回调到onActivityResult方法
+                }
+                break;
+            case CROP_PHOTO:    //裁剪执行完的回调
+                if (resultCode == mActivity.RESULT_OK){
+                    holder.main_img_circle.setImageURI(null);   //先设置为null，防止第二次点击拍摄时头像不更新
+                    holder.main_img_circle.setImageURI(imageUri);   //设置头像
+                    SharedPreferences sp = PrefUtils.getPref(mActivity);
+                    sp.edit().remove("imageUri").commit();
+                    PrefUtils.setImage(sp, "imageUri", imageUri.toString());
+                }
+                break;
+            case CHOICE_PHOTO:      //选择完图片的回调
+                if (resultCode == mActivity.RESULT_OK){     //从相册选择照片不裁切
+                    try {
+                        Uri selectedImage = data.getData(); //获取系统返回的照片的Uri
+                        holder.main_img_circle.setImageURI(selectedImage);
+                        SharedPreferences sp = PrefUtils.getPref(mActivity);
+                        sp.edit().remove("imageUri").commit();
+                        PrefUtils.setImage(sp, "imageUri", selectedImage.toString());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
         }
     }
