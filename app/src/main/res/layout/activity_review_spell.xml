@@ -10,20 +10,42 @@
         android:layout_height="match_parent"
         android:background="#000">
 
+        <RelativeLayout
+            android:id="@+id/review_spell_rl_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!--显示拼写情况-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/16"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:textColor="#fff"
+                android:textSize="24sp"/>
+            <!--圆点导航-->
+            <ImageView
+                android:id="@+id/review_spell_Dot"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <!--关闭-->
-        <TextView
-            android:id="@+id/spell_tv_close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:drawableRight="@mipmap/close" />
+            <!--关闭-->
+            <TextView
+                android:id="@+id/spell_tv_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:drawableRight="@mipmap/close" />
+
+        </RelativeLayout>
+
         <!--输入单词-->
         <EditText
             android:id="@+id/spell_et_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/spell_tv_close"
+            android:layout_below="@+id/review_spell_rl_top"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="50dp"
