@@ -16,6 +16,7 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/tv_complete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@mipmap/done"
@@ -24,6 +25,7 @@
                 android:textSize="26sp" />
 
             <TextView
+                android:id="@+id/tv_need_complete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -67,16 +69,18 @@
 
                     <!--英式音标，美式音标切换-->
                     <TextView
+                        android:id="@+id/learn_tv_changesound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="UK"
-                        android:padding="2dp"
+                        android:padding="3dp"
                         android:textStyle="bold"
                         android:gravity="center"
                         android:background="#919191"
                         android:textSize="13sp" />
 
                     <TextView
+                        android:id="@+id/learn_tv_soundmark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
@@ -97,24 +101,28 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/asterisk_four"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_there"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_two"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"
                     android:src="@mipmap/star_off" />
 
                 <ImageView
+                    android:id="@+id/asterisk_one"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_gravity="right"

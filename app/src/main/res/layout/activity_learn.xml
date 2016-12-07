@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- 例句显示部分 -->
         <include layout="@layout/example_sentence" />
 
         <LinearLayout
@@ -21,7 +22,7 @@
             android:orientation="vertical">
 
             <!--显示单词及学习情况-->
-            <include layout="@layout/learn_show_word" />
+            <include android:id="@+id/ll_show_word" layout="@layout/learn_show_word" />
 
             <!--横线-->
             <ImageView
@@ -138,9 +139,9 @@
                     android:layout_weight="1">
 
                     <!--选择题模式-->
-                    <include layout="@layout/show_word_abcd" />
+                    <include android:id="@+id/ll_abcd" layout="@layout/show_word_abcd" />
                     <!--显示词性词义-->
-                    <include layout="@layout/show_word_information" />
+                    <include android:id="@+id/ll_information" layout="@layout/show_word_information" />
                 </FrameLayout>
 
                 <!--底部返回，评写，删除-->

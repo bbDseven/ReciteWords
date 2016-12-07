@@ -18,6 +18,16 @@ public class Book {
     private String book_name;//词书名字
     private int userID;
 
+    public Book(){
+    }
+
+    public Book(String word,String soundmark_american,String soundmark_british,String word_mean){
+        this.word = word;
+        this.soundmark_american = soundmark_american;
+        this.soundmark_british = soundmark_british;
+        this.word_mean = word_mean;
+    }
+
     public String getBook_name() {
         return book_name;
     }

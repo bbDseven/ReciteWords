@@ -23,12 +23,20 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
             "word_img text, word_is_study integer, word_is_grasp integer, book_name text, userID integer)";
 
     //创建单词学习表的sql语句
-    private final String WORD_STUDY_SQL="create table word_study(word text," +
+    private final String WORD_STUDY_SQL="create table word_study(word text,soundmark_american text,soundmark_british text," +
             "option_A text,option_B text,option_C text,option_D text,answer_right text," +
             "answer_user text,asterisk integer,date text,book_name text,userID integer)";
+
     //创建例句表的sql语句
     private final String WORD_EXAMPLE_SENTENCE = "create table word_example_sentence(word text, example_sentence text, example_sentence_mean," +
             "example_sentence_pronounce text, example_sentence_resource text)";
+
+    //创建单词复习表的sql语句
+    private final String WORD_REVIEW_SQL="create table word_review(word text," +
+            "option_A text,option_B text,option_C text,option_D text,soundmark_american text," +
+            "soundmark_british text,answer_right text,answer_user text,word_is_review  integer," +
+            "date text,book_name text,userID integer)";
+
     public ReciteWordsSQLiteOpenHelper(Context context,String name,int version) {
         super(context,name, null, version);
     }
@@ -39,6 +47,7 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
         db.execSQL(WORD_EXAMPLE_SENTENCE);
         db.execSQL(LEXICON_SQL);
         db.execSQL(BOOK_SQL);
+        db.execSQL(WORD_REVIEW_SQL);
     }
 
     @Override

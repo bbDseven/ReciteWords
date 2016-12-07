@@ -3,6 +3,7 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -16,6 +17,7 @@ import net.youmi.android.offers.OffersManager;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.MainFragment;
 import recitewords.apj.com.recitewords.fragment.SlidingFragment;
+import recitewords.apj.com.recitewords.util.NumUtil;
 
 public class MainActivity extends BaseActivity implements PanelSlideListener, View.OnTouchListener {
 
@@ -49,6 +51,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         mScroller = new Scroller(this);    // 创建scroller
         initView();

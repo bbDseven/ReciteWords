@@ -8,25 +8,58 @@
         android:id="@+id/spell_rl_back"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000">
+        android:background="#000000">
+
+        <LinearLayout
+            android:id="@+id/review_spell_rl_top"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+            <!--显示拼写情况-->
+            <TextView
+                android:id="@+id/spell_tv_situation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="0/16"
+                android:textColor="#fff"
+                android:textSize="16sp" />
+            <!--圆点导航-->
+
+            <LinearLayout
+                android:id="@+id/spell_Dot"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+            </LinearLayout>
 
 
-        <!--关闭-->
-        <TextView
-            android:id="@+id/spell_tv_close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:drawableRight="@mipmap/close" />
+            <!--关闭-->
+            <TextView
+                android:id="@+id/spell_tv_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:layout_marginRight="10dp"
+                android:drawableRight="@mipmap/ic_close" />
+
+        </LinearLayout>
+
         <!--输入单词-->
         <EditText
             android:id="@+id/spell_et_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/spell_tv_close"
+            android:layout_below="@+id/review_spell_rl_top"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="70dp"
             android:background="@null"
             android:gravity="center"
             android:textCursorDrawable="@drawable/edit_color_cursor"
@@ -43,11 +76,14 @@
 
         <TextView
             android:id="@+id/spell_tv_correct"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/spell_et_input"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:layout_marginLeft="35dp"
+            android:layout_marginRight="35dp"
             android:text="哈哈哈哈"
             android:textSize="26sp"
             android:visibility="invisible" />
@@ -78,6 +114,16 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="15dp"
                 android:background="@mipmap/ic_spell_confirm" />
+
+            <TextView
+                android:id="@+id/spell_tv_spell_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@mipmap/spell_next" />
         </RelativeLayout>
 
     </RelativeLayout>

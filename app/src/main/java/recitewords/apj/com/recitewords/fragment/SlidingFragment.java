@@ -377,5 +377,4 @@ public class SlidingFragment extends BaseFragment {
         // 将广告条加入到布局中
         ll_banner_settings.addView(bannerView);
     }
-
 }

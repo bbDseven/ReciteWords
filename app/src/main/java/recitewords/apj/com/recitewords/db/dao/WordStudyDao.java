@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.bean.WordStudy;
 import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
@@ -19,6 +21,27 @@ public class WordStudyDao {
 
     public WordStudyDao(Context context) {
         helper = new ReciteWordsSQLiteOpenHelper(context, MainActivity.dbName, 1);
+    }
+
+    /**
+     * 获取要学习的20个 单词,美式音标，英式音标，词义，星号（认识次数）
+     * */
+    public ArrayList<WordStudy> getWordStudy(Context context){
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ArrayList<WordStudy> words = new ArrayList<WordStudy>();
+        Cursor cursor = db.rawQuery("select word,soundmark_american,soundmark_british,answer_right,asterisk from word_study",null);
+        while (cursor.moveToNext()){
+            String word = cursor.getString(cursor.getColumnIndex("word"));
+            String soundmark_american = cursor.getString(cursor.getColumnIndex("soundmark_american"));
+            String soundmark_british = cursor.getString(cursor.getColumnIndex("soundmark_british"));
+            String answer_right = cursor.getString(cursor.getColumnIndex("answer_right"));
+            int asterisk = cursor.getInt(cursor.getColumnIndex("asterisk"));
+            WordStudy wordStudy = new WordStudy(word,soundmark_american,soundmark_british,answer_right,asterisk);
+            words.add(wordStudy);
+        }
+        cursor.close();
+        db.close();
+        return words;
     }
 
 
@@ -38,12 +61,14 @@ public class WordStudyDao {
      * @param book_name  单词所属词书名字
      * @return 受影响行数
      */
-    public long addWord(String word,String option_A,String option_B,String option_C,String option_D,
-                        String answer_right,String answer_user,int asterisk,
+    public long addWord(String word,String soundmark_american,String soundmark_british,String option_A,String option_B,
+                        String option_C,String option_D, String answer_right,String answer_user,int asterisk,
                         String date,String book_name,int userID) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("word",word);
+        values.put("soundmark_american",soundmark_american);
+        values.put("soundmark_british",soundmark_british);
         values.put("option_A",option_A);
         values.put("option_B",option_B);
         values.put("option_C",option_C);
@@ -84,7 +109,7 @@ public class WordStudyDao {
         ContentValues mValues = new ContentValues();
         mValues.put("asterisk", asterisk);
         SQLiteDatabase db = helper.getWritableDatabase();
-        int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        int num = db.update("word_study", mValues, "word=? and book_name=?", new String[]{word, book_name});
         mValues.clear();
         db.close();
         return num;
@@ -102,7 +127,7 @@ public class WordStudyDao {
         ContentValues mValues = new ContentValues();
         mValues.put("date", date);
         SQLiteDatabase db = helper.getWritableDatabase();
-        int num = db.update("word_study", mValues, "word=?,book_name=?", new String[]{word, book_name});
+        int num = db.update("word_study", mValues, "word=? and book_name=?", new String[]{word, book_name});
         mValues.clear();
         db.close();
         return num;
@@ -118,7 +143,7 @@ public class WordStudyDao {
     public WordStudy findWordDetailByWord(String word, String book_name) {
         WordStudy wordStudy=null;
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.query("word_study", null, "book_name=?",
+        Cursor cursor = db.query("word_review", null, "book_name=?",
                 new String[]{book_name}, null, null, null);
         while (cursor.moveToNext()) {
             wordStudy = new WordStudy();
