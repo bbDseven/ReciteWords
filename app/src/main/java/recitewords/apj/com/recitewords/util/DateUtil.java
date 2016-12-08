@@ -45,9 +45,10 @@ public class DateUtil {
         return wDay;
     }
 
-
-    public void test(){
-
+    //获取年月日
+    public static String getYMD(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        return sdf.format(new Date());
     }
 
 }

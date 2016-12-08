@@ -1,29 +1,29 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +42,17 @@ import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LearnActivity;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.activity.ReviewActivity;
-import recitewords.apj.com.recitewords.bean.WordReview;
+import recitewords.apj.com.recitewords.bean.Book;
+import recitewords.apj.com.recitewords.bean.User;
+import recitewords.apj.com.recitewords.bean.WordExampleSentence;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.ExampleSentenceDao;
 import recitewords.apj.com.recitewords.db.dao.LexiconDao;
+import recitewords.apj.com.recitewords.db.dao.UserDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.util.DateUtil;
+import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.PrefUtils;
 import recitewords.apj.com.recitewords.util.UIUtil;
 import recitewords.apj.com.recitewords.view.CircleImageView;
@@ -62,7 +65,7 @@ import recitewords.apj.com.recitewords.view.CircleImageView;
 public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     //主页面背景图片对应单词数组
-    private String[] img_words = new String[]{"antler", "ferry", "lotus pond", "mist", "moon", "reading time", "scarecrow", "twinkling",};
+//    private String[] img_words = new String[]{"antler", "ferry", "lotus pond", "mist", "moon", "reading time", "scarecrow", "twinkling",};
     //定义好的6张背景图id数组
     private int[] imgs = new int[]{R.mipmap.haixin_bg_01, R.mipmap.haixin_bg_02, R.mipmap.haixin_bg_03,
             R.mipmap.haixin_bg_04, R.mipmap.haixin_bg_05, R.mipmap.haixin_bg_06};
@@ -77,10 +80,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private class ViewHolder {
         RelativeLayout activity_main;
-        TextView tv_word;
         LinearLayout linearLayout;
         ImageView img_sign;
-        ImageView main_img_sign;
         TextView tv_date;
         ImageView iv_menu;
         RelativeLayout main_rl_learn;
@@ -88,6 +89,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         CircleImageView main_img_circle;
         ImageView main_img_dict;
         TextView main_tv_review_num;  //需复习单词总数
+
+        ImageView iv_sign;  //签到的圆圈
+        LinearLayout ll_sign;   //签到的布局
+        LinearLayout ll_sign_succeed; //签到成功的布局
+        TextView tv_sign_money; //签到获得的酷币
+        TextView tv_sign_day;   //连续签到的天数
     }
 
     private ViewHolder holder;
@@ -104,8 +111,19 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private MyAdapter mAdapter; //lv的适配器
     private ImageView iv_query_delete;//输入框的叉叉按钮
     private List<String> list_word = new ArrayList<>(); //lv的数据源
+    private ListView lv_query;  //listview
+    private LinearLayout ll_query_wordInfo;    //单词信息的布局
+    private String data;    //输入框单词
+    private ImageView iv_word_voice; //单词的发音图标
+    private TextView tv_word_soundmark;    //音标
+    private TextView tv_word_mean;  //单词意思
+    private TextView tv_word_sentence;  //例句
+    private TextView tv_word_sentence_mean;//例句意思
+    private TextView tv_word_sentence1;    //例句2
+    private TextView tv_word_sentence_mean1;  //例句2意思
 
     private int mReviewWordSum;  //需要复习的单词总数
+    private UserDao userDao;
 
     //带参构造方法
     public MainFragment(Context context) {
@@ -118,10 +136,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         mainActivity = (MainActivity) mActivity;
         View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_main, null);
         holder.activity_main = findViewByIds(view, R.id.activity_main);
-        holder.tv_word = findViewByIds(view, R.id.main_tv_word);
         holder.linearLayout = findViewByIds(view, R.id.main_ll);
         holder.img_sign = findViewByIds(view, R.id.main_img_sign);
-        holder.main_img_sign = findViewByIds(view, R.id.main_img_sign);
         holder.tv_date = findViewByIds(view, R.id.main_tv_date);
         holder.iv_menu = findViewByIds(view, R.id.main_img_menu);
         holder.main_rl_learn = findViewByIds(view, R.id.main_rl_learn);
@@ -129,6 +145,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.main_img_circle = findViewByIds(view, R.id.main_img_circle);
         holder.main_img_dict = findViewByIds(view, R.id.main_img_dict);
         holder.main_tv_review_num = findViewByIds(view, R.id.main_tv_review_num);
+
+        holder.iv_sign = findViewByIds(view, R.id.main_img_sign);
+        holder.ll_sign = findViewByIds(view, R.id.main_ll_sign);
+        holder.ll_sign_succeed = findViewByIds(view, R.id.main_ll_sign_succeed);
+        holder.tv_sign_money = findViewByIds(view, R.id.tv_sign_money);
+        holder.tv_sign_day = findViewByIds(view, R.id.tv_sign_day);
         return view;
     }
 
@@ -147,12 +169,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //为主界面设置随机图片和图片对应单词
         holder.activity_main.setBackgroundResource(imgs[num]);
 
-        holder.tv_word.setText(img_words[num]);
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
 
-        holder.main_img_sign.setAlpha(150);//主界面签到那里设置透明度
+        holder.iv_sign.setAlpha(150);//主界面签到那里设置透明度
         holder.linearLayout.getBackground().setAlpha(150);  //主界面学习复习按钮设置透明度
 
         SharedPreferences sp = PrefUtils.getPref(mainActivity);//获取sp
@@ -161,6 +182,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             insertExampleSentence();//插入词书表book
             insertBook();//插入词书表book
             insertLexicon();//插入词库表lexicon*/
+            insertUser();//插入用户信息表
             //insertWordStudy();//插入学习单词
             BookDao bookDao = new BookDao(mContext);
             bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
@@ -180,6 +202,24 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         mReviewWordSum = bookDao.queryAllReviewWordSize();
         holder.main_tv_review_num.setText(mReviewWordSum + "");
 
+        //获取今天是否已签到
+        userDao = new UserDao(mActivity);
+        User bean_user = userDao.query();
+        String sign_in = bean_user.getSign_in();    //获取签到信息
+        int day = bean_user.getSign_in_continue();
+        if (!sign_in.equals(DateUtil.getYMD())){    //判断今天是否签到
+            holder.ll_sign.setVisibility(View.VISIBLE); //显示签到布局
+            holder.ll_sign_succeed.setVisibility(View.GONE);    //隐藏签到成功布局
+        }else {
+            holder.ll_sign.setVisibility(View.GONE);    //隐藏签到布局
+            holder.ll_sign_succeed.setVisibility(View.VISIBLE); //显示签到成功布局
+            //设置酷币和连续签到天数  数字的颜色
+            setMoneyColor();
+            setDayColor(day);
+        }
+        if (holder.ll_sign.getVisibility() == View.VISIBLE){    //如果还没签到
+            holder.iv_sign.setOnClickListener(this);    //设置签到圆圈的点击事件
+        }
     }
 
 
@@ -345,6 +385,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         dao.addWord("bankrupt", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
         dao.addWord("computer", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
     }
+    //添加用户信息表信息
+    private void insertUser(){
+        UserDao dao = new UserDao(mContext);
+        dao.add("11", 0, 0);
+    }
 
 
     //setOnClickListener监听点击的回调方法
@@ -414,52 +459,26 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 et_query = UIUtil.findViewByIds(view, R.id.et_query);
                 iv_query_delete = UIUtil.findViewByIds(view, R.id.iv_query_delete);//输入框的叉叉按钮
                 Button btn_cancel_query = UIUtil.findViewByIds(view, R.id.btn_cancel_query);//取消按钮
-                ListView lv_query = UIUtil.findViewByIds(view, R.id.lv_query);
+                lv_query = UIUtil.findViewByIds(view, R.id.lv_query);//listview
+                ll_query_wordInfo = UIUtil.findViewByIds(view, R.id.ll_query_wordInfo);    //单词信息的布局
+                iv_word_voice = UIUtil.findViewByIds(view, R.id.iv_word_voice); //单词的发音图标
+                tv_word_soundmark = UIUtil.findViewByIds(view, R.id.tv_word_soundmark);    //音标
+                tv_word_mean = UIUtil.findViewByIds(view, R.id.tv_word_mean);  //单词意思
+                tv_word_sentence = UIUtil.findViewByIds(view, R.id.tv_word_sentence);  //例句
+                tv_word_sentence_mean = UIUtil.findViewByIds(view, R.id.tv_word_sentence_mean);//例句意思
+                tv_word_sentence1 = UIUtil.findViewByIds(view, R.id.tv_word_sentence1);    //例句2
+                tv_word_sentence_mean1 = UIUtil.findViewByIds(view, R.id.tv_word_sentence_mean1);  //例句2意思
 
                 ll_query_bg.getBackground().setAlpha(100);  //设置输入框所在布局透明度
                 et_query.getBackground().setAlpha(70);  //设置输入框背景透明度
                 ll_query_word.setBackgroundResource(images[num]);//设置对话框背景
                 mAdapter = new MyAdapter();
                 lv_query.setAdapter(mAdapter);  //listview设置适配器
-//                et_query.setOnKeyListener(onKeyListener);   //设置输入法软键盘右下角按钮监听器
-                //输入框添加文本变化监听器
-                et_query.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-                    //文本变化后
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (s.length() > 0){    //文本内容大于0
-                            iv_query_delete.setVisibility(View.VISIBLE);    //显示删除按钮
-                            list_word.clear();  //先清空lv集合数据
-                            showListViewData(); //再添加数据
-                            mAdapter.notifyDataSetChanged();    //通知lv更新
-                        }else {
-                            iv_query_delete.setVisibility(View.GONE);   //隐藏删除按钮
-                            list_word.clear();  //清空集合数据
-                            mAdapter.notifyDataSetChanged();    //通知lv更新
-                        }
-                    }
-                });
-
-                lv_query.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        et_query.setText(list_word.get(position));
-                        list_word.clear();
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
+                setListener();//搜索框EditText和ListView设置监听
 
                 iv_query_delete.setOnClickListener(this);
                 btn_cancel_query.setOnClickListener(this);
+                iv_word_voice.setOnClickListener(this);
                 this.dialog.show();
                 break;
             case R.id.iv_query_delete:
@@ -469,10 +488,153 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             case R.id.btn_cancel_query:
                 //取消查询的点击事件
                 this.dialog.dismiss();
+                list_word.clear();
+                break;
+            case R.id.iv_word_voice:
+                //查询单词界面发音
+                MediaUtils.playWord(mActivity, data);
+                break;
+            case R.id.main_img_sign:
+                //签到
+                holder.iv_sign.setOnClickListener(null);    //取消签到的监听事件
+                holder.ll_sign.setVisibility(View.GONE);    //隐藏要签到的布局
+                holder.ll_sign_succeed.setVisibility(View.VISIBLE); //显示签到成功的布局
+                User bean_user = userDao.query();   //查询信息
+                String sign_in = bean_user.getSign_in();    //获取签到
+                int sign_in_continue = bean_user.getSign_in_continue(); //获取连续签到天数
+                int cool_money = bean_user.getCool_money(); //获取酷币
+                int sign_in_continue1 = 1;
+                int cool_money1 = cool_money + 20;
+                if (Integer.parseInt(DateUtil.getYMD()) - Integer.parseInt(sign_in) == 1){
+                    sign_in_continue1 = sign_in_continue + 1;
+                }
+                userDao.update(DateUtil.getYMD(), sign_in_continue1, cool_money1);  //更新用户信息
+                //设置酷币和连续签到天数  数字的颜色
+                setMoneyColor();
+                setDayColor(sign_in_continue1);
                 break;
             default:
                 break;
         }
+    }
+
+    //设置获取酷币个数的数字颜色
+    private void setMoneyColor(){
+        String sign_money = holder.tv_sign_money.getText().toString();
+        SpannableStringBuilder style = new SpannableStringBuilder(sign_money);
+        int start = sign_money.indexOf("20");
+        style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, start+2, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        holder.tv_sign_money.setText(style);
+    }
+    //设置连续签到天数的颜色
+    private void setDayColor(int day){
+        String sign_day = "连续签到"+day+"天";
+        SpannableStringBuilder style1 = new SpannableStringBuilder(sign_day);
+        int start1 = sign_day.indexOf(String.valueOf(day));
+        int end1 = String.valueOf(day).length() + start1;
+        style1.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start1, end1, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        holder.tv_sign_day.setText(style1);
+    }
+
+    //搜索框ext和ListView设置监听
+    private void setListener(){
+        et_query.setOnKeyListener(onKeyListener);   //设置输入法软键盘右下角按钮监听器
+        et_query.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                    data = et_query.getText().toString();
+                    if (list.contains(data)){
+                        //设置单词信息
+                        setWordInfo();
+                        return false;
+                    }else {
+                        ll_query_wordInfo.setVisibility(View.GONE);//隐藏单词信息
+                        lv_query.setVisibility(View.VISIBLE);   //显示listView
+                        return true;//这里返回true表示方法回调完系统不需再处理。
+                    }
+                }
+                return false;
+            }
+        });
+        //输入框添加文本变化监听器
+        et_query.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+            //文本变化后
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0){    //文本内容大于0
+                    iv_query_delete.setVisibility(View.VISIBLE);    //显示删除按钮
+                    list_word.clear();  //先清空lv集合数据
+                    showListViewData(); //再添加数据
+                    mAdapter.notifyDataSetChanged();    //通知lv更新
+                    lv_query.setVisibility(View.VISIBLE);   //显示listview
+                    ll_query_wordInfo.setVisibility(View.GONE); //隐藏单词信息
+                }else {
+                    iv_query_delete.setVisibility(View.GONE);   //隐藏删除按钮
+                    list_word.clear();  //清空集合数据
+                    mAdapter.notifyDataSetChanged();    //通知lv更新
+                    lv_query.setVisibility(View.VISIBLE);   //显示listview
+                    ll_query_wordInfo.setVisibility(View.GONE); //隐藏单词信息
+                }
+            }
+        });
+
+        lv_query.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                et_query.setText(list_word.get(position));  //设置文本框
+                list_word.clear();  //清空单词集合
+                mAdapter.notifyDataSetChanged();    //通知lv更新
+                data = et_query.getText().toString();   //获取文本框内容
+                setWordInfo();  //设置单词信息
+                //隐藏软键盘
+                InputMethodManager manager = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (manager.isActive()){
+                    manager.hideSoftInputFromWindow(et_query.getWindowToken(), 0);
+                }
+            }
+        });
+    }
+
+    //设置单词信息
+    private void setWordInfo(){
+        lv_query.setVisibility(View.GONE);//隐藏lv
+        ll_query_wordInfo.setVisibility(View.VISIBLE);//显示单词信息布局
+        Book book = queryBook(data);//查询单词信息
+        tv_word_soundmark.setText(book.getSoundmark_american());//设置音标
+        tv_word_mean.setText(book.getWord_mean());//设置单词意思
+
+        WordExampleSentence bean_sentence = querySentence(data);//查询例句信息
+        String sentence = bean_sentence.getExample_sentence();//获取例句
+        String sentence_mean = bean_sentence.getExample_sentence_mean();//获取例句意思
+        String[] sentences = sentence.split("\\.");
+        String[] sentence_means = sentence_mean.split("。");
+        tv_word_sentence.setText(sentences[0]);
+        tv_word_sentence1.setText(sentences[1]);
+        tv_word_sentence_mean.setText(sentence_means[0]);
+        tv_word_sentence_mean1.setText(sentence_means[1]);
+    }
+
+    //获取词书表的查询单词信息方法返回book的bean对象
+    private Book queryBook(String word) {
+        BookDao bookDao = new BookDao(mActivity);
+        Book book = bookDao.query_wordInfo(word);
+        return book;
+    }
+    //获取例句表的查询例句信息方法返回WordExampleSentence的bean对象
+    private WordExampleSentence querySentence(String word){
+        ExampleSentenceDao sentenceDao = new ExampleSentenceDao(mActivity);
+        WordExampleSentence bean_sentence = sentenceDao.query(word);
+        return bean_sentence;
     }
 
     //将总集合里的数据里包含文本框的数据添加到ListView数据集合
@@ -485,29 +647,20 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-//    //输入法软键盘右下角的监听器
-//    private View.OnKeyListener onKeyListener = new View.OnKeyListener() {
-//
-//        @Override
-//        public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-//                    et_query.setText("哈哈");
-//                    return false;
-//                }
-////                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-////                /*隐藏软键盘*/
-////                    InputMethodManager inputMethodManager = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-////                    if (inputMethodManager.isActive()) {
-////                        inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-////                    }
-////
-////                    et_query.setText("success");
-////
-////                    return true;
-////            }
-//            return false;
-//        }
-//    };
+    //输入法软键盘返回键的监听器
+    private View.OnKeyListener onKeyListener = new View.OnKeyListener() {
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            if (keyCode == KeyEvent.KEYCODE_BACK
+                    && event.getAction() == KeyEvent.ACTION_DOWN) {
+                list_word.clear();
+                Log.d("seven", "清空了哈哈哈哈");
+                return false;   //这里返回的boolean类型表示是否还需要系统处理，false表示方法回调完系统再处理返回。
+            }
+            return false;
+        }
+    };
 
     class MyAdapter extends BaseAdapter{
 
@@ -602,6 +755,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
         }
     }
+
 
     /**
      * 生成0 - 5的随机数

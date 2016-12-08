@@ -37,6 +37,10 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
             "soundmark_british text,answer_right text,answer_user text,word_is_review  integer," +
             "date text,book_name text,userID integer)";
 
+    //创建用户信息表
+    private final String USER_INFO_SQL = "create table user(id integer primary key autoincrement, username text, " +
+            "password text, img text, email text, sign_in text, sign_in_continue integer, cool_money integer)";
+
     public ReciteWordsSQLiteOpenHelper(Context context,String name,int version) {
         super(context,name, null, version);
     }
@@ -48,6 +52,7 @@ public class ReciteWordsSQLiteOpenHelper extends SQLiteOpenHelper{
         db.execSQL(LEXICON_SQL);
         db.execSQL(BOOK_SQL);
         db.execSQL(WORD_REVIEW_SQL);
+        db.execSQL(USER_INFO_SQL);
     }
 
     @Override
