@@ -52,11 +52,23 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//
+//        mScroller = new Scroller(this);    // 创建scroller
+//        initView();
+//        initData();
+//        initEvent();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //在onResume方法中，可以返回主页面时重新刷新
         mScroller = new Scroller(this);    // 创建scroller
         initView();
         initData();
         initEvent();
+
     }
 
     private void initView() {

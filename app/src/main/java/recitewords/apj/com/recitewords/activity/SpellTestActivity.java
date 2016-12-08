@@ -138,7 +138,6 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                 pointView.setLayoutParams(params);
                 holder.spell_Dot.addView(pointView);
             }
-
             spellNextWOrd();
         }
 
@@ -215,6 +214,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                 break;
             case R.id.spell_tv_spell_next:
                 spellNextWOrd();
+                is_Pass=true;
                 break;
             default:
                 break;
@@ -258,13 +258,12 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
         }else {//学完一遍后
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("温馨提醒：");
-            builder.setMessage("你已完成本轮复习，赶快去领取酷币吧！");
+            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
             AlertDialog alertDialog = builder.create();
             builder.setPositiveButton("确定",null);
             alertDialog.show();
         }
     }
-
 
     //文本框变化前
     @Override

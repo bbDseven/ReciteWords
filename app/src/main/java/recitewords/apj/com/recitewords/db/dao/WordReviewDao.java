@@ -15,7 +15,7 @@ import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
 
 /**
  * Created by Greetty on 2016/12/5.
- * <p/>
+ * <p>
  * 单词复习表工具类
  */
 public class WordReviewDao {
@@ -48,7 +48,7 @@ public class WordReviewDao {
 
     public long addWord(String word, String option_A, String option_B, String option_C, String option_D,
                         String soundmark_american, String soundmark_british, String answer_right,
-                        String answer_user,int word_is_review, String date, String book_name, int userID) {
+                        String answer_user, int word_is_review, String grasp_values, String date, String book_name, int userID) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("word", word);
@@ -60,7 +60,8 @@ public class WordReviewDao {
         values.put("soundmark_british", soundmark_british);
         values.put("answer_right", answer_right);
         values.put("answer_user", answer_user);
-        values.put("word_is_review",word_is_review );
+        values.put("word_is_review", word_is_review);
+        values.put("grasp_values", grasp_values);
         values.put("date", date);
         values.put("book_name", book_name);
         values.put("userID", userID);
@@ -71,14 +72,14 @@ public class WordReviewDao {
     }
 
     /**
-     * 查询所有需要复习的单词
+     * 查询本组复习的单词
      *
      * @return 所有单词
      */
     public List<WordReview> queryAll(String book_name) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ArrayList<WordReview> wordReviews = new ArrayList<>();
-        Cursor cursor = db.query("word_review", null,"book_name=?" ,new String[]{book_name}, null, null, null);
+        Cursor cursor = db.query("word_review", null, "book_name=?", new String[]{book_name}, null, null, null);
         while (cursor.moveToNext()) {
             WordReview wordReview = new WordReview();
             wordReview.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -122,15 +123,16 @@ public class WordReviewDao {
 
     /**
      * 更新单词的复习状态
-     * @param word  单词
-     * @param book_name  单词所在词书名字
-     * @return  受影响行数
+     *
+     * @param word      单词
+     * @param book_name 单词所在词书名字
+     * @return 受影响行数
      */
-    public int updateReviewState(String word, String book_name){
+    public int updateReviewState(String word, String book_name) {
         ContentValues mValues = new ContentValues();
-        mValues.put("word_is_review",1);
+        mValues.put("word_is_review", 1);
         SQLiteDatabase db = helper.getWritableDatabase();
-        return db.update("word_review",mValues,"word=? and book_name=?",new String[]{word, book_name});
+        return db.update("word_review", mValues, "word=? and book_name=?", new String[]{word, book_name});
     }
 
 //    /**

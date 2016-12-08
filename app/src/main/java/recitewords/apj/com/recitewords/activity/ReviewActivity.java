@@ -3,6 +3,7 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.os.Message;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -30,6 +32,7 @@ import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
+import recitewords.apj.com.recitewords.globle.Grasp;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.NumUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
@@ -38,11 +41,6 @@ import recitewords.apj.com.recitewords.view.CircleProgressView;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
 
-/**
- * Created by CGT on 2016/12/5.
- * <p/>
- * 复习界面的Activity
- */
 public class ReviewActivity extends BaseActivity implements View.OnClickListener,
         ViewTreeObserver.OnGlobalLayoutListener, SlidingUpMenu.OnToggleListener {
     //定义好的6张背景图id数组
@@ -73,6 +71,10 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private List<WordReview> wordReviews;  //当前复习的20个单词
     private int answer_right;  //正确答案的位置
     private int mGraspWord = 0;  //这次学习中，掌握的的单词
+    private float mModeScore = 0;  //模式切换的分值
+    private int mGraspValues;   //熟悉程度
+    private List<Integer> mGraspValuesList;  //熟悉程度集合
+    private int mCircleIndex = 1;  //学习模式切换圈数
 
 
     private Handler mHandler = new Handler(new Handler.Callback() {
@@ -81,24 +83,50 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             switch (msg.what) {
                 case 3:
                     //设置进度条进度
-                    holder.progress.setProgress(25);
-                    holder.fl_progress_click.setOnClickListener(ReviewActivity.this);
-                    setProgress();
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setProgress(25);
+                        holder.fl_progress_click.setOnClickListener(ReviewActivity.this);
+                        setProgress();
+                    } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                        holder.word_progress.setProgress(25);
+                        holder.ll_word_progress.setOnClickListener(ReviewActivity.this);
+                        setProgress();
+                    }
                     break;
                 case 2:
-                    holder.progress.setProgress(50);
-                    setProgress();
+
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setProgress(50);
+                        setProgress();
+                    } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                        holder.word_progress.setProgress(50);
+                        setProgress();
+                    }
                     break;
                 case 1:
-                    holder.progress.setProgress(75);
-                    setProgress();
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setProgress(75);
+                        setProgress();
+                    } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                        holder.word_progress.setProgress(75);
+                        setProgress();
+                    }
                     break;
                 case 0:
-                    holder.progress.setProgress(100);
-                    holder.fl_progress_click.setOnClickListener(null);
-                    holder.progress.setVisibility(View.GONE);   //隐藏进度条
-                    holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setProgress(100);
+                        holder.fl_progress_click.setOnClickListener(null);
+                        holder.progress.setVisibility(View.GONE);   //隐藏进度条
+                        holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
+                    } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                        holder.word_progress.setProgress(100);
+                        holder.ll_word_progress.setOnClickListener(null);
+                        holder.word_progress.setVisibility(View.GONE);   //隐藏进度条
+                        holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
+                    }
                     num = 4;    //进度条显示完num重新设置回4秒
+                    break;
+                default:
                     break;
             }
             return false;
@@ -141,6 +169,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         TextView learn_tv_soundmark; //音标
         TextView learn_tv_changesound;  //切换音标按钮
         TextView tv_word_information;  //显示词性词义
+        CircleProgressView word_progress;  //单词回忆模式--加载单词进度
+        LinearLayout ll_word_progress;  //单词回忆模式--加载单词进度父布局
+        LinearLayout ll_word_root;  //显示单词的父布局
 
         TextView tv_A;  //A选项
         TextView tv_B;  //B选项
@@ -185,6 +216,9 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.learn_tv_soundmark = findViewByIds(R.id.learn_tv_soundmark);
         holder.learn_tv_changesound = findViewByIds(R.id.learn_tv_changesound);
         holder.tv_word_information = findViewByIds(R.id.tv_word_information);
+        holder.word_progress = findViewByIds(R.id.word_progress);
+        holder.ll_word_progress = findViewByIds(R.id.ll_word_progress);
+        holder.ll_word_root = findViewByIds(R.id.ll_word_root);
         holder.tv_A = findViewByIds(R.id.tv_A);
         holder.tv_B = findViewByIds(R.id.tv_B);
         holder.tv_C = findViewByIds(R.id.tv_C);
@@ -222,10 +256,11 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
         holder.ll_star.setVisibility(View.GONE);        //隐藏学习页的星星
 
+        mGraspValuesList = new ArrayList<>();
         wordReviewDao = new WordReviewDao(this);
         getDataForBook();  //从词书表获取数据插入复习表中
-        //获取复习表中单词
-        wordReviews=new ArrayList<>();
+        //获取复习表中本组复习的单词
+        wordReviews = new ArrayList<>();
         wordReviews = wordReviewDao.queryAll(book_name);
 
         complete_review_word = getNeed_review_word();      //已复习单词
@@ -237,7 +272,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         } else if (review_mode.equals(Mode.MODE_CHOICE)) {  //选择题模式
             showNextWord();
         } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {  //单词回忆模式
-
+            showNextWord();
+            setProgress();
         }
 
         init_fragment();     //例句Fragment替换例句布局文件
@@ -254,8 +290,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             for (Book book : books) {
                 //把从字库表中获取到需要复习的单词添加到复习表中
                 wordReviewDao.addWord(book.getWord(), "", "", "", "", book.getSoundmark_american(),
-                        book.getSoundmark_british(), book.getWord_mean(), "", 0, "",
-                        book.getBook_name(), book.getUserID());
+                        book.getSoundmark_british(), book.getWord_mean(), "", 0,
+                        book.getGrasp_values(), book.getDate(), book.getBook_name(), book.getUserID());
             }
             //当前复习的单词没有完成，暂时不需要重新获取复习单词
             PrefUtils.setDBFlag(pref, "review_is_complete", false);
@@ -286,6 +322,19 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+
+    //取消handler处理，并设置进度条为0，时间重置为4秒
+    private void reset() {
+        if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+            holder.progress.setProgress(0);
+        } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+            holder.word_progress.setProgress(0);
+        }
+        mHandler.removeMessages(msg.what);
+        num = 4;
+    }
+
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -302,67 +351,86 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                     holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
                 }
                 break;
+            case R.id.ll_word_progress:
+                holder.word_progress.setVisibility(View.GONE);   //隐藏进度条
+                holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
+                break;
             case R.id.tv_know:   //认识
-                //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
-                completeIndex.add(review_word_index - 1);
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    mModeScore += 1;  //更改模式切换值
                     if (num < 4) {
-                        //更新词书表为已掌握
-//                        BookDao bookDao = new BookDao(this);
-//                         bookDao.updateGraspWord(book_name,mWord);
+                        mGraspValues += 100;  ///更改晋级
+                    } else {
+                        mGraspValues += 50;  ///更改晋级
+                    }
 
-                        //从复习表中标记为已复习,在这次复习中不再出现
-                        WordReviewDao dao = new WordReviewDao(this);
-                        int i = dao.updateReviewState(mWord, book_name);
-                        //更新头部学习情况信息
-                        need_review_word--;
-                        complete_review_word++;
-                    }
-                    //显示下一个单词
-                    showNextWord();
-                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
-                        holder.progress.setVisibility(View.VISIBLE);   //显示进度条
-                        holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
-                        reset();
-                        setProgress();
-                    }
+                } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                    mModeScore += 2;  //更改模式切换值
+                    mGraspValues += 15;//更改晋级值
                 }
+                saveGraspValues();
+                updateGrasp();
+                //显示下一个单词
+                reset();
+                setProgress();
+                showNextWord();
                 break;
             case R.id.tv_dim:  //模糊
-                //显示下一个单词
-                showNextWord();
-                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
+                holder.ll_incognizance.setVisibility(View.VISIBLE); //显示不认识布局
+                mModeScore += 1.5;  //更改模式切换值
+                mGraspValues += 10;//更改晋级值
+                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {   //显示词义
                     holder.progress.setVisibility(View.GONE);   //隐藏进度条
                     holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
-                    holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
-                    holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
+                    reset();
+                } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {  //显示单词
+                    holder.word_progress.setVisibility(View.INVISIBLE);  //隐藏进度条
+                    holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
                     reset();
                 }
+                saveGraspValues();
+                updateGrasp();
                 break;
             case R.id.tv_unknow:  //不认识
-                //显示下一个单词
-                showNextWord();
+                //显示下一个词义
+                holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
+                holder.ll_incognizance.setVisibility(View.VISIBLE); //显示不认识布局
+                mGraspValues += 5;//更改晋级值
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                    mModeScore += 2;  //更改模式切换值
                     holder.progress.setVisibility(View.GONE);   //隐藏进度条
                     holder.ll_information.setVisibility(View.VISIBLE);  //显示单词信息
-                    holder.ll_memory.setVisibility(View.GONE);  //隐藏认识布局
-                    holder.ll_incognizance.setVisibility(View.VISIBLE); //显示例句布局
+                    reset();
+                } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                    mModeScore += 1;  //更改模式切换值
+                    holder.word_progress.setVisibility(View.INVISIBLE);  //隐藏进度条
+                    holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
                     reset();
                 }
+                saveGraspValues();
+                updateGrasp();
                 break;
             case R.id.tv_incognizance_next:  //不认识--》》下一个
-                showNextWord();
+                showNextWord();    //显示下一个单词
+                //如果例句代开，则关闭例句
+                if (holder.review_sliding.getMenuState()) {
+                    holder.review_sliding.closeMenu();
+                }
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
-                    //显示下一个单词
-                    if (holder.review_sliding.getMenuState()) {
-                        holder.review_sliding.closeMenu();
-                    }
                     reset();
                     setProgress();
-                    holder.ll_memory.setVisibility(View.VISIBLE);  //隐藏认识布局
-                    holder.ll_incognizance.setVisibility(View.GONE); //显示例句布局
                     holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
                     holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+                    holder.ll_memory.setVisibility(View.VISIBLE);  //显示记忆模式属下的中间布局
+                    holder.ll_incognizance.setVisibility(View.GONE); //隐藏不认识的中间布局
+                } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                    holder.ll_word_root.setVisibility(View.INVISIBLE);  //隐藏单词
+                    holder.word_progress.setVisibility(View.VISIBLE);//显示进度条
+                    holder.ll_memory.setVisibility(View.VISIBLE);  //显示记忆模式属下的中间布局
+                    holder.ll_incognizance.setVisibility(View.GONE); //隐藏不认识的中间布局
+                    reset();
+                    setProgress();
                 }
                 break;
             case R.id.tv_incognizance_example:  //看例句
@@ -373,9 +441,15 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 }
                 break;
             case R.id.ll_choice:  //选择题模式--》》不认识
-                showNextWord();
+                mModeScore += 1;  //更改模式切换值
+                mGraspValues += 5;//更改晋级值
+                holder.ll_abcd.setVisibility(View.INVISIBLE);
+                holder.ll_information.setVisibility(View.VISIBLE);
+                holder.ll_choice.setVisibility(View.INVISIBLE);
+                holder.ll_incognizance.setVisibility(View.VISIBLE);
+                saveGraspValues();
+                updateGrasp();
                 break;
-
             case R.id.tv_A:
                 choice(0);
                 break;
@@ -389,7 +463,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 choice(3);
                 break;
             case R.id.tv_back:
-                //制造假的保存数据
                 AlertDialog.Builder mLoadingBuilder = new AlertDialog.Builder(this);
                 final AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
                 View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
@@ -432,7 +505,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
 //                intent.putExtra("Phonogram", mPhonogram);
 //                intent.putExtra("BanckgroundIndex", backgroundNum);
 //                intent.putExtra("Mode", "spell");
-                //拼写测试
+                //学完一组单词后，拼写测试
                 intent.putExtra("BanckgroundIndex", backgroundNum);
                 intent.putExtra("words", (Serializable) wordReviews);
                 intent.putExtra("Mode", "spellTest");
@@ -469,7 +542,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
      * 显示下一个单词
      */
     public void showNextWord() {
-        getWordData();  //重新获取数据
+        getWordData();  //获取数据
         holder.tv_complete.setText(complete_review_word + "");
         holder.tv_need_complete.setText(need_review_word + "");
         holder.learn_tv_word.setText(mWord);  //单词
@@ -477,18 +550,21 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.tv_word_information.setText(mWordMean);  //设置单词详细信息
         //词义回忆模式
         if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+            holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
             holder.progress.setVisibility(View.VISIBLE);  //显示加载进度条
             holder.ll_choice.setVisibility(View.INVISIBLE);  //隐藏下一个按钮
             holder.ll_memory.setVisibility(View.VISIBLE);  //显示回忆模式下的中间选项
             holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
+            holder.word_progress.setVisibility(View.INVISIBLE);  //隐藏单词加载进度
         } else if (review_mode.equals(Mode.MODE_CHOICE)) {
-
             holder.ll_information.setVisibility(View.INVISIBLE);  //隐藏词义
             holder.progress.setVisibility(View.INVISIBLE);  //隐藏加载进度条
             holder.ll_abcd.setVisibility(View.VISIBLE);  //显示选项
+            holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
             holder.ll_memory.setVisibility(View.INVISIBLE);  //隐藏回忆模式下的中间选项
             holder.ll_incognizance.setVisibility(View.INVISIBLE);  //隐藏不认识下的选项
             holder.ll_choice.setVisibility(View.VISIBLE);  //显示下一个按钮
+            holder.word_progress.setVisibility(View.INVISIBLE);  //隐藏单词加载进度
 
             int[] ints = NumUtil.random3(wordReviews.size(), review_word_index);
             answer_right = NumUtil.random(4);
@@ -515,45 +591,193 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
                 holder.tv_A.setText(wordReviews.get(ints[2]).getAnswer_right());
             }
+        } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {  //单词回想模式
+            holder.progress.setVisibility(View.INVISIBLE);  //显示加载进度条
+            holder.ll_choice.setVisibility(View.INVISIBLE);  //隐藏下一个按钮
+            holder.ll_memory.setVisibility(View.VISIBLE);  //显示回忆模式下的中间选项
+            holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
+            holder.word_progress.setVisibility(View.VISIBLE);  //隐藏单词加载进度
+            holder.ll_word_root.setVisibility(View.INVISIBLE);  //隐藏单词
+            holder.ll_information.setVisibility(View.VISIBLE);  //显示单词词义
         }
         review_word_index++;  //学习单词的位置增加1
+    }
+
+    /**
+     * 保存单词的晋级值
+     */
+    public void saveGraspValues() {
+        //保存当前单词的晋级值
+        if (mCircleIndex == 1) {
+            mGraspValuesList.add(mGraspValues);   //第一圈复习，直接添加到集合中
+        } else {
+            //大于等于二圈把晋级值保存到相应的集合位置中
+            if (review_word_index < wordReviews.size()) {
+                mGraspValuesList.set(review_word_index - 1, mGraspValues);
+            } else {
+                Log.e(TAG, "下标越界了");
+            }
+        }
+    }
+
+    /**
+     * 更新数据库中单词的熟悉级别
+     */
+    public void updateGrasp() {
+        //熟悉程度晋级，更新数据库
+//        Log.e(TAG, "当前单词：" + mWord + " 熟悉程度晋级值：" + mGraspValues + " 模式:" + review_mode);
+        if (mGraspValues >= 100) {
+            //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
+            completeIndex.add(review_word_index - 1);
+            BookDao bookDao = new BookDao(this);
+            String mWordGrasp = bookDao.queryWordGrasp(book_name, mWord);   //单词熟悉程度
+            //更新词书表为已掌握
+//                        BookDao bookDao = new BookDao(this);
+//                         bookDao.updateGraspWord(book_name,mWord);
+            //从复习表中标记为已复习,在这次复习中不再出现
+            WordReviewDao dao = new WordReviewDao(this);
+            dao.updateReviewState(mWord, book_name);
+            //更新头部学习情况信息
+            need_review_word--;
+            complete_review_word++;
+
+            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "词义回想模式--晋级：C");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_C,bookDao);
+                } else if (mCircleIndex == 2) {
+                    Log.e(TAG, "词义回想模式--晋级：D");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_D,bookDao);
+                } else if (mCircleIndex == 3) {
+                    Log.e(TAG, "词义回想模式--晋级：E");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
+                } else if (mCircleIndex >= 4) {
+                    Log.e(TAG, "词义回想模式--晋级：F");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
+                }
+            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "选择题模式--晋级：E");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
+                } else if (mCircleIndex >= 2) {
+                    Log.e(TAG, "选择题模式--晋级：F");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
+                }
+
+            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "单词回想模式--晋级：E");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
+                } else if (mCircleIndex >= 2) {
+                    Log.e(TAG, "单词回想模式--晋级：F");
+                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
+                }
+            }
+        }
+
+    }
+
+    public void setDbGrasp(String mWordGrasp,String grasp,BookDao bookDao){
+        if (mWordGrasp.equals(Grasp.GRASP_A)) {
+            bookDao.updateGraspWord(book_name,mWord);  //升一个等级级
+        } else if (mWordGrasp.equals(Grasp.GRASP_B)) {
+            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_A);
+        } else if (mWordGrasp.equals(Grasp.GRASP_C)) {
+            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_B);
+        } else if (mWordGrasp.equals(Grasp.GRASP_D)) {
+            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_C);
+        } else if (mWordGrasp.equals(Grasp.GRASP_E)) {
+            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_D);
+        } else if (mWordGrasp.equals(Grasp.GRASP_F)) {
+            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_E);
+        }else {
+            bookDao.updateGraspValues(book_name,mWord,grasp);
+        }
+    }
+
+    /**
+     * 切换复习模式
+     */
+    public void changeReviewMode() {
+        if (mModeScore >= 10) {
+            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) { //模式切换值达到10后,切换复习模式
+                review_mode = Mode.MODE_CHOICE;
+                reset();
+            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+                review_mode = Mode.MODE_MEMORY_WORD;
+                setProgress();        //设置进度条进度
+            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                review_mode = Mode.MODE_MEMORY_MEAN;
+                setProgress();        //设置进度条进度
+            }
+            mModeScore = 0;  //模式切换值清零
+        }
     }
 
     //获取单词详细信息
     public void getWordData() {
 
-        while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
-            review_word_index++;
+        if (wordReviews.size() == review_word_index) {
+            mCircleIndex++;   //单词循环圈加一
         }
-        if (completeIndex.size() == 20) {  //已完成学复习
+
+        changeReviewMode();  //切换复习模式
+
+        //循环复习单词
+        if (completeIndex.size() == wordReviews.size()) {  //已完成学复习
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("恭喜你");
             builder.setMessage("你已经复习完了本次的任务，赶快去玩吧");
-            builder.setPositiveButton("确定", null);
-            builder.show();
-        } else if (review_word_index < wordReviews.size()) {  //还没有完成一轮学习
-            mWord = wordReviews.get(review_word_index).getWord(); //获取单词
-            mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
-            mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
-        } else {  //完成一轮学习，切换学习模式
-            review_word_index = 0;
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+//                    alertDialog.dismiss();
+                    finish();
+                }
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } else if (review_word_index < wordReviews.size()) {  //还没有完成这一轮学习
             while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
                 review_word_index++;
             }
-            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) { //选择完一篇后，改变复习模式
-                review_mode = Mode.MODE_CHOICE;
-                reset();
-            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
-                review_mode = Mode.MODE_MEMORY_MEAN;
-                setProgress();        //设置进度条进度
+            mWord = wordReviews.get(review_word_index).getWord(); //获取单词
+            mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+            mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+//            saveGraspValues();
+            //根据复习单词的位置，取出他的晋级值
+            if (mCircleIndex == 1) {  //复习单词第一圈
+                mGraspValues = 0;
+            } else {
+                //复习第二圈就重保存的数值中取出
+                mGraspValues = mGraspValuesList.get(review_word_index);
+                Log.e("hei", "嘿嘿嘿" + mGraspValues);
+            }
+
+        } else {  //完成本组单词一轮学习
+            review_word_index = 0;  //重新复习没有完成复习的单词
+            while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
+                review_word_index++;
+                Log.e("ha", "进入第二个while");
             }
             if (review_word_index < wordReviews.size()) {
                 mWord = wordReviews.get(review_word_index).getWord(); //获取单词
                 mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
                 mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+//                saveGraspValues();
+                //根据复习单词的位置，取出他的晋级值
+                if (mCircleIndex == 1) {  //复习单词第一圈
+                    mGraspValues = 0;
+                } else {
+                    //复习第二圈就重保存的数值中取出
+                    mGraspValues = mGraspValuesList.get(review_word_index);
+                    Log.e("hei", "哈哈哈mGraspValues：" + mGraspValues);
+                }
             }
 
+
         }
+
     }
 
     /**
@@ -563,20 +787,21 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
      */
     public void choice(int index) {
         if (answer_right == index) {
+            mModeScore += 2;  //更改模式切换值
+            mGraspValues += 15;//更改晋级值
+            saveGraspValues();
+            updateGrasp();
             showNextWord();
         } else {
+            mModeScore += 1;  //更改模式切换值
+            mGraspValues += 5;//更改晋级值
+            saveGraspValues();
+            updateGrasp();
             holder.ll_abcd.setVisibility(View.INVISIBLE);
             holder.ll_information.setVisibility(View.VISIBLE);
             holder.ll_choice.setVisibility(View.INVISIBLE);
             holder.ll_incognizance.setVisibility(View.VISIBLE);
         }
-    }
-
-    //取消handler处理，并设置进度条为0，时间重置为4秒
-    private void reset() {
-        holder.progress.setProgress(0);
-        mHandler.removeMessages(msg.what);
-        num = 4;
     }
 
     //用Fragment替换帧布局来显示例句
@@ -611,4 +836,28 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         void onmToggleChange(SlidingUpMenu view, boolean isOpen);
     }
 
+
+    @Override
+    public void onBackPressed() {
+        //制造假的保存数据
+        AlertDialog.Builder mLoadingBuilder = new AlertDialog.Builder(this);
+        final AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
+        View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
+        mLoadingAlertDialog.setView(mLoadingView);
+        mLoadingAlertDialog.show();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LexiconDao lexiconDao = new LexiconDao(ReviewActivity.this);
+                int graspWord = lexiconDao.getGraspWord(book_name);  //原已掌握单词
+                int reviewWord = lexiconDao.getReviewWord(book_name);  //原需复习单词
+
+                lexiconDao.updateGraspWord(graspWord + mGraspWord, book_name);  //更新已掌握单词
+                lexiconDao.updateReviewWord(reviewWord - mGraspWord, book_name);  //更新需学习的单词数
+
+                mLoadingAlertDialog.dismiss();
+                finish();
+            }
+        }, 1000);
+    }
 }

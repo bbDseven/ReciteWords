@@ -19,6 +19,7 @@ public class WordReview implements Serializable {
     private String answer_right;  //正确答案
     private String answer_user;  //用户答案
     private int word_is_review;  //是否已完成复习
+    private String grasp_values;  //熟悉程度
     private String date;  //记住日期
     private String book_name;  //词书名字
     private int userID;  //用户ID
@@ -102,6 +103,14 @@ public class WordReview implements Serializable {
 
     public void setWord_is_review(int word_is_review) {
         this.word_is_review = word_is_review;
+    }
+
+    public String getGrasp_values() {
+        return grasp_values;
+    }
+
+    public void setGrasp_values(String grasp_values) {
+        this.grasp_values = grasp_values;
     }
 
     public String getDate() {
