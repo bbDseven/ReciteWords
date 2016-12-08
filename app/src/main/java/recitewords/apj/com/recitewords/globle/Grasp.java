@@ -8,12 +8,12 @@ package recitewords.apj.com.recitewords.globle;
  * 六个等级
  */
 public class Grasp {
-    public static String GRASP_A="A";
-    public static String GRASP_B="B";
-    public static String GRASP_C="C";
-    public static String GRASP_D="D";
-    public static String GRASP_E="E";
-    public static String GRASP_F="F";
+    public static final String GRASP_A="A";
+    public static final String GRASP_B="B";
+    public static final String GRASP_C="C";
+    public static final String GRASP_D="D";
+    public static final String GRASP_E="E";
+    public static final String GRASP_F="F";
 
-    public static int RRVIEW_NUMBER=20;
+    public static final int RRVIEW_NUMBER=20;
 }

@@ -82,7 +82,7 @@ public class DateUtil {
     }
 
     //获取年月日
-    public static String getYMD(){
+    public static String getYMD() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         return sdf.format(new Date());
 

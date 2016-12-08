@@ -33,7 +33,7 @@
             android:textSize="22sp" />
     </LinearLayout>
 
-<<<<<<< HEAD
+
     <TextView
         android:id="@+id/main_tv_word"
         android:layout_width="wrap_content"
@@ -45,8 +45,7 @@
         android:textSize="26sp"
         android:visibility="gone" />
 
-=======
->>>>>>> de3f9469ae2fb686c710a7e3b704be461e0b7a51
+
     <ImageView
         android:id="@+id/main_img_sign"
         android:layout_width="wrap_content"
@@ -62,12 +61,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="160dp"
         android:gravity="center"
-<<<<<<< HEAD
         android:orientation="vertical">
 
-=======
-        >
->>>>>>> de3f9469ae2fb686c710a7e3b704be461e0b7a51
+
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"

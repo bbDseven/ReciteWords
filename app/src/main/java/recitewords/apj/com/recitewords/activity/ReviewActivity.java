@@ -6,12 +6,9 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -56,7 +53,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private OnmToggleListener mOnToggleListener;   //监听例句显示状态
     private AlertDialog alertDialog;  //评写界面弹窗
     private boolean havaing_comfirm = false;  //拼写确认比较单词
-    private String mWord = "target";  //显示的单词
+    private String mWord = "abroad";  //显示的单词
     private String book_name = "CET4";  //词书名字
     private String mPhonogram = "[ 'shabi: ]";  //显示的单词的音标
     private String mWordMean;  //单词词性词义
@@ -322,7 +319,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-
     //取消handler处理，并设置进度条为0，时间重置为4秒
     private void reset() {
         if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
@@ -501,14 +497,14 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             case R.id.tv_spell:
                 //打开拼写界面
                 Intent intent = new Intent(this, SpellTestActivity.class);
-//                intent.putExtra("Word", mWord);
-//                intent.putExtra("Phonogram", mPhonogram);
-//                intent.putExtra("BanckgroundIndex", backgroundNum);
-//                intent.putExtra("Mode", "spell");
-                //学完一组单词后，拼写测试
+                intent.putExtra("Word", mWord);
+                intent.putExtra("Phonogram", mPhonogram);
                 intent.putExtra("BanckgroundIndex", backgroundNum);
-                intent.putExtra("words", (Serializable) wordReviews);
-                intent.putExtra("Mode", "spellTest");
+                intent.putExtra("Mode", "spell");
+                //学完一组单词后，拼写测试
+//                intent.putExtra("BanckgroundIndex", backgroundNum);
+//                intent.putExtra("words", (Serializable) wordReviews);
+//                intent.putExtra("Mode", "spellTest");
                 startActivity(intent);
                 break;
             case R.id.tv_delete:
@@ -542,12 +538,179 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
      * 显示下一个单词
      */
     public void showNextWord() {
-        getWordData();  //获取数据
+        Log.e("ha", "当前单词：" + mWord + " 晋级值：" + mGraspValues + " 单词位置为: " + review_word_index +
+                " mGraspValues: " + mGraspValues);
+
+        if (completeIndex.size() == wordReviews.size()) {  //已完成学复习
+            for (int i = 0; i < completeIndex.size(); i++) {
+            }
+            completeDialog();  //询问用户是否拼写测试
+        }
+        if (wordReviews.size() == review_word_index) {
+            mCircleIndex++;   //单词循环圈加一
+        }
+        while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
+            review_word_index++;
+        }
+        if (review_word_index < wordReviews.size()) {  //还没有完成这一轮学习
+            mWord = wordReviews.get(review_word_index).getWord(); //获取单词
+            mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+            mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+
+            //根据复习单词的位置，取出他的晋级值
+            if (mCircleIndex == 1) {  //复习单词第一圈
+                mGraspValues = 0;
+            } else {
+                //复习第二圈就重保存的数值中取出
+                mGraspValues = mGraspValuesList.get(review_word_index);
+            }
+        } else {
+            review_word_index = 0;
+            while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
+                review_word_index++;
+            }
+
+            if (review_word_index < wordReviews.size()) {
+                mWord = wordReviews.get(review_word_index).getWord(); //获取单词
+                mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
+                mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
+                //根据复习单词的位置，取出他的晋级值
+                if (mCircleIndex == 1) {  //复习单词第一圈
+                    mGraspValues = 0;
+                } else {
+                    //复习第二圈就重保存的数值中取出
+                    mGraspValues = mGraspValuesList.get(review_word_index);
+                }
+            }
+        }
+        changeReviewMode();  //切换复习模式
         holder.tv_complete.setText(complete_review_word + "");
         holder.tv_need_complete.setText(need_review_word + "");
         holder.learn_tv_word.setText(mWord);  //单词
         holder.learn_tv_soundmark.setText(mPhonogram);  //音标
         holder.tv_word_information.setText(mWordMean);  //设置单词详细信息
+        review_word_index++;  //学习单词的位置增加1
+    }
+
+    /**
+     * 保存单词的晋级值
+     */
+    public void saveGraspValues() {
+        //保存当前单词的晋级值
+        if (mCircleIndex == 1) {
+            if (completeIndex.contains(review_word_index - 1)) {
+                mGraspValuesList.add(0);   //完成复习的复习，添加0到集合中
+            }
+            mGraspValuesList.add(mGraspValues);   //第一圈复习，直接添加到集合中
+//            Log.e("saveGraspValues", "添加晋级值：" + mGraspValues);
+        } else {
+            //大于等于二圈把晋级值保存到相应的集合位置中
+            if (review_word_index <= wordReviews.size()) {
+                mGraspValuesList.set(review_word_index - 1, mGraspValues);
+            }else {
+                Log.e(TAG, "下标越界了");
+                Log.e("saveGraspValues", "下标值：" + (review_word_index - 1));
+            }
+        }
+    }
+
+    /**
+     * 更新数据库中单词的熟悉级别
+     */
+    public void updateGrasp() {
+        //熟悉程度晋级，更新数据库
+//        Log.e(TAG, "当前单词：" + mWord + " 熟悉程度晋级值：" + mGraspValues + " 模式:" + review_mode);
+        if (mGraspValues >= 100) {
+            //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
+            completeIndex.add(review_word_index - 1);
+            BookDao bookDao = new BookDao(this);
+            String mWordGrasp = bookDao.queryWordGrasp(book_name, mWord);   //单词熟悉程度
+            //从复习表中标记为已复习,在这次复习中不再出现
+            WordReviewDao dao = new WordReviewDao(this);
+            dao.updateReviewState(mWord, book_name);
+            //更新头部学习情况信息
+            need_review_word--;
+            complete_review_word++;
+
+            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "词义回想模式--晋级：C");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_C, bookDao);
+                } else if (mCircleIndex == 2) {
+                    Log.e(TAG, "词义回想模式--晋级：D");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_D, bookDao);
+                } else if (mCircleIndex == 3) {
+                    Log.e(TAG, "词义回想模式--晋级：E");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                } else if (mCircleIndex >= 4) {
+                    Log.e(TAG, "词义回想模式--晋级：F");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                }
+            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "选择题模式--晋级：E");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                } else if (mCircleIndex >= 2) {
+                    Log.e(TAG, "选择题模式--晋级：F");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                }
+
+            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                if (mCircleIndex == 1) {
+                    Log.e(TAG, "单词回想模式--晋级：E");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                } else if (mCircleIndex >= 2) {
+                    Log.e(TAG, "单词回想模式--晋级：F");
+                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 设置熟悉程度
+     *
+     * @param mWordGrasp 数据库中熟悉程度
+     * @param grasp      新的熟悉程度
+     * @param bookDao    对象
+     */
+    public void setDbGrasp(String mWordGrasp, String grasp, BookDao bookDao) {
+        if (mWordGrasp.equals(Grasp.GRASP_A)) {
+            bookDao.updateGraspWord(book_name, mWord);  //升一个等级级
+        } else if (mWordGrasp.equals(Grasp.GRASP_B)) {
+            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_A);
+        } else if (mWordGrasp.equals(Grasp.GRASP_C)) {
+            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_B);
+        } else if (mWordGrasp.equals(Grasp.GRASP_D)) {
+            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_C);
+        } else if (mWordGrasp.equals(Grasp.GRASP_E)) {
+            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_D);
+        } else if (mWordGrasp.equals(Grasp.GRASP_F)) {
+            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_E);
+        } else {
+            bookDao.updateGraspValues(book_name, mWord, grasp);
+        }
+    }
+
+    /**
+     * 切换复习模式
+     */
+    public void changeReviewMode() {
+        if (mModeScore >= 10) {
+            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) { //模式切换值达到10后,切换复习模式
+                review_mode = Mode.MODE_CHOICE;
+                reset();
+            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
+                review_mode = Mode.MODE_MEMORY_WORD;
+                setProgress();        //设置进度条进度
+            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
+                review_mode = Mode.MODE_MEMORY_MEAN;
+                setProgress();        //设置进度条进度
+            }
+            mModeScore = 0;  //模式切换值清零
+        }
+
         //词义回忆模式
         if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
             holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
@@ -570,22 +733,22 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             answer_right = NumUtil.random(4);
 
             //动态显示选项
-            if (answer_right == 0) {
+            if (answer_right == 0 && review_word_index < wordReviews.size()) {
                 holder.tv_A.setText(wordReviews.get(review_word_index).getAnswer_right());
                 holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
                 holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
                 holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
-            } else if (answer_right == 1) {
+            } else if (answer_right == 1 && review_word_index < wordReviews.size()) {
                 holder.tv_B.setText(wordReviews.get(review_word_index).getAnswer_right());
                 holder.tv_A.setText(wordReviews.get(ints[0]).getAnswer_right());
                 holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
                 holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
-            } else if (answer_right == 2) {
+            } else if (answer_right == 2 && review_word_index < wordReviews.size()) {
                 holder.tv_C.setText(wordReviews.get(review_word_index).getAnswer_right());
                 holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
                 holder.tv_A.setText(wordReviews.get(ints[1]).getAnswer_right());
                 holder.tv_D.setText(wordReviews.get(ints[2]).getAnswer_right());
-            } else if (answer_right == 3) {
+            } else if (answer_right == 3 && review_word_index < wordReviews.size()) {
                 holder.tv_D.setText(wordReviews.get(review_word_index).getAnswer_right());
                 holder.tv_B.setText(wordReviews.get(ints[0]).getAnswer_right());
                 holder.tv_C.setText(wordReviews.get(ints[1]).getAnswer_right());
@@ -600,184 +763,49 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             holder.ll_word_root.setVisibility(View.INVISIBLE);  //隐藏单词
             holder.ll_information.setVisibility(View.VISIBLE);  //显示单词词义
         }
-        review_word_index++;  //学习单词的位置增加1
     }
 
     /**
-     * 保存单词的晋级值
+     * 完成本轮复习后，弹窗提示是否拼写测试
      */
-    public void saveGraspValues() {
-        //保存当前单词的晋级值
-        if (mCircleIndex == 1) {
-            mGraspValuesList.add(mGraspValues);   //第一圈复习，直接添加到集合中
-        } else {
-            //大于等于二圈把晋级值保存到相应的集合位置中
-            if (review_word_index < wordReviews.size()) {
-                mGraspValuesList.set(review_word_index - 1, mGraspValues);
-            } else {
-                Log.e(TAG, "下标越界了");
+    public void completeDialog() {
+        holder.tv_complete.setText(wordReviews.size() + "");
+        holder.tv_need_complete.setText(0 + "");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("恭喜你");
+        builder.setMessage("你已经复习完了本次的任务，立即去拼写测试吧！");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LexiconDao lexiconDao = new LexiconDao(ReviewActivity.this);
+                int graspWord = lexiconDao.getGraspWord(book_name);  //原已掌握单词
+                int reviewWord = lexiconDao.getReviewWord(book_name);  //原需复习单词
+                lexiconDao.updateGraspWord(graspWord + mGraspWord, book_name);  //更新已掌握单词
+                lexiconDao.updateReviewWord(reviewWord - mGraspWord, book_name);  //更新需学习的单词数
+
+                Intent intent = new Intent(ReviewActivity.this, SpellTestActivity.class);
+                //学完一组单词后，拼写测试
+                intent.putExtra("BanckgroundIndex", backgroundNum);
+                intent.putExtra("words", (Serializable) wordReviews);
+                intent.putExtra("Mode", "spellTest");
+                startActivity(intent);
+                finish();
             }
-        }
-    }
+        });
 
-    /**
-     * 更新数据库中单词的熟悉级别
-     */
-    public void updateGrasp() {
-        //熟悉程度晋级，更新数据库
-//        Log.e(TAG, "当前单词：" + mWord + " 熟悉程度晋级值：" + mGraspValues + " 模式:" + review_mode);
-        if (mGraspValues >= 100) {
-            //当前显示的单词已经掌握，不再在这次复习中出现，把下标位置添加到已掌握的集合中
-            completeIndex.add(review_word_index - 1);
-            BookDao bookDao = new BookDao(this);
-            String mWordGrasp = bookDao.queryWordGrasp(book_name, mWord);   //单词熟悉程度
-            //更新词书表为已掌握
-//                        BookDao bookDao = new BookDao(this);
-//                         bookDao.updateGraspWord(book_name,mWord);
-            //从复习表中标记为已复习,在这次复习中不再出现
-            WordReviewDao dao = new WordReviewDao(this);
-            dao.updateReviewState(mWord, book_name);
-            //更新头部学习情况信息
-            need_review_word--;
-            complete_review_word++;
-
-            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
-                if (mCircleIndex == 1) {
-                    Log.e(TAG, "词义回想模式--晋级：C");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_C,bookDao);
-                } else if (mCircleIndex == 2) {
-                    Log.e(TAG, "词义回想模式--晋级：D");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_D,bookDao);
-                } else if (mCircleIndex == 3) {
-                    Log.e(TAG, "词义回想模式--晋级：E");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
-                } else if (mCircleIndex >= 4) {
-                    Log.e(TAG, "词义回想模式--晋级：F");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
-                }
-            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
-                if (mCircleIndex == 1) {
-                    Log.e(TAG, "选择题模式--晋级：E");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
-                } else if (mCircleIndex >= 2) {
-                    Log.e(TAG, "选择题模式--晋级：F");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
-                }
-
-            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
-                if (mCircleIndex == 1) {
-                    Log.e(TAG, "单词回想模式--晋级：E");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_E,bookDao);
-                } else if (mCircleIndex >= 2) {
-                    Log.e(TAG, "单词回想模式--晋级：F");
-                    setDbGrasp(mWordGrasp,Grasp.GRASP_F,bookDao);
-                }
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LexiconDao lexiconDao = new LexiconDao(ReviewActivity.this);
+                int graspWord = lexiconDao.getGraspWord(book_name);  //原已掌握单词
+                int reviewWord = lexiconDao.getReviewWord(book_name);  //原需复习单词
+                lexiconDao.updateGraspWord(graspWord + mGraspWord, book_name);  //更新已掌握单词
+                lexiconDao.updateReviewWord(reviewWord - mGraspWord, book_name);  //更新需学习的单词数
+                finish();
             }
-        }
-
-    }
-
-    public void setDbGrasp(String mWordGrasp,String grasp,BookDao bookDao){
-        if (mWordGrasp.equals(Grasp.GRASP_A)) {
-            bookDao.updateGraspWord(book_name,mWord);  //升一个等级级
-        } else if (mWordGrasp.equals(Grasp.GRASP_B)) {
-            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_A);
-        } else if (mWordGrasp.equals(Grasp.GRASP_C)) {
-            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_B);
-        } else if (mWordGrasp.equals(Grasp.GRASP_D)) {
-            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_C);
-        } else if (mWordGrasp.equals(Grasp.GRASP_E)) {
-            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_D);
-        } else if (mWordGrasp.equals(Grasp.GRASP_F)) {
-            bookDao.updateGraspValues(book_name,mWord,Grasp.GRASP_E);
-        }else {
-            bookDao.updateGraspValues(book_name,mWord,grasp);
-        }
-    }
-
-    /**
-     * 切换复习模式
-     */
-    public void changeReviewMode() {
-        if (mModeScore >= 10) {
-            if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) { //模式切换值达到10后,切换复习模式
-                review_mode = Mode.MODE_CHOICE;
-                reset();
-            } else if (review_mode.equals(Mode.MODE_CHOICE)) {
-                review_mode = Mode.MODE_MEMORY_WORD;
-                setProgress();        //设置进度条进度
-            } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
-                review_mode = Mode.MODE_MEMORY_MEAN;
-                setProgress();        //设置进度条进度
-            }
-            mModeScore = 0;  //模式切换值清零
-        }
-    }
-
-    //获取单词详细信息
-    public void getWordData() {
-
-        if (wordReviews.size() == review_word_index) {
-            mCircleIndex++;   //单词循环圈加一
-        }
-
-        changeReviewMode();  //切换复习模式
-
-        //循环复习单词
-        if (completeIndex.size() == wordReviews.size()) {  //已完成学复习
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("恭喜你");
-            builder.setMessage("你已经复习完了本次的任务，赶快去玩吧");
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-//                    alertDialog.dismiss();
-                    finish();
-                }
-            });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        } else if (review_word_index < wordReviews.size()) {  //还没有完成这一轮学习
-            while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
-                review_word_index++;
-            }
-            mWord = wordReviews.get(review_word_index).getWord(); //获取单词
-            mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
-            mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
-//            saveGraspValues();
-            //根据复习单词的位置，取出他的晋级值
-            if (mCircleIndex == 1) {  //复习单词第一圈
-                mGraspValues = 0;
-            } else {
-                //复习第二圈就重保存的数值中取出
-                mGraspValues = mGraspValuesList.get(review_word_index);
-                Log.e("hei", "嘿嘿嘿" + mGraspValues);
-            }
-
-        } else {  //完成本组单词一轮学习
-            review_word_index = 0;  //重新复习没有完成复习的单词
-            while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
-                review_word_index++;
-                Log.e("ha", "进入第二个while");
-            }
-            if (review_word_index < wordReviews.size()) {
-                mWord = wordReviews.get(review_word_index).getWord(); //获取单词
-                mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
-                mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
-//                saveGraspValues();
-                //根据复习单词的位置，取出他的晋级值
-                if (mCircleIndex == 1) {  //复习单词第一圈
-                    mGraspValues = 0;
-                } else {
-                    //复习第二圈就重保存的数值中取出
-                    mGraspValues = mGraspValuesList.get(review_word_index);
-                    Log.e("hei", "哈哈哈mGraspValues：" + mGraspValues);
-                }
-            }
-
-
-        }
-
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     /**
@@ -803,6 +831,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             holder.ll_incognizance.setVisibility(View.VISIBLE);
         }
     }
+
 
     //用Fragment替换帧布局来显示例句
     private void init_fragment() {
