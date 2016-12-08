@@ -378,4 +378,20 @@ public class BookDao {
         db.close();
     }
 
+    /**
+     * 根据单词查询单词信息   返回音标和词义
+    * */
+    public Book query_wordInfo(String word){
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor wordInfo = db.rawQuery("select * from book where word=?", new String[]{word});
+        Book book = new Book();
+        if (wordInfo != null && wordInfo.getCount() > 0){
+            if (wordInfo.moveToFirst()){
+                book.setSoundmark_american(wordInfo.getString(wordInfo.getColumnIndex("soundmark_american")));
+                book.setWord_mean(wordInfo.getString(wordInfo.getColumnIndex("word_mean")));
+                return book;
+            }
+        }
+        return null;
+    }
 }

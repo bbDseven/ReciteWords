@@ -33,6 +33,7 @@
             android:textSize="22sp" />
     </LinearLayout>
 
+<<<<<<< HEAD
     <TextView
         android:id="@+id/main_tv_word"
         android:layout_width="wrap_content"
@@ -44,6 +45,8 @@
         android:textSize="26sp"
         android:visibility="gone" />
 
+=======
+>>>>>>> de3f9469ae2fb686c710a7e3b704be461e0b7a51
     <ImageView
         android:id="@+id/main_img_sign"
         android:layout_width="wrap_content"
@@ -53,13 +56,18 @@
         android:src="@drawable/circle_img_shape" />
 
     <LinearLayout
+        android:id="@+id/main_ll_sign"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="160dp"
         android:gravity="center"
+<<<<<<< HEAD
         android:orientation="vertical">
 
+=======
+        >
+>>>>>>> de3f9469ae2fb686c710a7e3b704be461e0b7a51
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
@@ -83,6 +91,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="嘿嘿" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/main_ll_sign_succeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="160dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/checked" />
+        <TextView
+            android:id="@+id/tv_sign_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="获得20枚酷币"
+            android:textSize="14sp"
+            android:textColor="#fff"
+            />
+        <TextView
+            android:id="@+id/tv_sign_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="连续签到1天"
+            android:textSize="14sp"
+            android:textColor="#fff"
+            />
     </LinearLayout>
 
     <LinearLayout

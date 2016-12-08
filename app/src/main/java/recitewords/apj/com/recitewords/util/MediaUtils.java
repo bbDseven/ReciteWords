@@ -44,6 +44,7 @@ public class MediaUtils {
         }else {
             player.start();
         }
+        player = null;
     }
 
     /**
