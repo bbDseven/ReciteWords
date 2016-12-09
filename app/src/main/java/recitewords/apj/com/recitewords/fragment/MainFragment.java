@@ -124,7 +124,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private int mReviewWordSum;  //需要复习的单词总数
     private UserDao userDao;
-
     //带参构造方法
     public MainFragment(Context context) {
         this.mContext = context;
@@ -755,7 +754,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
         }
     }
-
 
     /**
      * 生成0 - 5的随机数

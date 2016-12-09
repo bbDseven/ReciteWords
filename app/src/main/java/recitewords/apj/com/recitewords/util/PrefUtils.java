@@ -34,4 +34,13 @@ public class PrefUtils {
     public static String getImage(SharedPreferences sp, String key, String uri_string_def){
         return sp.getString(key, uri_string_def);
     }
+
+    //设置主题的颜色
+    public static void setThemes(SharedPreferences sp, String key, String themes){
+        sp.edit().putString(key, themes).commit();
+    }
+    //获取主题的颜色
+    public static String getThemes(SharedPreferences sp, String key, String def_themes){
+        return sp.getString(key, def_themes);
+    }
 }
