@@ -273,7 +273,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             setProgress();
         }
 
-        init_fragment();     //例句Fragment替换例句布局文件
+        Log.e("ha","单词："+mWord);
+        init_fragment("computer");     //例句Fragment替换例句布局文件
     }
 
     //判断是否需要把从字库表中获取到需要复习的单词添加到复习表中
@@ -817,10 +818,10 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
 
 
     //用Fragment替换帧布局来显示例句
-    private void init_fragment() {
+    private void init_fragment(String word) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review("abroad"), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review(word), FRAGMENT_SENTENCE);
         transaction.commit();
     }
 
