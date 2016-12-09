@@ -17,8 +17,7 @@
             android:id="@+id/pb_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"
-            />
+            android:visibility="invisible"/>
         <!--词性和词义-->
         <TextView
             android:id="@+id/tv_word_information"
