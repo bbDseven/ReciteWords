@@ -59,7 +59,7 @@ import recitewords.apj.com.recitewords.view.CircleImageView;
 
 /**
  * Created by CGT on 2016/11/22.
- * <p/>
+ * <p>
  * 主页面Fragment
  */
 public class MainFragment extends BaseFragment implements View.OnClickListener {
@@ -272,62 +272,62 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
      */
     private void insertBook() {
         BookDao bookDao = new BookDao(mContext);
-        bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的", 1, 0, "CET4", 0);
-        bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 1, 0, "CET4", 0);
-        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "CET4", 0);
-        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 1, 0, "CET4", 0);
-        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的 n.修士，修女，出家人", 1, 0, "CET4", 0);
-        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 1, 0, "CET4", 0);
-        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "CET4", 0);
-        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性 adj.动物的;肉体的;肉欲的", 1, 0, "CET4", 0);
-        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 n.放任，放纵;完全屈从于压制", 1, 0, "CET4", 0);
-        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "CET4", 0);
-        bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 1, 0, "CET4", 0);
-        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车） adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "CET4", 0);
-        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "CET4", 0);
-        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地 adj.往国外的 n.海外，异国", 1, 0, "CET4", 0);
-        bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;吞并，合并;忍受，承担（费用）", 1, 0, "CET4", 0);
-        bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;（伤口等）发炎的", 1, 0, "CET4", 0);
-        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;周年纪念的;年年的;每年的", 1, 0, "CET4", 0);
-        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "CET4", 0);
-        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 1, 0, "CET4", 0);
-        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "CET4", 0);
+        bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的 n.修士，修女，出家人", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性 adj.动物的;肉体的;肉欲的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 n.放任，放纵;完全屈从于压制", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车） adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地 adj.往国外的 n.海外，异国", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;吞并，合并;忍受，承担（费用）", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;（伤口等）发炎的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;周年纪念的;年年的;每年的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
     }
 
     /**
      * 插入复习单词
-     * <p/>
+     * <p>
      * 模拟需要复习的单词
      */
     public void insertWordReview() {
         WordReviewDao dao = new WordReviewDao(mContext);
 
         dao.addWord("economic", "", "", "", "", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]",
-                "adj.经济的;经济学的;合算的;有经济效益的", "", 0, "", "CET4", 0);
+                "adj.经济的;经济学的;合算的;有经济效益的", "", 0, "","", "CET4", 0);
 
         dao.addWord("election", "", "", "", "", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]",
-                "n.选举，当选;选举权;[神]神的选择", "", 0, "", "CET4", 0);
+                "n.选举，当选;选举权;[神]神的选择", "", 0, "","", "CET4", 0);
 
         dao.addWord("murder", "", "", "", "", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]",
                 "n.谋杀;杀戮;极艰难[令人沮丧]的经历\n" +
                         "vt.凶杀;糟蹋;打垮\n" +
-                        "vi.杀人\n", "", 0, "", "CET4", 0);
+                        "vi.杀人\n", "", 0, "", "","CET4", 0);
 
         dao.addWord("progress", "", "", "", "", "[ˈprɑ:gres]", "[ˈprəʊgres]",
                 "n.进步;前进;[生物学]进化;（向更高方向）增长\n" +
                         "v.发展;（使）进步，（使）进行;促进\n" +
-                        "vi.发展;（向更高方向）增进\n", "", 0, "", "CET4", 0);
+                        "vi.发展;（向更高方向）增进\n", "", 0, "", "","CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]",
                 "adj.宗教的;虔诚的;笃信宗教的;谨慎的\n" +
-                        "n.修士，修女，出家人\n", "", 0, "", "CET4", 0);
+                        "n.修士，修女，出家人\n", "", 0, "", "","CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[smɑ:rt]", "[smɑ:t]",
                 "adj.聪明的;敏捷的;漂亮的;整齐的\n" +
                         "vi.疼痛;感到刺痛;难过\n" +
                         "n.创伤;刺痛;疼痛;痛苦\n" +
                         "vt.引起…的疼痛（或痛苦、苦恼等）\n" +
-                        "adv.聪明伶俐地，轻快地，漂亮地\n", "", 0, "", "CET4", 0);
+                        "adv.聪明伶俐地，轻快地，漂亮地\n", "", 0, "", "","CET4", 0);
 //        dao.addWord("religious", "", "", "", "", "", "", "","", "", "CET4", 0);
     }
 
@@ -417,7 +417,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                     Intent intent_review = new Intent(mActivity, ReviewActivity.class);
                     intent_review.putExtra("backgroundNum", num);
                     startActivity(intent_review);
-                }else {
+                } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setTitle("温馨提醒：");
                     builder.setMessage("暂时还没有复习任务，你任性去吧");

@@ -37,100 +37,123 @@
 
         </RelativeLayout>
 
-
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/ll_word_root"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <!--单词-->
-                <TextView
-                    android:id="@+id/learn_tv_word"
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <!--单词-->
+                    <TextView
+                        android:id="@+id/learn_tv_word"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:text="target"
+                        android:textColor="#d1f57f"
+                        android:textSize="38sp" />
+
+                    <!--音标-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/learn_tv_word"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="10dp">
+
+                        <!--英式音标，美式音标切换-->
+                        <TextView
+                            android:id="@+id/learn_tv_changesound"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UK"
+                            android:padding="3dp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:background="#919191"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/learn_tv_soundmark"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="[ 'ta:git ]"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+                <!--星号-->
+                <LinearLayout
+                    android:id="@+id/ll_star"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center"
-                    android:text="target"
-                    android:textColor="#d1f57f"
-                    android:textSize="38sp" />
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical">
 
-                <!--音标-->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/learn_tv_word"
-                    android:layout_centerInParent="true"
-                    android:layout_marginTop="10dp">
+                    <ImageView
+                        android:id="@+id/asterisk_four"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="right"
+                        android:src="@mipmap/star_off" />
 
-                    <!--英式音标，美式音标切换-->
-                    <TextView
-                        android:id="@+id/learn_tv_changesound"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="UK"
-                        android:padding="3dp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:background="#919191"
-                        android:textSize="13sp" />
+                    <ImageView
+                        android:id="@+id/asterisk_there"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="right"
+                        android:src="@mipmap/star_off" />
 
-                    <TextView
-                        android:id="@+id/learn_tv_soundmark"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:text="[ 'ta:git ]"
-                        android:textSize="16sp" />
+                    <ImageView
+                        android:id="@+id/asterisk_two"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="right"
+                        android:src="@mipmap/star_off" />
+
+                    <ImageView
+                        android:id="@+id/asterisk_one"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="right"
+                        android:src="@mipmap/star_off" />
 
                 </LinearLayout>
 
+            </LinearLayout>
 
-            </RelativeLayout>
-            <!--星号-->
             <LinearLayout
-                android:id="@+id/ll_star"
+                android:id="@+id/ll_word_progress"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="vertical">
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <recitewords.apj.com.recitewords.view.CircleProgressView
+                    android:id="@+id/word_progress"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:visibility="invisible"
+                    android:layout_gravity="center">
 
-                <ImageView
-                    android:id="@+id/asterisk_four"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="right"
-                    android:src="@mipmap/star_off" />
-
-                <ImageView
-                    android:id="@+id/asterisk_there"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="right"
-                    android:src="@mipmap/star_off" />
-
-                <ImageView
-                    android:id="@+id/asterisk_two"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="right"
-                    android:src="@mipmap/star_off" />
-
-                <ImageView
-                    android:id="@+id/asterisk_one"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="right"
-                    android:src="@mipmap/star_off" />
+                </recitewords.apj.com.recitewords.view.CircleProgressView>
 
             </LinearLayout>
 
-        </LinearLayout>
+
+        </FrameLayout>
 
     </LinearLayout>
 

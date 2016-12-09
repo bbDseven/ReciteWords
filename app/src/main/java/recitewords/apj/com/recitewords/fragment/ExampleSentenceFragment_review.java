@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -55,6 +56,8 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
     public void initData() {
         super.initData();
         //从数据库获取单词例句
+
+
         WordExampleSentence bean = querySentence(word);
         String example_sentence = bean.getExample_sentence();
         String example_sentence_mean = bean.getExample_sentence_mean();
@@ -70,7 +73,7 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
             setSentence_pronounce();
             str = example_sentences[i];
             style = new SpannableStringBuilder(str);
-            int start = str.indexOf(word);  //单词第一次出现的索引
+            int start = str.toUpperCase().indexOf(word.toUpperCase());  //单词第一次出现的索引
             int end = start + word.length();
             style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
             vp_example_sentence.setText(style);

@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.view;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,32 @@ public class SlidingUpMenu extends ViewGroup {
         int cvRight = mContentView.getMeasuredWidth();
         int cvTop = 0;
         mContentView.layout(cvLeft, cvTop, cvRight, cvBottom);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        int action = event.getAction();
+        switch (action){
+            case MotionEvent.ACTION_DOWN:
+                mDownX = event.getX();
+                mDownY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float moveX = event.getX();
+                float moveY = event.getY();
+
+                if (Math.abs(moveY - mDownY) > Math.abs(moveX - mDownX)) {
+                    // 上下滑动，拦截事件，不给子控件事件，自己需要处理
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+            default:
+                break;
+        }
+
+        return super.onInterceptTouchEvent(event);
     }
 
     //触摸监听

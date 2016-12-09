@@ -129,6 +129,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             holder.spell_tv_correct.setVisibility(View.VISIBLE);  //显示词义
 
             mReviewWords = (List<WordReview>) intent.getSerializableExtra("words");
+            holder.spell_tv_situation.setText(0/mReviewWords.size()+"");  //设置拼写情况
             //动态设置圆点个数
             for (int i = 0; i < mReviewWords.size(); i++) {
                 View pointView = new View(this);
@@ -138,7 +139,6 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                 pointView.setLayoutParams(params);
                 holder.spell_Dot.addView(pointView);
             }
-
             spellNextWOrd();
         }
 
@@ -173,6 +173,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             case R.id.spell_tv_confirm:
                 //比较用户输入单词和正确单词
                 input = holder.spell_et_input.getText().toString();  //获取用户输入的单词
+                height = holder.spell_rl_bottom.getHeight();
                 if (input.equals(mWord)) {
                     //改变文字颜色--淡黄
                     holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
@@ -187,6 +188,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                             //一次通过，改变圆点颜色
                             passIndexs.add(mSpellIndex);  //增加到一次性通过的集合中去
                             holder.spell_Dot.getChildAt(mSpellIndex-1).setBackgroundResource(R.drawable.circle_white_shape);
+                            holder.spell_tv_situation.setText(passIndexs.size()+"/"+mReviewWords.size());
                         }
                     }
 
@@ -215,6 +217,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                 break;
             case R.id.spell_tv_spell_next:
                 spellNextWOrd();
+                is_Pass=true;
                 break;
             default:
                 break;
@@ -258,13 +261,12 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
         }else {//学完一遍后
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("温馨提醒：");
-            builder.setMessage("你已完成本轮复习，赶快去领取酷币吧！");
+            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
             AlertDialog alertDialog = builder.create();
             builder.setPositiveButton("确定",null);
             alertDialog.show();
         }
     }
-
 
     //文本框变化前
     @Override

@@ -15,6 +15,8 @@ public class Book {
     private String word_img;//单词相关背景图片
     private String word_is_study;//是否已学习
     private String word_is_grasp;//是否已掌握
+    private String grasp_values;  //熟悉程度
+    private String date;  //更新熟悉程度的日期
     private String book_name;//词书名字
     private int userID;
 
@@ -28,99 +30,116 @@ public class Book {
         this.word_mean = word_mean;
     }
 
-    public String getBook_name() {
-        return book_name;
-    }
-
-    public String getPronounce_american() {
-        return pronounce_american;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public String getPronounce_british() {
-        return pronounce_british;
-    }
-
-    public String getSoundmark_american() {
-        return soundmark_american;
-    }
-
-    public String getSoundmark_british() {
-        return soundmark_british;
-    }
 
     public String getWord() {
         return word;
-    }
-
-    public String getWord_img() {
-        return word_img;
-    }
-
-    public String getWord_is_grasp() {
-        return word_is_grasp;
-    }
-
-    public String getWord_is_study() {
-        return word_is_study;
-    }
-
-    public String getWord_mean() {
-        return word_mean;
-    }
-
-    public String getWord_property() {
-        return word_property;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
-    public void setBook_name(String book_name) {
-        this.book_name = book_name;
-    }
-
-    public void setPronounce_american(String pronounce_american) {
-        this.pronounce_american = pronounce_american;
-    }
-
-    public void setPronounce_british(String pronounce_british) {
-        this.pronounce_british = pronounce_british;
-    }
-
-    public void setSoundmark_american(String soundmark_american) {
-        this.soundmark_american = soundmark_american;
-    }
-
-    public void setSoundmark_british(String soundmark_british) {
-        this.soundmark_british = soundmark_british;
     }
 
     public void setWord(String word) {
         this.word = word;
     }
 
-    public void setWord_img(String word_img) {
-        this.word_img = word_img;
+    public String getSoundmark_american() {
+        return soundmark_american;
     }
 
-    public void setWord_is_grasp(String word_is_grasp) {
-        this.word_is_grasp = word_is_grasp;
+    public void setSoundmark_american(String soundmark_american) {
+        this.soundmark_american = soundmark_american;
     }
 
-    public void setWord_is_study(String word_is_study) {
-        this.word_is_study = word_is_study;
+    public String getPronounce_american() {
+        return pronounce_american;
+    }
+
+    public void setPronounce_american(String pronounce_american) {
+        this.pronounce_american = pronounce_american;
+    }
+
+    public String getSoundmark_british() {
+        return soundmark_british;
+    }
+
+    public void setSoundmark_british(String soundmark_british) {
+        this.soundmark_british = soundmark_british;
+    }
+
+    public String getPronounce_british() {
+        return pronounce_british;
+    }
+
+    public void setPronounce_british(String pronounce_british) {
+        this.pronounce_british = pronounce_british;
+    }
+
+    public String getWord_property() {
+        return word_property;
+    }
+
+    public void setWord_property(String word_property) {
+        this.word_property = word_property;
+    }
+
+    public String getWord_mean() {
+        return word_mean;
     }
 
     public void setWord_mean(String word_mean) {
         this.word_mean = word_mean;
     }
 
-    public void setWord_property(String word_property) {
-        this.word_property = word_property;
+    public String getWord_img() {
+        return word_img;
+    }
+
+    public void setWord_img(String word_img) {
+        this.word_img = word_img;
+    }
+
+    public String getWord_is_study() {
+        return word_is_study;
+    }
+
+    public void setWord_is_study(String word_is_study) {
+        this.word_is_study = word_is_study;
+    }
+
+    public String getWord_is_grasp() {
+        return word_is_grasp;
+    }
+
+    public void setWord_is_grasp(String word_is_grasp) {
+        this.word_is_grasp = word_is_grasp;
+    }
+
+    public String getGrasp_values() {
+        return grasp_values;
+    }
+
+    public void setGrasp_values(String grasp_values) {
+        this.grasp_values = grasp_values;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getBook_name() {
+        return book_name;
+    }
+
+    public void setBook_name(String book_name) {
+        this.book_name = book_name;
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 }
