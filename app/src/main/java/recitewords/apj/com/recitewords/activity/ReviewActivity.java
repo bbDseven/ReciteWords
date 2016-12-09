@@ -273,8 +273,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             setProgress();
         }
 
-        Log.e("ha","单词："+mWord);
-        init_fragment("computer");     //例句Fragment替换例句布局文件
+        init_fragment(mWord);     //例句Fragment替换例句布局文件
     }
 
     //判断是否需要把从字库表中获取到需要复习的单词添加到复习表中
@@ -583,6 +582,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.learn_tv_soundmark.setText(mPhonogram);  //音标
         holder.tv_word_information.setText(mWordMean);  //设置单词详细信息
         review_word_index++;  //学习单词的位置增加1
+
+        init_fragment(mWord);  //切换例句
     }
 
     /**

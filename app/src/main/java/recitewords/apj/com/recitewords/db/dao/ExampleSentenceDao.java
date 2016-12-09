@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.bean.WordExampleSentence;
 import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
