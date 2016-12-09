@@ -253,7 +253,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
         holder.ll_star.setVisibility(View.GONE);        //隐藏学习页的星星
 
-        mGraspValuesList = new ArrayList<>();
+
         wordReviewDao = new WordReviewDao(this);
         getDataForBook();  //从词书表获取数据插入复习表中
         //获取复习表中本组复习的单词
@@ -297,6 +297,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
 
     //获取已经完成的复习的单词数量
     public int getNeed_review_word() {
+        mGraspValuesList = new ArrayList<>();
         completeIndex = new ArrayList<>();
         int mCompleteNum = 0;
         int i = 0;
@@ -306,6 +307,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 completeIndex.add(i);
             }
             i++;
+            mGraspValuesList.add(0);   //初始化晋级值
         }
         return mCompleteNum;
     }
@@ -558,12 +560,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
 
             //根据复习单词的位置，取出他的晋级值
-            if (mCircleIndex == 1) {  //复习单词第一圈
-                mGraspValues = 0;
-            } else {
-                //复习第二圈就重保存的数值中取出
-                mGraspValues = mGraspValuesList.get(review_word_index);
-            }
+            mGraspValues = mGraspValuesList.get(review_word_index);
         } else {
             review_word_index = 0;
             while (completeIndex.contains(review_word_index)) {  //已复习的不再出现
@@ -575,12 +572,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 mPhonogram = wordReviews.get(review_word_index).getSoundmark_american();  //获取音标
                 mWordMean = wordReviews.get(review_word_index).getAnswer_right();  //获取词性词义
                 //根据复习单词的位置，取出他的晋级值
-                if (mCircleIndex == 1) {  //复习单词第一圈
-                    mGraspValues = 0;
-                } else {
-                    //复习第二圈就重保存的数值中取出
-                    mGraspValues = mGraspValuesList.get(review_word_index);
-                }
+                mGraspValues = mGraspValuesList.get(review_word_index);
             }
         }
         changeReviewMode();  //切换复习模式
@@ -597,20 +589,11 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
      */
     public void saveGraspValues() {
         //保存当前单词的晋级值
-        if (mCircleIndex == 1) {
-            if (completeIndex.contains(review_word_index - 1)) {
-                mGraspValuesList.add(0);   //完成复习的复习，添加0到集合中
-            }
-            mGraspValuesList.add(mGraspValues);   //第一圈复习，直接添加到集合中
-//            Log.e("saveGraspValues", "添加晋级值：" + mGraspValues);
+        if (review_word_index <= wordReviews.size()) {
+            mGraspValuesList.set(review_word_index - 1, mGraspValues);
         } else {
-            //大于等于二圈把晋级值保存到相应的集合位置中
-            if (review_word_index <= wordReviews.size()) {
-                mGraspValuesList.set(review_word_index - 1, mGraspValues);
-            }else {
-                Log.e(TAG, "下标越界了");
-                Log.e("saveGraspValues", "下标值：" + (review_word_index - 1));
-            }
+            Log.e(TAG, "下标越界了");
+            Log.e("saveGraspValues", "下标值：" + (review_word_index - 1));
         }
     }
 
