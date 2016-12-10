@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="themes_one">#9D812E</color>
+    <color name="textView_stroke_one">#D7C180</color>
+    <color name="color_item_divide">#D2D2D2</color>  <!--查看今日学习单词时，item横线颜色-->
+    <color name="color_item_word">#7b7a7a</color>  <!--查看今日学习单词时，item横线颜色-->
+    <color name="color_item_word_mean">#B6B6B6</color>  <!--查看今日学习单词时，item横线颜色-->
+    <color name="color_item_word_background">#EEEEEE</color>
 </resources>

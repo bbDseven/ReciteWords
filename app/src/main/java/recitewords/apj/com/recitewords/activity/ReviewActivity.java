@@ -29,7 +29,8 @@ import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
-import recitewords.apj.com.recitewords.globle.Grasp;
+import recitewords.apj.com.recitewords.globle.Review;
+import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.NumUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
@@ -283,7 +284,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         review_is_complete = PrefUtils.getDBFlag(pref, "review_is_complete", true);
         if (review_is_complete) {
             BookDao bookDao = new BookDao(this);
-            List<Book> books = bookDao.queryReviewWOrd();
+            List<Book> books = bookDao.queryReviewWOrd(book_name);
             for (Book book : books) {
                 //把从字库表中获取到需要复习的单词添加到复习表中
                 wordReviewDao.addWord(book.getWord(), "", "", "", "", book.getSoundmark_american(),
@@ -620,33 +621,33 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
                 if (mCircleIndex == 1) {
                     Log.e(TAG, "词义回想模式--晋级：C");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_C, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_C, bookDao);
                 } else if (mCircleIndex == 2) {
                     Log.e(TAG, "词义回想模式--晋级：D");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_D, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_D, bookDao);
                 } else if (mCircleIndex == 3) {
                     Log.e(TAG, "词义回想模式--晋级：E");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_E, bookDao);
                 } else if (mCircleIndex >= 4) {
                     Log.e(TAG, "词义回想模式--晋级：F");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_F, bookDao);
                 }
             } else if (review_mode.equals(Mode.MODE_CHOICE)) {
                 if (mCircleIndex == 1) {
                     Log.e(TAG, "选择题模式--晋级：E");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_E, bookDao);
                 } else if (mCircleIndex >= 2) {
                     Log.e(TAG, "选择题模式--晋级：F");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_F, bookDao);
                 }
 
             } else if (review_mode.equals(Mode.MODE_MEMORY_WORD)) {
                 if (mCircleIndex == 1) {
                     Log.e(TAG, "单词回想模式--晋级：E");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_E, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_E, bookDao);
                 } else if (mCircleIndex >= 2) {
                     Log.e(TAG, "单词回想模式--晋级：F");
-                    setDbGrasp(mWordGrasp, Grasp.GRASP_F, bookDao);
+                    setDbGraspAndDate(mWordGrasp, Review.GRASP_F, bookDao);
                 }
             }
         }
@@ -654,28 +655,29 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     }
 
     /**
-     * 设置熟悉程度
+     * 设置熟悉程度和日期
      *
      * @param mWordGrasp 数据库中熟悉程度
      * @param grasp      新的熟悉程度
      * @param bookDao    对象
      */
-    public void setDbGrasp(String mWordGrasp, String grasp, BookDao bookDao) {
-        if (mWordGrasp.equals(Grasp.GRASP_A)) {
+    public void setDbGraspAndDate(String mWordGrasp, String grasp, BookDao bookDao) {
+        if (mWordGrasp.equals(Review.GRASP_A)) {
             bookDao.updateGraspWord(book_name, mWord);  //升一个等级级
-        } else if (mWordGrasp.equals(Grasp.GRASP_B)) {
-            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_A);
-        } else if (mWordGrasp.equals(Grasp.GRASP_C)) {
-            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_B);
-        } else if (mWordGrasp.equals(Grasp.GRASP_D)) {
-            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_C);
-        } else if (mWordGrasp.equals(Grasp.GRASP_E)) {
-            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_D);
-        } else if (mWordGrasp.equals(Grasp.GRASP_F)) {
-            bookDao.updateGraspValues(book_name, mWord, Grasp.GRASP_E);
+        } else if (mWordGrasp.equals(Review.GRASP_B)) {
+            bookDao.updateGraspValues(book_name, mWord, Review.GRASP_A);
+        } else if (mWordGrasp.equals(Review.GRASP_C)) {
+            bookDao.updateGraspValues(book_name, mWord, Review.GRASP_B);
+        } else if (mWordGrasp.equals(Review.GRASP_D)) {
+            bookDao.updateGraspValues(book_name, mWord, Review.GRASP_C);
+        } else if (mWordGrasp.equals(Review.GRASP_E)) {
+            bookDao.updateGraspValues(book_name, mWord, Review.GRASP_D);
+        } else if (mWordGrasp.equals(Review.GRASP_F)) {
+            bookDao.updateGraspValues(book_name, mWord, Review.GRASP_E);
         } else {
             bookDao.updateGraspValues(book_name, mWord, grasp);
         }
+        bookDao.updateDate(book_name,mWord, DateUtil.getNowDate("yyyy-MM-dd"));  //更新日期
     }
 
     /**
@@ -704,6 +706,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             holder.ll_memory.setVisibility(View.VISIBLE);  //显示回忆模式下的中间选项
             holder.ll_abcd.setVisibility(View.INVISIBLE);        //隐藏abcd选项模式
             holder.word_progress.setVisibility(View.INVISIBLE);  //隐藏单词加载进度
+            holder.ll_word_root.setVisibility(View.VISIBLE);
         } else if (review_mode.equals(Mode.MODE_CHOICE)) {
             holder.ll_information.setVisibility(View.INVISIBLE);  //隐藏词义
             holder.progress.setVisibility(View.INVISIBLE);  //隐藏加载进度条

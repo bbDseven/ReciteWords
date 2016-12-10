@@ -2,6 +2,7 @@ package recitewords.apj.com.recitewords.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.bean.WordReview;
+import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.UIUtil;
 
@@ -31,7 +33,7 @@ import recitewords.apj.com.recitewords.util.UIUtil;
  * Created by CGT on 2016/12/7.
  * <p/>
  * 拼写测试
- *
+ * <p/>
  * 默认为不管是不是一次性通过，学完一篇后就不再复习
  */
 public class SpellTestActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
@@ -105,7 +107,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initData() {
-        passIndexs=new ArrayList<>();
+        passIndexs = new ArrayList<>();
 
         Intent intent = getIntent();
         banckgroundIndex = intent.getIntExtra("BanckgroundIndex", 0);
@@ -129,7 +131,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             holder.spell_tv_correct.setVisibility(View.VISIBLE);  //显示词义
 
             mReviewWords = (List<WordReview>) intent.getSerializableExtra("words");
-            holder.spell_tv_situation.setText(0/mReviewWords.size()+"");  //设置拼写情况
+            holder.spell_tv_situation.setText(0 + "/" + mReviewWords.size() + "");  //设置拼写情况
             //动态设置圆点个数
             for (int i = 0; i < mReviewWords.size(); i++) {
                 View pointView = new View(this);
@@ -150,7 +152,24 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.spell_tv_close:
                 //关闭拼写界面
-                finish();
+                if (SpellMode.equals("spell")) {  //拼写
+                    finish();
+                } else if (SpellMode.equals("spellTest")) {  //拼写测试
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("真的放弃拼写测试吗！！");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+                    builder.setNegativeButton("取消", null);
+                    AlertDialog alertDialog = alertDialog = builder.create();
+                    alertDialog.show();
+
+                }
+
                 break;
             case R.id.spell_tv_prompt:
                 //提示用户的单词信息，显示音标和读音
@@ -187,8 +206,8 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                         if (is_Pass) {
                             //一次通过，改变圆点颜色
                             passIndexs.add(mSpellIndex);  //增加到一次性通过的集合中去
-                            holder.spell_Dot.getChildAt(mSpellIndex-1).setBackgroundResource(R.drawable.circle_white_shape);
-                            holder.spell_tv_situation.setText(passIndexs.size()+"/"+mReviewWords.size());
+                            holder.spell_Dot.getChildAt(mSpellIndex - 1).setBackgroundResource(R.drawable.circle_white_shape);
+                            holder.spell_tv_situation.setText(passIndexs.size() + "/" + mReviewWords.size());
                         }
                     }
 
@@ -200,7 +219,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                     if (SpellMode.equals("spell")) {
 
                     } else if (SpellMode.equals("spellTest")) {
-                        UIUtil.toast(this, mPhonogram, 2000,Gravity.BOTTOM ,0,height / 2-20,16);
+                        UIUtil.toast(this, mPhonogram, 2000, Gravity.BOTTOM, 0, height / 2 - 20, 16);
                         holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
                         mHandler.postDelayed(new Runnable() {
                             @Override
@@ -217,7 +236,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                 break;
             case R.id.spell_tv_spell_next:
                 spellNextWOrd();
-                is_Pass=true;
+                is_Pass = true;
                 break;
             default:
                 break;
@@ -230,40 +249,40 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
      */
     public void spellNextWOrd() {
 
-        if (mSpellIndex<mReviewWords.size()){
-        mWord = mReviewWords.get(mSpellIndex).getWord();
-        mPhonogram = mReviewWords.get(mSpellIndex).getSoundmark_british();
-        mWordMean = mReviewWords.get(mSpellIndex).getAnswer_right();
-        //当题目，圆点变大
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
-        if (mSpellIndex==0){
-            params.rightMargin=20;
-        }else {
-            params.leftMargin=5;
-            params.rightMargin=15;
-        }
-        holder.spell_Dot.getChildAt(mSpellIndex).setLayoutParams(params);
+        if (mSpellIndex < mReviewWords.size()) {
+            mWord = mReviewWords.get(mSpellIndex).getWord();
+            mPhonogram = mReviewWords.get(mSpellIndex).getSoundmark_british();
+            mWordMean = mReviewWords.get(mSpellIndex).getAnswer_right();
+            //当题目，圆点变大
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+            if (mSpellIndex == 0) {
+                params.rightMargin = 20;
+            } else {
+                params.leftMargin = 5;
+                params.rightMargin = 15;
+            }
+            holder.spell_Dot.getChildAt(mSpellIndex).setLayoutParams(params);
 
-        //上一题圆点大小还原
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(10, 10);
-        params1.rightMargin=10;
-        if (mSpellIndex==0){
-            holder.spell_Dot.getChildAt(mReviewWords.size()-1).setLayoutParams(params1);
-        }else {
-            holder.spell_Dot.getChildAt(mSpellIndex-1).setLayoutParams(params1);
-        }
+            //上一题圆点大小还原
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(10, 10);
+            params1.rightMargin = 10;
+            if (mSpellIndex == 0) {
+                holder.spell_Dot.getChildAt(mReviewWords.size() - 1).setLayoutParams(params1);
+            } else {
+                holder.spell_Dot.getChildAt(mSpellIndex - 1).setLayoutParams(params1);
+            }
 
-        holder.spell_tv_correct.setText(mWordMean);  //显示词义
-        holder.spell_tv_confirm.setVisibility(View.VISIBLE);  //显示比较按钮
-        holder.spell_tv_spell_next.setVisibility(View.GONE);  //隐藏下一个
-        holder.spell_et_input.setText("");
-        mSpellIndex++;
-        }else {//学完一遍后
+            holder.spell_tv_correct.setText(mWordMean);  //显示词义
+            holder.spell_tv_confirm.setVisibility(View.VISIBLE);  //显示比较按钮
+            holder.spell_tv_spell_next.setVisibility(View.GONE);  //隐藏下一个
+            holder.spell_et_input.setText("");
+            mSpellIndex++;
+        } else {//学完一遍后
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("温馨提醒：");
             builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
             AlertDialog alertDialog = builder.create();
-            builder.setPositiveButton("确定",null);
+            builder.setPositiveButton("确定", null);
             alertDialog.show();
         }
     }

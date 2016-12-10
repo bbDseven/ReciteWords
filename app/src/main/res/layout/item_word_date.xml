@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_item_word_background"
+    android:orientation="vertical">
+
+    <!--日期-->
+    <TextView
+        android:id="@+id/item_word_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:text="2016年12月09日   5个单词"
+        android:textColor="#AAAAAA"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/item_ll_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="15dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="15dp">
+
+        <!--单词-->
+        <TextView
+            android:id="@+id/item_word"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="occur"
+            android:textColor="@color/color_item_word"
+            android:textSize="@dimen/item_word" />
+        <!--词义-->
+        <TextView
+            android:id="@+id/item_word_mean"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp"
+            android:text="vi.出现，存在，发生，有；（想法或生意）被想到，被想起，浮现在脑海中"
+            android:textColor="@color/color_item_word_mean"
+            android:visibility="visible" />
+
+    </LinearLayout>
+    <!--分割线-->
+    <ImageView
+        android:id="@+id/item_word_divide"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="5dp"
+        android:background="@color/color_item_divide" />
+</LinearLayout>

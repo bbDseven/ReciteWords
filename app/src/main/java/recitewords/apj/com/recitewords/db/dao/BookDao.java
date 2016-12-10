@@ -4,16 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
-import recitewords.apj.com.recitewords.globle.Grasp;
+import recitewords.apj.com.recitewords.globle.Review;
 import recitewords.apj.com.recitewords.util.DateUtil;
 
 /**
@@ -54,12 +52,12 @@ public class BookDao {
      *
      * @return 单词信息
      */
-    public List<Book> queryReviewWOrd() {
-        int day = 0;   //相差日期
+    public List<Book> queryReviewWOrd(String book_name) {
+        int day;   //相差日期
         SQLiteDatabase db = helper.getWritableDatabase();
         ArrayList<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
-                new String[]{"1", "0"}, null, null, null, null);
+        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
+                new String[]{"1", "0", book_name}, null, null, null, null);
         while (cursor.moveToNext()) {
             Book book = new Book();
             //熟悉程度
@@ -67,9 +65,9 @@ public class BookDao {
             //
             String date = cursor.getString(cursor.getColumnIndex("date"));
             day = DateUtil.compareToday(date);
-            if (books.size() < Grasp.RRVIEW_NUMBER) {
-                if (graspValues.equals(Grasp.GRASP_A)) {
-                    if (day >= 100) {
+            if (books.size() < Review.RRVIEW_NUMBER) {
+                if (graspValues.equals(Review.GRASP_A)) {
+                    if (day >= Review.REVIEW_DAY_A) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -80,8 +78,8 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
-                } else if (graspValues.equals(Grasp.GRASP_B)) {
-                    if (day >= 50) {
+                } else if (graspValues.equals(Review.GRASP_B)) {
+                    if (day >= Review.REVIEW_DAY_B) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -92,8 +90,8 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
-                } else if (graspValues.equals(Grasp.GRASP_C)) {
-                    if (day >= 20) {
+                } else if (graspValues.equals(Review.GRASP_C)) {
+                    if (day >= Review.REVIEW_DAY_C) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -104,8 +102,8 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
-                } else if (graspValues.equals(Grasp.GRASP_D)) {
-                    if (day >= 10) {
+                } else if (graspValues.equals(Review.GRASP_D)) {
+                    if (day >= Review.REVIEW_DAY_D) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -116,8 +114,8 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
-                } else if (graspValues.equals(Grasp.GRASP_E)) {
-                    if (day >= 5) {
+                } else if (graspValues.equals(Review.GRASP_E)) {
+                    if (day >= Review.REVIEW_DAY_E) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -128,8 +126,8 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
-                } else if (graspValues.equals(Grasp.GRASP_F)) {
-                    if (day >= 0) {
+                } else if (graspValues.equals(Review.GRASP_F)) {
+                    if (day >= Review.REVIEW_DAY_F) {
                         book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                         book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                         book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -146,27 +144,27 @@ public class BookDao {
         return books;
     }
 
+
     /**
-     * 获取需要复习的单词总数
+     * 查询所有需要复习的单词
      *
-     * @return 单词总数 int
+     * @param book_name 词书名字
+     * @return list
      */
-    public int queryAllReviewWordSize() {
-        int day = 0;   //相差日期
+    public List<Book> queryALLReviewWords(String book_name) {
+        int day ;   //相差日期
         SQLiteDatabase db = helper.getWritableDatabase();
         ArrayList<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
-                new String[]{"1", "0"}, null, null, null, null);
+        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
+                new String[]{"1", "0", book_name}, null, null, null, null);
         while (cursor.moveToNext()) {
             Book book = new Book();
             //熟悉程度
             String graspValues = cursor.getString(cursor.getColumnIndex("grasp_values"));
-            //
             String date = cursor.getString(cursor.getColumnIndex("date"));
-           // Log.e("BookDao","日期差： "+day);
             day = DateUtil.compareToday(date);
-            if (graspValues.equals(Grasp.GRASP_A)) {
-                if (day >= 100) {
+            if (graspValues.equals(Review.GRASP_A)) {
+                if (day >= Review.REVIEW_DAY_A) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -177,8 +175,8 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
-            } else if (graspValues.equals(Grasp.GRASP_B)) {
-                if (day >= 50) {
+            } else if (graspValues.equals(Review.GRASP_B)) {
+                if (day >= Review.REVIEW_DAY_B) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -189,8 +187,8 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
-            } else if (graspValues.equals(Grasp.GRASP_C)) {
-                if (day >= 20) {
+            } else if (graspValues.equals(Review.GRASP_C)) {
+                if (day >= Review.REVIEW_DAY_C) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -201,8 +199,8 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
-            } else if (graspValues.equals(Grasp.GRASP_D)) {
-                if (day >= 10) {
+            } else if (graspValues.equals(Review.GRASP_D)) {
+                if (day >= Review.REVIEW_DAY_D) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -213,8 +211,8 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
-            } else if (graspValues.equals(Grasp.GRASP_E)) {
-                if (day >= 5) {
+            } else if (graspValues.equals(Review.GRASP_E)) {
+                if (day >= Review.REVIEW_DAY_E) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -225,8 +223,8 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
-            } else if (graspValues.equals(Grasp.GRASP_F)) {
-                if (day >= 0) {
+            } else if (graspValues.equals(Review.GRASP_F)) {
+                if (day >= Review.REVIEW_DAY_F) {
                     book.setWord(cursor.getString(cursor.getColumnIndex("word")));
                     book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
                     book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
@@ -239,22 +237,22 @@ public class BookDao {
                 }
             }
         }
-        return books.size();
+        return books;
     }
 
-
     /**
-     * 查询单词的熟悉程度更新日期
-     * @param book_name  词书名字
-     * @param word  单词
-     * @return  日期 String
+     * 查询单词的熟悉程度的日期
+     *
+     * @param book_name 词书名字
+     * @param word      单词
+     * @return 日期 String
      */
-    public String queryWordDate(String book_name, String word){
+    public String queryWordDate(String book_name, String word) {
         String date = "";
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor cursor = db.query("book", null, "book_name=? and word=?",
                 new String[]{book_name, word}, null, null, null);
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             date = cursor.getString(cursor.getColumnIndex("date"));
         }
         return date;
@@ -262,21 +260,49 @@ public class BookDao {
 
     /**
      * 查询单词的熟悉程度
-     * @param book_name  词书名字
-     * @param word  单词
-     * @return  熟悉程度 String
+     *
+     * @param book_name 词书名字
+     * @param word      单词
+     * @return 熟悉程度 String
      */
-    public String queryWordGrasp(String book_name, String word){
+    public String queryWordGrasp(String book_name, String word) {
         String grasp = "";
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor cursor = db.query("book", null, "book_name=? and word=?",
                 new String[]{book_name, word}, null, null, null);
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             grasp = cursor.getString(cursor.getColumnIndex("grasp_values"));
         }
         return grasp;
     }
 
+
+    /**
+     * 查看某一天学习的单词总数
+     *
+     * @param book_name  词书名字
+     * @param date  日期
+     * @return  list
+     */
+    public List<Book> queryDayLearn(String book_name,String date){
+        SQLiteDatabase db = helper.getWritableDatabase();
+        List<Book> books=new ArrayList<>();
+        Cursor cursor = db.query("book", null, "book_name=? and date=? and word_is_study=?",
+                new String[]{book_name, date,"1"}, null, null, null);
+        while (cursor.moveToNext()){
+            Book book = new Book();
+            book.setWord(cursor.getString(cursor.getColumnIndex("word")));
+            book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
+            book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
+            book.setWord_mean(cursor.getString(cursor.getColumnIndex("word_mean")));
+            book.setBook_name(cursor.getString(cursor.getColumnIndex("book_name")));
+            book.setGrasp_values(cursor.getString(cursor.getColumnIndex("grasp_values")));
+            book.setDate(cursor.getString(cursor.getColumnIndex("date")));
+            book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
+            books.add(book);
+        }
+        return books;
+    }
     /**
      * 更新单词是否为已掌握
      *
@@ -321,6 +347,7 @@ public class BookDao {
         values.put("date ", date);
         return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
     }
+
 
     /**
      * 更改单词的：是否已学习 word_is_study 字段 变为 1
@@ -380,13 +407,13 @@ public class BookDao {
 
     /**
      * 根据单词查询单词信息   返回音标和词义
-    * */
-    public Book query_wordInfo(String word){
+     */
+    public Book query_wordInfo(String word) {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor wordInfo = db.rawQuery("select * from book where word=?", new String[]{word});
         Book book = new Book();
-        if (wordInfo != null && wordInfo.getCount() > 0){
-            if (wordInfo.moveToFirst()){
+        if (wordInfo != null && wordInfo.getCount() > 0) {
+            if (wordInfo.moveToFirst()) {
                 book.setSoundmark_american(wordInfo.getString(wordInfo.getColumnIndex("soundmark_american")));
                 book.setWord_mean(wordInfo.getString(wordInfo.getColumnIndex("word_mean")));
                 return book;

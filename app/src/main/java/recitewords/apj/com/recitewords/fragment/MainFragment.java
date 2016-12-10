@@ -121,6 +121,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private TextView tv_word_sentence_mean;//例句意思
     private TextView tv_word_sentence1;    //例句2
     private TextView tv_word_sentence_mean1;  //例句2意思
+    private String book_name="CET4";
 
     private int mReviewWordSum;  //需要复习的单词总数
     private UserDao userDao;
@@ -199,7 +200,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //获取徐复习单词总数，并显示
 
         BookDao bookDao = new BookDao(mActivity);
-        mReviewWordSum = bookDao.queryAllReviewWordSize();
+        mReviewWordSum = bookDao.queryALLReviewWords(book_name).size();
         holder.main_tv_review_num.setText(mReviewWordSum + "");
 
         //获取今天是否已签到
@@ -404,7 +405,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                     mainActivity.setNavigateShow();
                 }
                 mainActivity.setNavigateShowState(!navigateShowState);
-                Log.e("ha", "点击了，状态后为：" + navigateShowState);
+               // Log.e("ha", "点击了，状态后为：" + navigateShowState);
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面

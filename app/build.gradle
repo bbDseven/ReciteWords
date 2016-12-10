@@ -29,5 +29,4 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:+'
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.android.support:support-v4:23.4.0'
-    compile files('libs/YoumiSdk_v6.4.4_2016-09-08.jar')
 }

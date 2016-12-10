@@ -10,7 +10,13 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!--有米积分墙所需权限 -->
+
+
+    <!-- 蓝牙分享所需的权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <!-- 有米积分墙所需权限 -->
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
@@ -37,11 +43,11 @@
         <activity
             android:name="net.youmi.android.AdBrowser"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
 
         <service
             android:name="net.youmi.android.AdService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <receiver android:name="net.youmi.android.AdReceiver">
             <intent-filter>
@@ -54,9 +60,11 @@
         <!-- 有米广告积分墙 -->
         <service
             android:name="net.youmi.android.ExpService"
-            android:exported="false"></service>
+            android:exported="false" />
 
-        <activity android:name=".activity.SpellTestActivity"></activity>
+        <activity android:name=".activity.SpellTestActivity" />
+        <activity android:name=".activity.ShowTodayLearnActivity" />
+
     </application>
 
 </manifest>

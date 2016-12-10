@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -18,7 +19,6 @@ import android.widget.TextView;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import net.youmi.android.listener.Interface_ActivityListener;
 import net.youmi.android.normal.banner.BannerManager;
 import net.youmi.android.normal.banner.BannerViewListener;
 import net.youmi.android.offers.OffersManager;
@@ -28,7 +28,12 @@ import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.MainActivity;
+import recitewords.apj.com.recitewords.activity.ShowTodayLearnActivity;
 import recitewords.apj.com.recitewords.adapter.MyViewPagerAdapter;
+import recitewords.apj.com.recitewords.bean.Book;
+import recitewords.apj.com.recitewords.db.dao.BookDao;
+import recitewords.apj.com.recitewords.globle.AppConfig;
+import recitewords.apj.com.recitewords.util.DateUtil;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -44,6 +49,10 @@ public class SlidingFragment extends BaseFragment {
         private TextView text_set, text_the, text_lib, text_sta;// 4个TextView菜单的名称
         private LinearLayout ll_setting, ll_theme, ll_library, ll_statistics;  //菜单导航栏
         private LinearLayout ll_top;  //导航栏父控件
+
+        //--------------------统计
+        TextView statistics_tv_today_learn;  //查看
+        TextView statistics_tv_today_sum;  //显示今日已学习个数
     }
 
     private static final String TAG = "SlidingFragment";
@@ -88,7 +97,20 @@ public class SlidingFragment extends BaseFragment {
         holder.ll_library = findViewByIds(view, R.id.ll_library);
         holder.ll_statistics = findViewByIds(view, R.id.ll_statistics);
 
+        //-------------------统计
 
+        getHeight(view);
+        InitImageView();
+        InitViewPager();
+        return view;
+    }
+
+    /**
+     * 获取菜单导航栏高度，设置用户向上的最大高度
+     *
+     * @param view 所在的父布局
+     */
+    public void getHeight(final View view) {
         //获取菜单导航栏高度，设置用户向上的最大高度
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
@@ -100,7 +122,6 @@ public class SlidingFragment extends BaseFragment {
                     public void run() {
                         holder.ll_top = findViewByIds(view, R.id.ll_top);
                         NavigateHeight = holder.ll_top.getHeight();
-//                        Log.e(TAG, "大小：" + NavigateHeight);
                         mainActivity.setNavigateHeight(NavigateHeight);
                     }
                 }, 300);
@@ -108,10 +129,6 @@ public class SlidingFragment extends BaseFragment {
                         .removeOnGlobalLayoutListener(this);  //移除监听
             }
         });
-
-        InitImageView();
-        InitViewPager();
-        return view;
     }
 
     /**
@@ -149,22 +166,51 @@ public class SlidingFragment extends BaseFragment {
         MyViewPagerAdapter myViewPager = new MyViewPagerAdapter(mActivity, viewList);
         holder.menu_viewPager.setAdapter(myViewPager);
         holder.menu_viewPager.setCurrentItem(0);
+
+        statistics(holder.view_statistics);  //统计
         //holder.text_set.setTextColor(Color.CYAN);
         holder.menu_viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
     }
 
+
+    /**
+     * 统计Viewpager
+     *
+     * @param view  view
+     */
+    private void statistics(View view) {
+        init_StatView(view);
+        init_StatData();
+    }
+
+    /**
+     * 初始化统计的UI
+     */
+    public void init_StatView(View view) {
+        holder.statistics_tv_today_learn=findViewByIds(view,R.id.statistics_tv_today_learn);
+        holder.statistics_tv_today_sum=findViewByIds(view,R.id.statistics_tv_today_sum);
+
+    }
+
+    /**
+     * 初始化统计的数据
+     */
+    public void init_StatData() {
+        BookDao bookDao = new BookDao(mActivity);
+        List<Book> list = bookDao.queryDayLearn(AppConfig.BOOK_NAME, DateUtil.getNowDate("yyyy-MM-dd"));
+        holder.statistics_tv_today_sum.setText(list.size()+"");
+        holder.statistics_tv_today_learn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //显示今天学习单词
+                startActivity(new Intent(mActivity, ShowTodayLearnActivity.class));
+            }
+        });
+    }
+
+
     @Override
     public void initEvent() {
-//        holder.img_set.setOnClickListener(new MyOnClickListener(0));
-//        holder.img_the.setOnClickListener(new MyOnClickListener(1));
-//        holder.img_lib.setOnClickListener(new MyOnClickListener(2));
-//        holder.img_sta.setOnClickListener(new MyOnClickListener(3));
-//
-//        holder.text_set.setOnClickListener(new MyOnClickListener(0));
-//        holder.text_the.setOnClickListener(new MyOnClickListener(1));
-//        holder.text_lib.setOnClickListener(new MyOnClickListener(2));
-//        holder.text_sta.setOnClickListener(new MyOnClickListener(3));
-
         holder.ll_setting.setOnClickListener(new MyOnClickListener(0));
         holder.ll_theme.setOnClickListener(new MyOnClickListener(1));
         holder.ll_library.setOnClickListener(new MyOnClickListener(2));
@@ -172,7 +218,7 @@ public class SlidingFragment extends BaseFragment {
     }
 
     /**
-     * 头标点击监听
+     * 头部点击监听
      */
     public class MyOnClickListener implements View.OnClickListener {
         private int index = 0;
@@ -346,7 +392,7 @@ public class SlidingFragment extends BaseFragment {
     }
 
     //设置广告条
-    private void setAdv(){
+    private void setAdv() {
         // 获取广告条
         View bannerView = BannerManager.getInstance(mActivity)
                 .getBannerView(new BannerViewListener() {

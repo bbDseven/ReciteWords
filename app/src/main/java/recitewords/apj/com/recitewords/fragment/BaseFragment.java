@@ -25,6 +25,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return initView();
+
     }
 
     // 承载Fragment的Activity创建完成
