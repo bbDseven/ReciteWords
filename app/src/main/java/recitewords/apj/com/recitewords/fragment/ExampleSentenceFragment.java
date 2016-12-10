@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Spannable;
@@ -35,7 +36,6 @@ public class ExampleSentenceFragment extends BaseFragment implements LearnActivi
     private LinearLayout sentence_pronounce; //例句点击发音
     private String str; //例句
     private SpannableStringBuilder style;   //设置字体颜色
-
 
     public ExampleSentenceFragment(String word) {
         this.word = word;

@@ -135,7 +135,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public View initView() {
         holder = new ViewHolder();
         mainActivity = (MainActivity) mActivity;
-        View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_main, null);
+        View view = LayoutInflater.from(mActivity).inflate(R.layout.fragment_main, null);
         holder.activity_main = findViewByIds(view, R.id.activity_main);
         holder.linearLayout = findViewByIds(view, R.id.main_ll);
         holder.img_sign = findViewByIds(view, R.id.main_img_sign);

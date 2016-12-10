@@ -212,4 +212,12 @@ public class TodayLearnFragment extends BaseFragment {
         }
 
     }
+
+    /**
+     * 获取今天复习单词的总数
+     * @return
+     */
+    public int getLearnSum(){
+        return list.size();
+    }
 }

@@ -1,6 +1,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Spannable;
@@ -38,13 +39,13 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
     private String str; //例句
     private SpannableStringBuilder style;   //设置字体颜色
 
-
     public ExampleSentenceFragment_review(String word) {
         this.word = word;
     }
 
     @Override
     public View initView() {
+
         View view = View.inflate(mActivity, R.layout.fragment_example_sentence, null);
         vp = (ViewPager) view.findViewById(R.id.example_sentence_vp);
         cursor = (ImageView) view.findViewById(R.id.vp_cursor);

@@ -6,6 +6,8 @@ import android.app.Application;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.sharesdk.framework.ShareSDK;
+
 /**
  * Created by CGT on 2016/11/22.
  */
@@ -16,6 +18,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ShareSDK.initSDK(getBaseContext(),"19cb550c85b26");
     }
 
 

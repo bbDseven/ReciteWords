@@ -78,7 +78,7 @@ public class SlidingFragment extends BaseFragment {
     @Override
     public View initView() {
         OffersManager.getInstance(mActivity).onAppExit();//广告积分墙资源释放
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.fragment_sliding, null);
+        final View view = LayoutInflater.from(mActivity).inflate(R.layout.fragment_sliding, null);
         holder = new holder();
         mainActivity = (MainActivity) mActivity;
 
@@ -196,7 +196,7 @@ public class SlidingFragment extends BaseFragment {
      * 初始化统计的数据
      */
     public void init_StatData() {
-        BookDao bookDao = new BookDao(mActivity);
+        BookDao bookDao = new BookDao(mContext);
         List<Book> list = bookDao.queryDayLearn(AppConfig.BOOK_NAME, DateUtil.getNowDate("yyyy-MM-dd"));
         holder.statistics_tv_today_sum.setText(list.size()+"");
         holder.statistics_tv_today_learn.setOnClickListener(new View.OnClickListener() {
