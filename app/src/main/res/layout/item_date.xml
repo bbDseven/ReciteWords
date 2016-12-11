@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:gravity="center"
+    android:padding="5dp"
+    android:background="@color/color_item_word_background"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/circle_gray_shape" />
+
+
+    <!--日期-->
+    <TextView
+        android:id="@+id/item_word_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:text="2016年12月09日   5个单词"
+        android:textColor="#AAAAAA"
+        android:textSize="16sp" />
+</LinearLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_item_word_background"
+    android:orientation="vertical">
+
+
+
+    <recitewords.apj.com.recitewords.view.SwipeLayout
+        android:id="@+id/sl_word"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/item_ll_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingTop="20dp">
+
+            <!--单词-->
+            <TextView
+                android:id="@+id/item_word"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="occur"
+                android:textColor="@color/color_item_word"
+                android:textSize="@dimen/item_word" />
+            <!--词义-->
+            <TextView
+                android:id="@+id/item_word_mean"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="5dp"
+                android:text="vi.出现，存在，发生，有；（想法或生意）被想到，被想起，浮现在脑海中"
+                android:textColor="@color/color_item_word_mean"
+                android:visibility="visible" />
+
+            <!--分割线-->
+            <ImageView
+                android:id="@+id/item_word_divide"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="25dp"
+                android:background="@color/color_item_divide" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/item_learn_again"
+            android:layout_width="100dp"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/item_delete"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="重学"
+                android:textSize="24sp"
+                android:background="@color/colorRed"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textColor="@color/colorWhite"
+                android:clickable="true"
+                />
+        </LinearLayout>
+
+    </recitewords.apj.com.recitewords.view.SwipeLayout>
+
+</LinearLayout>

@@ -22,6 +22,6 @@ public class Review {
     public static final int REVIEW_DAY_C=20;
     public static final int REVIEW_DAY_D=10;
     public static final int REVIEW_DAY_E=5;
-    public static final int REVIEW_DAY_F=2;
+    public static final int REVIEW_DAY_F=0;
 
 }

@@ -102,14 +102,13 @@ public class WordStudyDao {
      *
      * @param asterisk  记住次数
      * @param word      要更改记住次数的单词
-     * @param book_name 要更改记住次数的单词所在的词书
      * @return 受影响行数
      */
-    public long updateWordAsterisk(int asterisk, String word, String book_name) {
+    public long updateWordAsterisk(int asterisk, String word) {
         ContentValues mValues = new ContentValues();
         mValues.put("asterisk", asterisk);
         SQLiteDatabase db = helper.getWritableDatabase();
-        int num = db.update("word_study", mValues, "word=? and book_name=?", new String[]{word, book_name});
+        int num = db.update("word_study", mValues, "word=?", new String[]{word});
         mValues.clear();
         db.close();
         return num;
@@ -163,4 +162,19 @@ public class WordStudyDao {
         db.close();
         return wordStudy;
     }
+
+    /**
+     * 获取单词的星号的方法
+     * */
+    public int getWordAsterisk(String word){
+        SQLiteDatabase db = helper.getReadableDatabase();
+        int asterisk = 0;
+        Cursor cursor = db.rawQuery("select asterisk from word_study where word=?", new String[]{word});
+        while (cursor.moveToNext()){
+            asterisk = cursor.getInt(cursor.getColumnIndex("asterisk"));
+        }
+        return asterisk;
+    }
+
+
 }

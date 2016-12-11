@@ -512,24 +512,26 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 break;
             case R.id.tv_delete:
                 //Toast.makeText(this, "点击了删除按钮，功能还没写", Toast.LENGTH_SHORT).show();
-                mGraspWord++;
-                completeIndex.add(review_word_index - 1);  //增加到已复习中
-                //从复习表中标记为已复习,在这次复习中不再出现
-                WordReviewDao dao = new WordReviewDao(this);
-                int i = dao.updateReviewState(mWord, book_name);
-                BookDao bookDao = new BookDao(this);  //更新词书表，已掌握
-                bookDao.updateGraspWord(book_name, mWord);
+                if (complete_review_word<20){
+                    mGraspWord++;
+                    completeIndex.add(review_word_index - 1);  //增加到已复习中
+                    //从复习表中标记为已复习,在这次复习中不再出现
+                    WordReviewDao dao = new WordReviewDao(this);
+                    int i = dao.updateReviewState(mWord, book_name);
+                    BookDao bookDao = new BookDao(this);  //更新词书表，已掌握
+                    bookDao.updateGraspWord(book_name, mWord);
 
-                //更新头部学习情况信息
-                need_review_word--;
-                complete_review_word++;
-                //显示下一个单词
-                showNextWord();
-                if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
-                    holder.progress.setVisibility(View.VISIBLE);   //显示进度条
-                    holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
-                    reset();
-                    setProgress();
+                    //更新头部学习情况信息
+                    need_review_word--;
+                    complete_review_word++;
+                    //显示下一个单词
+                    showNextWord();
+                    if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
+                        holder.progress.setVisibility(View.VISIBLE);   //显示进度条
+                        holder.ll_information.setVisibility(View.GONE);  //隐藏单词信息
+                        reset();
+                        setProgress();
+                    }
                 }
                 break;
             default:

@@ -21,7 +21,7 @@ import recitewords.apj.com.recitewords.util.DateUtil;
 /**
  * Created by Greetty on 2016/12/9.
  *
- * 今天复习单词
+ * 今天需复习单词
  */
 public class TodayReviewFragment extends BaseFragment {
 

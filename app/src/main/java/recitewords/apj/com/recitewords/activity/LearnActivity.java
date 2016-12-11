@@ -27,9 +27,11 @@ import java.util.ArrayList;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.bean.WordStudy;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
+import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.util.LearnWordsUtil;
 import recitewords.apj.com.recitewords.util.MediaUtils;
+import recitewords.apj.com.recitewords.util.NumUtil;
 import recitewords.apj.com.recitewords.util.UIUtil;
 import recitewords.apj.com.recitewords.view.SlidingUpMenu;
 
@@ -52,6 +54,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         public LinearLayout ll_choice;  //选择题模式--中间按钮--不认识
         public LinearLayout ll_incognizance;   //不认识--中间按钮
         public LinearLayout ll_memory;   //回忆模式--中间按钮
+
+        SlidingUpMenu review_sliding;   //sliding
 
         public LinearLayout ll_abcd;   //选择题模式--显示ABCD选项
         public LinearLayout ll_information;   //不认识-，回忆模式-显示词性词义
@@ -119,6 +123,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_spell = findViewByIds(R.id.tv_spell);
         holder.tv_delete = findViewByIds(R.id.tv_delete);
 
+        holder.tv_incognizance_example = findViewByIds(R.id.tv_incognizance_example);
+
         holder.tv_incognizance_next = findViewByIds(R.id.tv_incognizance_next);
 
     }
@@ -140,6 +146,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
 
         studyWords = LearnWordsUtil.getWords(this);//初始化20个单词数据
 
+        isWordAsteriskFour();
         showWordsInformation(order);        //显示 要单词各个信息
         showWordOption(order);              //显示A B C D 选项 （随机）
     }
@@ -159,6 +166,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_delete.setOnClickListener(this);
         //监听例句是否显示
         holder.learn_sliding.setOnToggleListener(this);
+        //监听看例句
+        holder.tv_incognizance_example.setOnClickListener(this);
 
         holder.learn_tv_word = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_word);//获取要学习单词的控件
         holder.learn_tv_soundMark = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_soundmark);//获取音标控件
@@ -185,11 +194,14 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_choice:                    //点击不认识
-                incognizance();                      //显示该单词的含义模式
-                showWordAnswer(order);              //显示该单词词义
+                reduceWordAsterisk(order);          //点击不认识，该单词的星号归零
+                showWordsInformation(order);        //显示单词 第一部分的 信息
+                incognizance();                      //显示该单词词义模式
+                showWordAnswer(order);              //显示该单词答案
                 break;
             case R.id.tv_incognizance_next:       //点击下一个
-                order++;                            //单词下标加1
+                Log.e("点击下一个：","——————");
+                isShowLearnWord();                  //判断单词下标是否大于19，然后进行一次循环
                 choice();                            //显示选择题模式
                 showWordsInformation(order);        //显示单词信息
                 showWordOption(order);              //显示ABCD选项
@@ -204,12 +216,17 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 String A_option = holder.tv_A.getText().toString().trim();//获取A选项词义
                 Log.e("用户选择的是",""+A_option);
                 if (check(A_option)){                       //判断是否选择正确
-                    order++;                                //判断正确，单词下标加1，显示下一个单词
+                    Log.e("该单词是：",""+studyWords.get(order).getWord());
+                    addWordAsterisk(order);                //答对 该 单词，星号加1
+                    isShowLearnWord();                  //判断单词下标是否大于19，然后进行一次循环
+                    //order++;                                //单词下标加1，显示下一个单词
                     choice();                               // 显示选择题模式
                     showWordsInformation(order);           //显示单词信息
                     showWordOption(order);                 //显示ABCD选项
-                    //updateWordAsterisk(order);            //更新数据库 表中字段
                 }else {
+                    reduceWordAsterisk(order);              //答错 该 单词，星号归零
+                    Log.e("答错了,单词的星号是;",""+getWordAsterisk(order)+"单词位置"+order+"该单词"+studyWords.get(order).getWord());
+                    showWordsInformation(order);           // 显示单词信息
                     incognizance();                         //用户选择错误，显示单词词义
                     showWordAnswer(order);                  //显示单词答案
                 }
@@ -218,12 +235,17 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 String B_option = holder.tv_B.getText().toString().trim();//获取B选项词义
                 Log.e("用户选择的是",""+B_option);
                 if (check(B_option)){                        //判断是否选择正确
-                    order++;                                //判断正确，单词下标加1，显示下一个单词
+                    Log.e("该单词是：",""+studyWords.get(order).getWord());
+                    addWordAsterisk(order);                //答对 该 单词，星号加1
+                    isShowLearnWord();                  //判断单词下标是否大于19，然后进行一次循环
+                    //order++;                                //单词下标加1，显示下一个单词
                     choice();                               // 显示选择题模式
-                    showWordsInformation(order);            // 显示单词信息
+                    showWordsInformation(order);           //显示单词信息
                     showWordOption(order);                 //显示ABCD选项
-                    //updateWordAsterisk(order);            //更新数据库 表中字段
                 }else {
+                    reduceWordAsterisk(order);              //答错 该 单词，星号归零
+                    Log.e("答错了,单词的星号是;",""+getWordAsterisk(order)+"单词位置"+order+"该单词"+studyWords.get(order).getWord());
+                    showWordsInformation(order);           // 显示单词信息
                     incognizance();                         //用户选择错误，显示单词词义
                     showWordAnswer(order);                  //显示单词答案
                 }
@@ -232,12 +254,17 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 String C_option = holder.tv_C.getText().toString().trim();//获取B选项词义
                 Log.e("用户选择的是",""+C_option);
                 if (check(C_option)){                         //判断是否选择正确
-                    order++;                                 //判断正确，单词下标加1，显示下一个单词
-                    choice();                                // 显示选择题模式
-                    showWordsInformation(order);            // 显示单词信息
-                    showWordOption(order);                   //显示ABCD选项
-                    //updateWordAsterisk(order);             //更新数据库 表中字段
+                    Log.e("该单词是：",""+studyWords.get(order).getWord());
+                    addWordAsterisk(order);                //答对 该 单词，星号加1
+                    isShowLearnWord();                  //判断单词下标是否大于19，然后进行一次循环
+                    //order++;                                //单词下标加1，显示下一个单词
+                    choice();                               // 显示选择题模式
+                    showWordsInformation(order);           //显示单词信息
+                    showWordOption(order);                 //显示ABCD选项
                 }else {
+                    reduceWordAsterisk(order);              //答错 该 单词，星号归零
+                    Log.e("答错了,单词的星号是;",""+getWordAsterisk(order)+"单词位置"+order+"该单词"+studyWords.get(order).getWord());
+                    showWordsInformation(order);           // 显示单词信息
                     incognizance();                         //用户选择错误，显示单词词义
                     showWordAnswer(order);                  //显示单词答案
                 }
@@ -246,12 +273,17 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 String D_option = holder.tv_D.getText().toString().trim();//获取B选项词义
                 Log.e("用户选择的是",""+D_option);
                 if (check(D_option)){                        //判断是否选择正确
-                    order++;                                //判断正确，单词下标加1，显示下一个单词
+                    Log.e("该单词是：",""+studyWords.get(order).getWord());
+                    addWordAsterisk(order);                //答对 该 单词，星号加1
+                    isShowLearnWord();                  //判断单词下标是否大于19，然后进行一次循环
+                    //order++;                                //单词下标加1，显示下一个单词
                     choice();                               // 显示选择题模式
-                    showWordsInformation(order);             // 显示单词信息
-                    showWordOption(order);                   //显示ABCD选项
-                    //updateWordAsterisk(order);             //更新数据库 表中字段
+                    showWordsInformation(order);           //显示单词信息
+                    showWordOption(order);                 //显示ABCD选项
                 }else {
+                    reduceWordAsterisk(order);              //答错 该 单词，星号归零
+                    Log.e("答错了,单词的星号是;",""+getWordAsterisk(order)+"单词位置"+order+"该单词"+studyWords.get(order).getWord());
+                    showWordsInformation(order);           // 显示单词信息
                     incognizance();                         //用户选择错误，显示单词词义
                     showWordAnswer(order);                  //显示单词答案
                 }
@@ -281,9 +313,42 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 //从学习单词表中删除单词，表示已经掌握
                 Toast.makeText(LearnActivity.this, "点击删除按钮", Toast.LENGTH_LONG).show();
                 break;
+            case R.id.tv_incognizance_example:  //看例句
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 答对单词星号加1
+     * */
+    private void addWordAsterisk(int order) {
+        WordStudyDao wordStudyDao = new WordStudyDao(this);
+        int asterisk = getAsterisk(order);
+        if (asterisk>=0 && asterisk<=3){
+            wordStudyDao.updateWordAsterisk(asterisk+1,studyWords.get(order).getWord());
+        }
+    }
+
+    /**
+     * 答错单词星号归零
+     * */
+    private void reduceWordAsterisk(int order) {
+        WordStudyDao wordStudyDao = new WordStudyDao(this);
+        int asterisk = getWordAsterisk(order);
+        if (asterisk>=1 && asterisk<=3){
+            wordStudyDao.updateWordAsterisk(0,studyWords.get(order).getWord());
+        }
+    }
+
+    /**
+     * 从数据库中获取单词的星号
+     * */
+    private int getWordAsterisk(int order){
+        String word = studyWords.get(order).getWord();
+        WordStudyDao wordStudyDao = new WordStudyDao(this);
+        return wordStudyDao.getWordAsterisk(word);
     }
 
     /**
@@ -294,10 +359,12 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.learn_tv_word = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_word);//获取要学习单词的控件
         holder.learn_tv_soundMark = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_soundmark);//获取音标控件
 
+        Log.e("显示单词的下标",""+order);
+
         holder.learn_tv_word.setText(studyWords.get(order).getWord());                      //显示要学习的单词
         holder.learn_tv_soundMark.setText(studyWords.get(order).getSoundmark_american());  //显示单词音标
-        showAsterisk(getAsterisk(order));                                                      //显示单词的星号
-        showFinishWords();                                                                     //显示已学习单词，剩余学习单词
+        showAsterisk(getWordAsterisk(order));        //显示单词的星号
+        showFinishWords();     //显示已学习单词，剩余学习单词
     }
 
     /**
@@ -316,17 +383,29 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.asterisk_there = (ImageView) holder.ll_show_word.findViewById(R.id.asterisk_there);//获取星号3控件
         holder.asterisk_four = (ImageView) holder.ll_show_word.findViewById(R.id.asterisk_four);//获取星号4控件
         switch (order){
+            case 0:
+                holder.asterisk_one.setImageResource(R.mipmap.star_off);
+                holder.asterisk_two.setImageResource(R.mipmap.star_off);
+                holder.asterisk_there.setImageResource(R.mipmap.star_off);
+                holder.asterisk_four.setImageResource(R.mipmap.star_off);
+                break;
             case 1:
                 holder.asterisk_one.setImageResource(R.mipmap.star_on);
+                holder.asterisk_two.setImageResource(R.mipmap.star_off);
+                holder.asterisk_there.setImageResource(R.mipmap.star_off);
+                holder.asterisk_four.setImageResource(R.mipmap.star_off);
                 break;
             case 2:
                 holder.asterisk_one.setImageResource(R.mipmap.star_on);
                 holder.asterisk_two.setImageResource(R.mipmap.star_on);
+                holder.asterisk_there.setImageResource(R.mipmap.star_off);
+                holder.asterisk_four.setImageResource(R.mipmap.star_off);
                 break;
             case 3:
                 holder.asterisk_one.setImageResource(R.mipmap.star_on);
                 holder.asterisk_two.setImageResource(R.mipmap.star_on);
                 holder.asterisk_there.setImageResource(R.mipmap.star_on);
+                holder.asterisk_four.setImageResource(R.mipmap.star_off);
                 break;
             case 4:
                 holder.asterisk_one.setImageResource(R.mipmap.star_on);
@@ -351,7 +430,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.no_completed_words = (TextView)holder.ll_show_word.findViewById(R.id.tv_need_complete);
         int completedNum = 0;
         for (int i=0;i<studyWords.size();i++){
-            if (studyWords.get(i).getAsterisk() == 4){
+            if (getWordAsterisk(i)==4){
                 setWord_is_study(studyWords.get(i).getWord());//修改Book里面的 word_is_study 字段
                 completedNum++;
             }
@@ -374,20 +453,33 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
      * 显示 ABCD 四个选项（随机的）
      * */
     private void showWordOption(int order){
-        options = LearnWordsUtil.getWordsOption(this,studyWords.get(order).getWord());//获取20个单词的随机答案
+        int[] ints = NumUtil.random3(studyWords.size(), order);
+        int answer_right = NumUtil.random(4);
         holder.tv_A = (TextView) holder.ll_abcd.findViewById(R.id.tv_A); //获取选项A控件
         holder.tv_B = (TextView) holder.ll_abcd.findViewById(R.id.tv_B);//获取选项B控件
         holder.tv_C = (TextView) holder.ll_abcd.findViewById(R.id.tv_C);//获取选项C控件
         holder.tv_D = (TextView) holder.ll_abcd.findViewById(R.id.tv_D);//获取选项D控件
-
-        holder.tv_A.setText(options.get(0));    //显示A选项
-        holder.tv_B.setText(options.get(1));    //显示B选项
-        holder.tv_C.setText(options.get(2));    //显示C选项
-        holder.tv_D.setText(options.get(3));    //显示D选项
-
-        Log.e("当前单词是：",""+studyWords.get(order).getWord());
-        for(int i=0;i<options.size();i++){
-            Log.e("获取到的4个ABCD选项：",""+options.get(i));
+        //动态显示选项
+        if (answer_right == 0) {
+            holder.tv_A.setText(studyWords.get(order).getAnswer_right());
+            holder.tv_B.setText(studyWords.get(ints[0]).getAnswer_right());
+            holder.tv_C.setText(studyWords.get(ints[1]).getAnswer_right());
+            holder.tv_D.setText(studyWords.get(ints[2]).getAnswer_right());
+        } else if (answer_right == 1) {
+            holder.tv_B.setText(studyWords.get(order).getAnswer_right());
+            holder.tv_A.setText(studyWords.get(ints[0]).getAnswer_right());
+            holder.tv_C.setText(studyWords.get(ints[1]).getAnswer_right());
+            holder.tv_D.setText(studyWords.get(ints[2]).getAnswer_right());
+        } else if (answer_right == 2) {
+            holder.tv_C.setText(studyWords.get(order).getAnswer_right());
+            holder.tv_B.setText(studyWords.get(ints[0]).getAnswer_right());
+            holder.tv_A.setText(studyWords.get(ints[1]).getAnswer_right());
+            holder.tv_D.setText(studyWords.get(ints[2]).getAnswer_right());
+        } else if (answer_right == 3) {
+            holder.tv_D.setText(studyWords.get(order).getAnswer_right());
+            holder.tv_B.setText(studyWords.get(ints[0]).getAnswer_right());
+            holder.tv_C.setText(studyWords.get(ints[1]).getAnswer_right());
+            holder.tv_A.setText(studyWords.get(ints[2]).getAnswer_right());
         }
     }
 
@@ -483,6 +575,65 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.pb_loading.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * 显示下一个单词的时候
+     * 进行一次判断，如果单词下标为19
+     * */
+    private void isShowLearnWord(){
+        Log.e("进入isShowLearnWord判断","order为："+order);
+        if (order >= studyWords.size()-1){
+            Log.e("是否进入大于20","order为："+order);
+            order = 0;
+            while (studyWords.get(order).getAsterisk() == 4){
+                order ++;
+                if (order == (studyWords.size()-1)){
+                    Log.e("20个单词已学习完","20个单词已学习完");
+                    break;
+                }
+            }
+        }else {
+            order++;
+        }
+    }
+
+    /**
+     * 判断单词的星号是否为4
+     * 如果为4，则不显示
+     * 显示下一个单词
+     * */
+    private void isWordAsteriskFour(){
+        while (getWordAsterisk(order) == 4){
+            order ++;
+        }
+    }
+
+    /**
+     * 学习单词模式切换
+     * 显示下一个单词的时候，判断该单词的星号
+     * 星号为：0 —— 选择模式
+     * 星号为：1 —— 记忆模式
+     * 星号为：2 —— 选择模式
+     * 星号为：3 —— 记忆模式
+     * 注意：考虑为 4 的情况
+     * */
+    private boolean LearnMode(int asteriskNum){
+        switch (asteriskNum){
+            case 0:
+                return true;
+            case 1:
+                return false;
+                //break;
+            case 2:
+                return true;
+                //break;
+            case 3:
+                return false;
+                //break;
+            default:
+                return true;
+            //break;
+        }
+    }
 
 
 }

@@ -2,6 +2,7 @@ package recitewords.apj.com.recitewords.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -15,7 +16,10 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -28,12 +32,14 @@ import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.MainActivity;
+import recitewords.apj.com.recitewords.activity.ShowAllLearnActivity;
 import recitewords.apj.com.recitewords.activity.ShowTodayLearnActivity;
 import recitewords.apj.com.recitewords.adapter.MyViewPagerAdapter;
 import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -49,10 +55,14 @@ public class SlidingFragment extends BaseFragment {
         private TextView text_set, text_the, text_lib, text_sta;// 4个TextView菜单的名称
         private LinearLayout ll_setting, ll_theme, ll_library, ll_statistics;  //菜单导航栏
         private LinearLayout ll_top;  //导航栏父控件
-
+        private LinearLayout sliding_layout_ll; //根布局用于设置背景颜色
         //--------------------统计
-        TextView statistics_tv_today_learn;  //查看
+        TextView statistics_tv_today_learn;  //查看今日已学单词
         TextView statistics_tv_today_sum;  //显示今日已学习个数
+        TextView statistics_tv_all_sum;  //显示全部已学习个数
+        TextView statistics_tv_all_learn; //查看全部已学单词
+
+
     }
 
     private static final String TAG = "SlidingFragment";
@@ -69,7 +79,13 @@ public class SlidingFragment extends BaseFragment {
     private int clickSlidinMenugSum = 1;  //一个菜单的点击次数
     private int oldClickIndex = -1;  //上一次点击的菜单位置
     private int NavigateHeight = 0;  //导航栏高度
-
+    private RadioButton rb_gold;    //主题页面的金色按钮
+    private RadioButton rb_night;
+    private RadioButton rb_ocean;
+    private RadioButton rb_green;   //主题页面的绿色按钮
+    private RadioButton rb_pink;
+    private RadioButton rb_purple;  //主题页面的紫色按钮
+    private SharedPreferences sp;
 
     public SlidingFragment(Context context) {
         this.mContext = context;
@@ -96,12 +112,28 @@ public class SlidingFragment extends BaseFragment {
         holder.ll_theme = findViewByIds(view, R.id.ll_theme);
         holder.ll_library = findViewByIds(view, R.id.ll_library);
         holder.ll_statistics = findViewByIds(view, R.id.ll_statistics);
+        holder.sliding_layout_ll = findViewByIds(view, R.id.sliding_layout_ll);
 
-        //-------------------统计
 
         getHeight(view);
         InitImageView();
         InitViewPager();
+
+        //通过用户选择的主题，重新进入应用时将背景设置为相应的颜色
+        String theme = PrefUtils.getThemes(sp, "themes", "gold");
+        if ("gold".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Golden_Eye);
+        } else if ("night".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Night_Hawks);
+        } else if ("ocean".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Ocean_Deep);
+        } else if ("green".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Green_Peace);
+        } else if ("pink".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Pinky_Girl);
+        } else if ("purple".equals(theme)) {
+            holder.sliding_layout_ll.setBackgroundResource(R.color.Purple_Viola);
+        }
         return view;
     }
 
@@ -131,11 +163,11 @@ public class SlidingFragment extends BaseFragment {
         });
     }
 
+
     /**
      * 初始化游标图片
      */
     private void InitImageView() {
-
         bmpW = BitmapFactory.decodeResource(getResources(), R.mipmap.cursor).getWidth();// 获取图片宽度
         DisplayMetrics dm = new DisplayMetrics();
         mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -156,8 +188,8 @@ public class SlidingFragment extends BaseFragment {
         holder.view_themes = inflater.inflate(R.layout.viewpager_themes, null);
         holder.view_library = inflater.inflate(R.layout.viewpager_library, null);
         holder.view_statistics = inflater.inflate(R.layout.viewpager_statistics, null);
-        //设置4个view广告
-        setAdv();
+        setAdv();        //设置广告
+        setThemes();    //设置主题
         //把4个View都放在集合里
         viewList.add(holder.view_settings);
         viewList.add(holder.view_themes);
@@ -176,7 +208,7 @@ public class SlidingFragment extends BaseFragment {
     /**
      * 统计Viewpager
      *
-     * @param view  view
+     * @param view view
      */
     private void statistics(View view) {
         init_StatView(view);
@@ -187,9 +219,10 @@ public class SlidingFragment extends BaseFragment {
      * 初始化统计的UI
      */
     public void init_StatView(View view) {
-        holder.statistics_tv_today_learn=findViewByIds(view,R.id.statistics_tv_today_learn);
-        holder.statistics_tv_today_sum=findViewByIds(view,R.id.statistics_tv_today_sum);
-
+        holder.statistics_tv_today_learn = findViewByIds(view, R.id.statistics_tv_today_learn);
+        holder.statistics_tv_today_sum = findViewByIds(view, R.id.statistics_tv_today_sum);
+        holder.statistics_tv_all_learn = findViewByIds(view, R.id.statistics_tv_all_learn);
+        holder.statistics_tv_all_sum = findViewByIds(view, R.id.statistics_tv_all_sum);
     }
 
     /**
@@ -197,13 +230,24 @@ public class SlidingFragment extends BaseFragment {
      */
     public void init_StatData() {
         BookDao bookDao = new BookDao(mContext);
-        List<Book> list = bookDao.queryDayLearn(AppConfig.BOOK_NAME, DateUtil.getNowDate("yyyy-MM-dd"));
-        holder.statistics_tv_today_sum.setText(list.size()+"");
+        List<Book> mLearnList = bookDao.queryDayLearn(AppConfig.BOOK_NAME, DateUtil.getNowDate("yyyy-MM-dd"));
+        final List<Book> mGraspList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);
+        holder.statistics_tv_today_sum.setText(mLearnList.size() + "个");  //今日已学单词总数
+        holder.statistics_tv_all_sum.setText(mGraspList.size() + "个");  //全部已学单词总数
         holder.statistics_tv_today_learn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //显示今天学习单词
                 startActivity(new Intent(mActivity, ShowTodayLearnActivity.class));
+            }
+        });
+
+        holder.statistics_tv_all_learn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //显示全部学习单词
+//                Log.e("ha","全部已学习单词哈哈哈"+mGraspList.size());
+                startActivity(new Intent(mActivity, ShowAllLearnActivity.class));
             }
         });
     }
@@ -237,16 +281,20 @@ public class SlidingFragment extends BaseFragment {
                 // 返回时和再次进去同一个页面就需要设置字体颜色
                 switch (v.getId()) {
                     case R.id.ll_setting:
-                        holder.text_set.setTextColor(Color.CYAN);
+//                        holder.text_set.setTextColor(Color.CYAN);
+                        setTextColor(holder.text_set);
                         break;
                     case R.id.ll_theme:
-                        holder.text_the.setTextColor(Color.CYAN);
+//                        holder.text_the.setTextColor(Color.CYAN);
+                        setTextColor(holder.text_the);
                         break;
                     case R.id.ll_library:
-                        holder.text_lib.setTextColor(Color.CYAN);
+//                        holder.text_lib.setTextColor(Color.CYAN);
+                        setTextColor(holder.text_lib);
                         break;
                     case R.id.ll_statistics:
-                        holder.text_sta.setTextColor(Color.CYAN);
+//                        holder.text_sta.setTextColor(Color.CYAN);
+                        setTextColor(holder.text_sta);
                         break;
                 }
             } else if (panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
@@ -289,31 +337,30 @@ public class SlidingFragment extends BaseFragment {
      * 文字颜色改变的方法
      */
     public void TextColorChange(int position) {
-        Log.e(TAG, "position:  " + position);
         switch (position) {
             case 0:
-                holder.text_set.setTextColor(Color.CYAN);
+                setTextColor(holder.text_set);
                 holder.text_the.setTextColor(Color.WHITE);
                 holder.text_lib.setTextColor(Color.WHITE);
                 holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 1:
                 holder.text_set.setTextColor(Color.WHITE);
-                holder.text_the.setTextColor(Color.CYAN);
+                setTextColor(holder.text_the);
                 holder.text_lib.setTextColor(Color.WHITE);
                 holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 2:
                 holder.text_set.setTextColor(Color.WHITE);
                 holder.text_the.setTextColor(Color.WHITE);
-                holder.text_lib.setTextColor(Color.CYAN);
+                setTextColor(holder.text_lib);
                 holder.text_sta.setTextColor(Color.WHITE);
                 break;
             case 3:
                 holder.text_set.setTextColor(Color.WHITE);
                 holder.text_the.setTextColor(Color.WHITE);
                 holder.text_lib.setTextColor(Color.WHITE);
-                holder.text_sta.setTextColor(Color.CYAN);
+                setTextColor(holder.text_sta);
                 break;
         }
     }
@@ -422,5 +469,138 @@ public class SlidingFragment extends BaseFragment {
 
         // 将广告条加入到布局中
         ll_banner_settings.addView(bannerView);
+    }
+
+    //设置主题页面的按钮事件
+    private void setThemes() {
+        RadioGroup rg = findViewByIds(holder.view_themes, R.id.themes_rg);
+        rb_gold = findViewByIds(holder.view_themes, R.id.themes_rb_gold);
+        rb_night = findViewByIds(holder.view_themes, R.id.themes_rb_night);
+        rb_ocean = findViewByIds(holder.view_themes, R.id.themes_rb_ocean);
+        rb_green = findViewByIds(holder.view_themes, R.id.themes_rb_green);
+        rb_pink = findViewByIds(holder.view_themes, R.id.themes_rb_pink);
+        rb_purple = findViewByIds(holder.view_themes, R.id.themes_rb_purple);
+        final ImageView iv_gold = findViewByIds(holder.view_themes, R.id.themes_iv_gold);
+        final ImageView iv_night = findViewByIds(holder.view_themes, R.id.themes_iv_night);
+        final ImageView iv_ocean = findViewByIds(holder.view_themes, R.id.themes_iv_ocean);
+        final ImageView iv_green = findViewByIds(holder.view_themes, R.id.themes_iv_green);
+        final ImageView iv_pink = findViewByIds(holder.view_themes, R.id.themes_iv_pink);
+        final ImageView iv_purple = findViewByIds(holder.view_themes, R.id.themes_iv_purple);
+
+        sp = PrefUtils.getPref(mActivity);
+        //通过用户选择的主题，重新进入应用时将主题的默认选中设置为相应的
+        String theme = PrefUtils.getThemes(sp, "themes", "gold");
+        if ("gold".equals(theme)) {
+            rb_gold.setChecked(true);
+            iv_gold.setVisibility(View.VISIBLE);
+        } else if ("night".equals(theme)) {
+            rb_night.setChecked(true);
+            iv_night.setVisibility(View.VISIBLE);
+        } else if ("ocean".equals(theme)) {
+            rb_ocean.setChecked(true);
+            iv_ocean.setVisibility(View.VISIBLE);
+        } else if ("green".equals(theme)) {
+            rb_green.setChecked(true);
+            iv_green.setVisibility(View.VISIBLE);
+        } else if ("pink".equals(theme)) {
+            rb_pink.setChecked(true);
+            iv_pink.setVisibility(View.VISIBLE);
+        } else if ("purple".equals(theme)) {
+            rb_purple.setChecked(true);
+            iv_purple.setVisibility(View.VISIBLE);
+        }
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.themes_rb_gold:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Golden_Eye);
+                        iv_gold.setVisibility(View.VISIBLE);
+                        iv_night.setVisibility(View.GONE);
+                        iv_ocean.setVisibility(View.GONE);
+                        iv_green.setVisibility(View.GONE);
+                        iv_pink.setVisibility(View.GONE);
+                        iv_purple.setVisibility(View.GONE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.gold));
+                        PrefUtils.setThemes(sp, "themes", "gold");
+                        break;
+                    case R.id.themes_rb_night:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Night_Hawks);
+                        iv_gold.setVisibility(View.GONE);
+                        iv_night.setVisibility(View.VISIBLE);
+                        iv_ocean.setVisibility(View.GONE);
+                        iv_green.setVisibility(View.GONE);
+                        iv_pink.setVisibility(View.GONE);
+                        iv_purple.setVisibility(View.GONE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.night));
+                        PrefUtils.setThemes(sp, "themes", "night");
+                        break;
+                    case R.id.themes_rb_ocean:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Ocean_Deep);
+                        iv_gold.setVisibility(View.GONE);
+                        iv_night.setVisibility(View.GONE);
+                        iv_ocean.setVisibility(View.VISIBLE);
+                        iv_green.setVisibility(View.GONE);
+                        iv_pink.setVisibility(View.GONE);
+                        iv_purple.setVisibility(View.GONE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+                        PrefUtils.setThemes(sp, "themes", "ocean");
+                        break;
+                    case R.id.themes_rb_green:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Green_Peace);
+                        iv_gold.setVisibility(View.GONE);
+                        iv_night.setVisibility(View.GONE);
+                        iv_ocean.setVisibility(View.GONE);
+                        iv_green.setVisibility(View.VISIBLE);
+                        iv_pink.setVisibility(View.GONE);
+                        iv_purple.setVisibility(View.GONE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.green));
+                        PrefUtils.setThemes(sp, "themes", "green");
+                        break;
+                    case R.id.themes_rb_pink:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Pinky_Girl);
+                        iv_gold.setVisibility(View.GONE);
+                        iv_night.setVisibility(View.GONE);
+                        iv_ocean.setVisibility(View.GONE);
+                        iv_green.setVisibility(View.GONE);
+                        iv_pink.setVisibility(View.VISIBLE);
+                        iv_purple.setVisibility(View.GONE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.pink));
+                        PrefUtils.setThemes(sp, "themes", "pink");
+                        break;
+                    case R.id.themes_rb_purple:
+                        holder.sliding_layout_ll.setBackgroundResource(R.color.Purple_Viola);
+                        iv_gold.setVisibility(View.GONE);
+                        iv_night.setVisibility(View.GONE);
+                        iv_ocean.setVisibility(View.GONE);
+                        iv_green.setVisibility(View.GONE);
+                        iv_pink.setVisibility(View.GONE);
+                        iv_purple.setVisibility(View.VISIBLE);
+                        holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.purple));
+                        PrefUtils.setThemes(sp, "themes", "purple");
+                        break;
+                }
+            }
+        });
+    }
+
+    //设置主题页的文本颜色
+    private void setTextColor(TextView tv) {
+        if (rb_gold.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        } else if (rb_night.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.night));
+        } else if (rb_ocean.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        } else if (rb_green.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.green));
+        } else if (rb_pink.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        } else if (rb_purple.isChecked()) {
+            tv.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        } else {
+            tv.setTextColor(Color.WHITE);
+        }
     }
 }

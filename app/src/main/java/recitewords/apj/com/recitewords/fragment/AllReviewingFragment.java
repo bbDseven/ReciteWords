@@ -1,6 +1,5 @@
 package recitewords.apj.com.recitewords.fragment;
 
-import android.nfc.FormatException;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,7 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
@@ -19,42 +21,42 @@ import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
-import recitewords.apj.com.recitewords.util.MyDecoration;
 
 /**
- * Created by Greetty on 2016/12/9.
+ * Created by Greetty on 2016/12/10.
  * <p/>
- * 今天已学习单词
+ * 已掌握的全部单词
  */
-public class TodayLearnFragment extends BaseFragment {
+public class AllReviewingFragment extends BaseFragment {
 
     public class ViewHolder {
-        RecyclerView today_rv_learn;
+        RecyclerView all_rv_reviewing;
     }
 
     private ViewHolder holder;
     private BookDao bookDao;
     private List<Book> list;
     private List<Integer> mClickList;
-    private String today;  //今天日期
+    private String day;  //日期
 
     @Override
     public View initView() {
         holder = new ViewHolder();
-        View view = LayoutInflater.from(mActivity).inflate(R.layout.fragment_today_learn, null);
-        holder.today_rv_learn = findViewByIds(view, R.id.today_rv_learn);
+        View view = LayoutInflater.from(mActivity).inflate(R.layout.fragment_all_reviewing, null);
+        holder.all_rv_reviewing = findViewByIds(view, R.id.all_rv_reviewing);
         return view;
     }
 
     @Override
     public void initData() {
-        mClickList=new ArrayList<>();
-        today = DateUtil.getNowDate("yyyy-MM-dd");
+        mClickList = new ArrayList<>();
         bookDao = new BookDao(mActivity);
-        list = bookDao.queryDayLearn(AppConfig.BOOK_NAME, today);
-        holder.today_rv_learn.setAdapter(new MyAdapter());
+        list = bookDao.queryAllRevewing(AppConfig.BOOK_NAME);
+        //单词按日期排序
+        sortDate(list);
+        holder.all_rv_reviewing.setAdapter(new MyAdapter());
         //设置一个LinearLayoutManager
-        holder.today_rv_learn.setLayoutManager(new LinearLayoutManager(mActivity));
+        holder.all_rv_reviewing.setLayoutManager(new LinearLayoutManager(mActivity));
 
     }
 
@@ -78,10 +80,14 @@ public class TodayLearnFragment extends BaseFragment {
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0) {
+            if (position>0){
+                if (!list.get(position).getDate().equals(list.get(position-1).getDate())){
+                   return 0;
+                }else{
+                    return 1;
+                }
+            }else {
                 return 0;
-            } else {
-                return 1;
             }
         }
 
@@ -96,9 +102,11 @@ public class TodayLearnFragment extends BaseFragment {
                     holderOne.item_ll_root.setTag(position);
                     holderOne.item_word.setText(list.get(position).getWord());
                     holderOne.item_word_mean.setText(list.get(position).getWord_mean());
-                    String[] time = today.split("-");
+                    day=list.get(position).getDate();
+                    String[] time = day.split("-");
                     ((MyViewHolderOne) holder).item_word_date.
-                            setText(time[0]+"年"+time[1]+"月"+time[2]+"日    "+list.size()+"个单词");
+                            setText(time[0] + "年" + time[1] + "月" + time[2] + "日    " +
+                                    calculateDate(list,list.get(position).getDate()) + "个单词");
                     //显示隐藏词义
                     holderOne.item_ll_root.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -214,10 +222,57 @@ public class TodayLearnFragment extends BaseFragment {
     }
 
     /**
+     * 日期排序
+     *
+     * @return list
+     */
+    public List<Book> sortDate(List<Book> list) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-M-dd");
+        // 冒泡排序
+        Book book = null;
+        for (int i = list.size() - 1; i > 0; --i) {
+            for (int j = 0; j < i; ++j) {
+
+                try {
+                    //从大到小的排序
+                    if (format.parse(list.get(j + 1).getDate()).
+                            after(format.parse(list.get(j).getDate()))) {
+                        book = list.get(j);
+                        list.set(j, list.get(j + 1));
+                        list.set(j + 1, book);
+                    } else {
+                        //从小到大的排序
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return list;
+    }
+
+
+    /**
+     * 计算一个集合中同一个日期的个数
+     * @param list  数据源
+     * @param date  寻找的日期
+     * @return  int
+     */
+    public int calculateDate(List<Book> list,String date){
+        int sum=0;
+        for (int i=0;i<list.size();i++){
+            if (list.get(i).getDate().equals(date)){
+                sum++;
+            }
+        }
+        return sum;
+    }
+    /**
      * 获取今天复习单词的总数
+     *
      * @return
      */
-    public int getLearnSum(){
+    public int getLearnSum() {
         return list.size();
     }
 }

@@ -1,14 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="@mipmap/background_color">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="view_themes"
-        android:textColor="@android:color/white"/>
-</LinearLayout>
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/themes_iv_gold"
+        android:layout_marginTop="30dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/themes_iv_night"
+        android:layout_marginTop="105dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/themes_iv_ocean"
+        android:layout_marginTop="175dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/themes_iv_green"
+        android:layout_marginTop="245dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/themes_iv_pink"
+        android:layout_marginTop="315dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/themes_iv_purple"
+        android:layout_marginTop="385dp"
+        style="@style/themes_iv"
+        android:visibility="gone"
+        />
+    <RadioGroup
+        android:id="@+id/themes_rg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        >
+        <RadioButton
+            android:id="@+id/themes_rb_gold"
+            android:drawableLeft="@drawable/themes_gold_shape"
+            android:text="Golden Eye"
+            style="@style/themes_rb"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bebebe"
+            />
+        <RadioButton
+            android:id="@+id/themes_rb_night"
+            android:drawableLeft="@drawable/themes_night_shape"
+            android:text="Night Hawks"
+            style="@style/themes_rb"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bebebe"
+            />
+        <RadioButton
+            android:id="@+id/themes_rb_ocean"
+            android:drawableLeft="@drawable/themes_ocean_shape"
+            android:text="Ocean Deep"
+            style="@style/themes_rb"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bebebe"
+            />
+        <RadioButton
+            android:id="@+id/themes_rb_green"
+            android:drawableLeft="@drawable/themes_green_shape"
+            android:text="Green Peace"
+            style="@style/themes_rb"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bebebe"
+            />
+        <RadioButton
+            android:id="@+id/themes_rb_pink"
+            android:drawableLeft="@drawable/themes_pink_shape"
+            android:text="Pinky Girl"
+            style="@style/themes_rb"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#bebebe"
+            />
+        <RadioButton
+            android:id="@+id/themes_rb_purple"
+            android:drawableLeft="@drawable/themes_purple_shape"
+            android:text="Purple Viola"
+            style="@style/themes_rb"/>
+    </RadioGroup>
+</RelativeLayout>

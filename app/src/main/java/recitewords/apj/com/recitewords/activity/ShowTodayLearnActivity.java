@@ -23,6 +23,12 @@ import recitewords.apj.com.recitewords.fragment.TodayLearnFragment;
 import recitewords.apj.com.recitewords.fragment.TodayReviewFragment;
 import recitewords.apj.com.recitewords.util.DateUtil;
 
+
+/**
+ * Created by Greetty on 2016/12/9.
+ * <p/>
+ * 今日已学习单词
+ */
 public class ShowTodayLearnActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TODAYLEARNFRAGMENT = "today_learn";
