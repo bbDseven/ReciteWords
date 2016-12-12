@@ -16,7 +16,7 @@ import android.widget.Toast;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.AllGraspFragment;
 import recitewords.apj.com.recitewords.fragment.AllReviewingFragment;
-
+import recitewords.apj.com.recitewords.globle.AppConfig;
 
 
 /**
@@ -71,8 +71,8 @@ public class ShowAllLearnActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initDate() {
-        mAllReviewingFragment = new AllReviewingFragment();
-        mAllGraspFragment = new AllGraspFragment();
+        mAllReviewingFragment = new AllReviewingFragment(AppConfig.MODE_STATISTICS_REVINEING);
+        mAllGraspFragment = new AllGraspFragment(AppConfig.MODE_STATISTICS_GRASP);
         fm = getFragmentManager();
         ft = fm.beginTransaction();
         ft.replace(R.id.show_all_fl, mAllReviewingFragment, ALLREVIEWINGFRAGMRNT);
@@ -84,14 +84,14 @@ public class ShowAllLearnActivity extends BaseActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.show_all_info:
-//                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                builder.setTitle("温馨提示：");
-//                builder.setMessage("复习中:已学习单完成复习\n已掌握:已完全掌握，" +
-//                        "不用再复习\n\n1.点击单词查看词义\n2.已掌握的单词如果有遗忘，可以向左滑动单词后选择“重学”");
-//                builder.setPositiveButton("臣妾知道啦",null);
-//                AlertDialog alertDialog = builder.create();
-//                alertDialog.show();
-                startActivity(new Intent(this,TestActivity.class));
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("温馨提示：");
+                builder.setMessage("复习中:已学习单完成复习\n已掌握:已完全掌握，" +
+                        "不用再复习\n\n1.点击单词查看词义\n2.已掌握的单词如果有遗忘，可以向左滑动单词后选择“重学”");
+                builder.setPositiveButton("臣妾知道啦",null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+//                startActivity(new Intent(this,TestActivity.class));
                 break;
             case R.id.show_all_close:
                 //关闭当前窗口

@@ -48,7 +48,8 @@ public class TodayReviewFragment extends BaseFragment {
         mClickList=new ArrayList<>();
         today = DateUtil.getNowDate("yyyy-MM-dd");
         bookDao = new BookDao(mActivity);
-        list = bookDao.queryALLReviewWords(AppConfig.BOOK_NAME);
+        //词书名字为空，默认为从查询全部,查询全部需要复习的单词
+        list = bookDao.queryALLReviewWords("");
         holder.today_rv_review.setAdapter(new MyAdapter());
         //设置一个LinearLayoutManager
         holder.today_rv_review.setLayoutManager(new LinearLayoutManager(mActivity));

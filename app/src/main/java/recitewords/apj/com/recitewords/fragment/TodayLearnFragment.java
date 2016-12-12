@@ -51,7 +51,7 @@ public class TodayLearnFragment extends BaseFragment {
         mClickList=new ArrayList<>();
         today = DateUtil.getNowDate("yyyy-MM-dd");
         bookDao = new BookDao(mActivity);
-        list = bookDao.queryDayLearn(AppConfig.BOOK_NAME, today);
+        list = bookDao.queryDayLearn("", today);   //词书名字为空，默认为从查询全部
         holder.today_rv_learn.setAdapter(new MyAdapter());
         //设置一个LinearLayoutManager
         holder.today_rv_learn.setLayoutManager(new LinearLayoutManager(mActivity));

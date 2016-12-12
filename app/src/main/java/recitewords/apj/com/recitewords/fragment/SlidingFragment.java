@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import recitewords.apj.com.recitewords.R;
+import recitewords.apj.com.recitewords.activity.LibraryAllGraspActivity;
+import recitewords.apj.com.recitewords.activity.LibraryAllLearnActivity;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.activity.ShowAllLearnActivity;
 import recitewords.apj.com.recitewords.activity.ShowTodayLearnActivity;
@@ -43,7 +46,7 @@ import recitewords.apj.com.recitewords.util.PrefUtils;
 
 /**
  * Created by CGT on 2016/11/22.
- * <p/>
+ * <p>
  * 滑动页面Fragment
  */
 public class SlidingFragment extends BaseFragment {
@@ -62,6 +65,11 @@ public class SlidingFragment extends BaseFragment {
         TextView statistics_tv_all_sum;  //显示全部已学习个数
         TextView statistics_tv_all_learn; //查看全部已学单词
 
+        //-----------------LIBRARY图书馆
+        RelativeLayout library_have_learn;  //点击查看已学习
+        LinearLayout library_have_grasp;  //点击查看已掌握
+        TextView library_have_learn_sum;  //显示已学习总数
+        TextView library_have_grasp_sum;  //显示已掌握总数
 
     }
 
@@ -200,6 +208,7 @@ public class SlidingFragment extends BaseFragment {
         holder.menu_viewPager.setCurrentItem(0);
 
         statistics(holder.view_statistics);  //统计
+        library(holder.view_library);  //图书馆
         //holder.text_set.setTextColor(Color.CYAN);
         holder.menu_viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
     }
@@ -250,6 +259,57 @@ public class SlidingFragment extends BaseFragment {
                 startActivity(new Intent(mActivity, ShowAllLearnActivity.class));
             }
         });
+    }
+
+
+    /**
+     * 图书馆Viewpager
+     *
+     * @param view view
+     */
+    private void library(View view) {
+        init_LibraryView(view);
+        init__LibraryData();
+    }
+
+
+    /**
+     * 初始化图书馆的UI
+     */
+    public void init_LibraryView(View view) {
+        holder.library_have_learn = findViewByIds(view, R.id.library_have_learn);
+        holder.library_have_grasp = findViewByIds(view, R.id.library_have_grasp);
+        holder.library_have_learn_sum = findViewByIds(view, R.id.library_have_learn_sum);
+        holder.library_have_grasp_sum = findViewByIds(view, R.id.library_have_grasp_sum);
+    }
+
+    /**
+     * 初始化图书馆的数据
+     */
+    public void init__LibraryData() {
+
+        BookDao bookDao = new BookDao(mActivity);
+        List<Book> haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);
+        List<Book> haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);
+        //设置显示已学习已掌握总数
+        holder.library_have_learn_sum.setText(haveLearnList.size() + "");
+        holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
+        //打开已学习
+        holder.library_have_learn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mActivity, LibraryAllLearnActivity.class));
+            }
+        });
+        //打开已掌握
+        holder.library_have_grasp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Log.e("ha","全部已学习单词哈哈哈");
+                startActivity(new Intent(mActivity, LibraryAllGraspActivity.class));
+            }
+        });
+
     }
 
 

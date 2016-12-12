@@ -29,6 +29,10 @@ import recitewords.apj.com.recitewords.util.DateUtil;
  */
 public class AllReviewingFragment extends BaseFragment {
 
+
+    public AllReviewingFragment(String mode){
+        this.mode=mode;
+    }
     public class ViewHolder {
         RecyclerView all_rv_reviewing;
     }
@@ -38,6 +42,7 @@ public class AllReviewingFragment extends BaseFragment {
     private List<Book> list;
     private List<Integer> mClickList;
     private String day;  //日期
+    private String mode=AppConfig.MODE_STATISTICS_REVINEING;  //展示那些数据
 
     @Override
     public View initView() {
@@ -51,7 +56,12 @@ public class AllReviewingFragment extends BaseFragment {
     public void initData() {
         mClickList = new ArrayList<>();
         bookDao = new BookDao(mActivity);
-        list = bookDao.queryAllRevewing(AppConfig.BOOK_NAME);
+
+        if (mode.equals(AppConfig.MODE_STATISTICS_REVINEING)){
+            list = bookDao.queryAllRevewing("");   //词书名字为空，默认为从查询全部
+        }else if (mode.equals(AppConfig.MODE_LIBRARY_LEARN)){
+            list=bookDao.queryAllLearn(AppConfig.BOOK_NAME);
+        }
         //单词按日期排序
         sortDate(list);
         holder.all_rv_reviewing.setAdapter(new MyAdapter());

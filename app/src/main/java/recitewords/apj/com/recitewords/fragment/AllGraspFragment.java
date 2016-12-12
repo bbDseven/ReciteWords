@@ -33,6 +33,10 @@ import recitewords.apj.com.recitewords.view.SwipeLayout;
  */
 public class AllGraspFragment extends BaseFragment {
 
+    public AllGraspFragment(String mode) {
+        this.mode = mode;
+    }
+
 
     public class ViewHolder {
         RecyclerView all_rv_grasp;
@@ -44,6 +48,7 @@ public class AllGraspFragment extends BaseFragment {
     private List<Integer> mClickList;  //记录显示词义的集合
     private List<SwipeLayout> mOpenViews;  //记录显示删除的集合
     private String day;  //日期
+    private String mode = AppConfig.MODE_STATISTICS_GRASP;  //展示那些数据
 
     @Override
     public View initView() {
@@ -58,7 +63,11 @@ public class AllGraspFragment extends BaseFragment {
         mClickList = new ArrayList<>();
         mOpenViews = new ArrayList<>();
         bookDao = new BookDao(mActivity);
-        list = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);
+        if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {
+            list = bookDao.queryAllGrasp("");  //词书名字为空，默认为从查询全部
+        } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {
+            list = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);
+        }
         //单词按日期排序
         sortDate(list);
         handleDate((ArrayList<Book>) list);
@@ -99,11 +108,6 @@ public class AllGraspFragment extends BaseFragment {
             }
         }
 
-        @Override
-        public long getItemId(int position) {
-            Log.e("ha", "id是：" + position);
-            return super.getItemId(position);
-        }
 
         @Override
         public int getItemViewType(int position) {
@@ -208,12 +212,20 @@ public class AllGraspFragment extends BaseFragment {
                             }
                             if (dateType > 2) {
                                 //重新学习
-                                bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {  //LIBRARY
+                                    bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {  //STATISTICS
+                                    bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                }
                                 holderTwo.item_word_mean.setVisibility(View.VISIBLE);
                                 list.remove(position);
                             } else {
                                 //重新学习
-                                bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {
+                                    bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {
+                                    bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                }
                                 holderTwo.item_word_mean.setVisibility(View.VISIBLE);
                                 list.remove(position);
                                 list.remove(position - 1);

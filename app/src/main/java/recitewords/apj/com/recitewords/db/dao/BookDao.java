@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,10 +154,17 @@ public class BookDao {
      */
     public List<Book> queryALLReviewWords(String book_name) {
         int day;   //相差日期
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         ArrayList<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
-                new String[]{"1", "0", book_name}, null, null, null, null);
+        if (TextUtils.isEmpty(book_name)){
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
+                    new String[]{"1", "0"}, null, null, null, null);
+        }else {
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
+                    new String[]{"1", "0",book_name}, null, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             //熟悉程度
@@ -278,17 +286,23 @@ public class BookDao {
 
 
     /**
-     * 查看某一天已学习的单词总数
+     * 查看某一天已学习的单词总数,如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @param date      日期
      * @return list
      */
     public List<Book> queryDayLearn(String book_name, String date) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and date=? and word_is_study=?",
-                new String[]{book_name, date, "1"}, null, null, null);
+        if (TextUtils.isEmpty(book_name)){
+            cursor = db.query("book", null, "date=? and word_is_study=?",
+                    new String[]{date, "1"}, null, null, null);
+        }else {
+            cursor = db.query("book", null, "book_name=? and date=? and word_is_study=?",
+                    new String[]{book_name,date, "1"}, null, null, null);
+        }
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -306,16 +320,23 @@ public class BookDao {
 
 
     /**
-     * 查看全部已学习的单词总数
+     * 查看全部已学习的单词总数，如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllLearn(String book_name) {
         SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor;
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_study=?",
-                new String[]{book_name, "1"}, null, null, null);
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "book_name=? and word_is_study=?",
+                    new String[]{book_name, "1"}, null, null, null);
+        } else {
+            cursor = db.query("book", null, "word_is_study=?",
+                    new String[]{"1"}, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -333,16 +354,22 @@ public class BookDao {
 
 
     /**
-     * 查看正在复习的单词（已完成学习但未掌握的）
+     * 查看正在复习的单词（已完成学习但未掌握的），如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllRevewing(String book_name) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_study=? and word_is_grasp=?",
-                new String[]{book_name, "1","0"}, null, null, null);
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
+                    new String[]{"1", "0"}, null, null, null);
+        } else {
+            cursor = db.query("book", null, "book_name=? and word_is_study=? and word_is_grasp=?",
+                    new String[]{book_name, "1", "0"}, null, null, null);
+        }
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -359,18 +386,25 @@ public class BookDao {
     }
 
 
-
     /**
-     * 查看全部已掌握的单词总数
+     * 查看全部已掌握的单词总数，如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllGrasp(String book_name) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_grasp =?",
-                new String[]{book_name, "1"}, null, null, null);
+
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "word_is_grasp =?",
+                    new String[]{"1"}, null, null, null);
+        } else {
+            cursor = db.query("book", null, "book_name=? and word_is_grasp =?",
+                    new String[]{book_name, "1"}, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -385,7 +419,6 @@ public class BookDao {
         }
         return books;
     }
-
 
 
     /**
@@ -440,16 +473,15 @@ public class BookDao {
      * @param word      单词
      * @return 受影响行数
      */
-    public int updateLearnAgain(String book_name, String word){
+    public int updateLearnAgain(String book_name, String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("date ", DateUtil.getNowDate("yyyy-MM-dd"));
-        values.put("word_is_study",0);
-        values.put("word_is_grasp",0);
-        values.put("grasp_values","F");
+        values.put("word_is_study", 0);
+        values.put("word_is_grasp", 0);
+        values.put("grasp_values", "F");
         return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
     }
-
 
 
     /**
