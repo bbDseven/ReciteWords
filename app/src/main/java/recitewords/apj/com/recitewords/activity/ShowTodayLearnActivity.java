@@ -3,6 +3,7 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -83,6 +84,9 @@ public class ShowTodayLearnActivity extends BaseActivity implements View.OnClick
         ft = fm.beginTransaction();
         ft.replace(R.id.show_today_fl, mTodayLearnFragment, TODAYLEARNFRAGMENT);
         ft.commit();
+
+        Intent intent = getIntent();
+        learnSum = intent.getIntExtra("TodayLearnSum", 0);
     }
 
 
@@ -90,10 +94,6 @@ public class ShowTodayLearnActivity extends BaseActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.show_today_share:
-                FragmentManager fragmentManager = getFragmentManager();
-                TodayLearnFragment fragment = (TodayLearnFragment)fragmentManager.
-                        findFragmentByTag(TODAYLEARNFRAGMENT);
-                learnSum = fragment.getLearnSum();
 //                Toast.makeText(this, "分享", Toast.LENGTH_SHORT).show();
                 showShare();  //分享
                 break;
@@ -137,13 +137,13 @@ public class ShowTodayLearnActivity extends BaseActivity implements View.OnClick
         // titleUrl是标题的网络链接，QQ和QQ空间等使用
         oks.setTitleUrl("http://sharesdk.cn");
         // text是分享文本，所有平台都需要这个字段
-        oks.setText("今儿我用不背单词轻松hold住"+learnSum+"个单词，表羡慕、~^~、");
+        oks.setText("今儿我用不背单词轻松hold住" + learnSum + "个单词，表羡慕、~^~、");
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         //oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
         // url仅在微信（包括好友和朋友圈）中使用
         oks.setUrl("http://sharesdk.cn");
         // comment是我对这条分享的评论，仅在人人网和QQ空间使用
-        oks.setComment("今儿我用不背单词轻松hold住"+learnSum+"个单词，表羡慕、~^~、");
+        oks.setComment("今儿我用不背单词轻松hold住" + learnSum + "个单词，表羡慕、~^~、");
         // site是分享此内容的网站名称，仅在QQ空间使用
         oks.setSite(getString(R.string.app_name));
         // siteUrl是分享此内容的网站地址，仅在QQ空间使用

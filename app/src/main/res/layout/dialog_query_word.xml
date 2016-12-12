@@ -6,8 +6,8 @@
     <LinearLayout
         android:id="@+id/ll_query_word_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:background="#000"
+        android:layout_height="match_parent"
         android:orientation="vertical">
         <RelativeLayout
             android:id="@+id/rl_query_bg"
@@ -73,15 +73,26 @@
                     android:id="@+id/iv_word_voice"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
                     android:src="@mipmap/ic_voice_search"/>
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/tv_word_soundmark"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:gravity="center"
                     android:text="[smɑ:rt]"
                     android:textSize="22sp"
                     android:textColor="#fff"/>
+
+                <TextView
+                    android:id="@+id/add_new_word"
+                    android:layout_width="wrap_content"
+                    android:gravity="right"
+                    android:layout_marginRight="15dp"
+                    android:layout_height="match_parent"
+                    android:drawableRight="@mipmap/ico_dict_add_new_word"/>
+
             </LinearLayout>
             <TextView
                 android:id="@+id/tv_word_mean"

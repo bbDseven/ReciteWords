@@ -2,7 +2,9 @@ package recitewords.apj.com.recitewords.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.AllReviewingFragment;
 import recitewords.apj.com.recitewords.globle.AppConfig;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 
 public class LibraryAllLearnActivity extends BaseActivity implements View.OnClickListener {
     private static final String ALLHaveLearn = "all_have_learn";
@@ -46,7 +49,13 @@ public class LibraryAllLearnActivity extends BaseActivity implements View.OnClic
     }
 
     private void initDate() {
-        mAllHaveLearnFragment = new AllReviewingFragment(AppConfig.MODE_LIBRARY_LEARN);
+        SharedPreferences pref = PrefUtils.getPref(this);
+        boolean new_words = pref.getBoolean("NEW_WORDS", false);
+        if (new_words){
+            mAllHaveLearnFragment = new AllReviewingFragment(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS);
+        }else {
+            mAllHaveLearnFragment = new AllReviewingFragment(AppConfig.MODE_LIBRARY_LEARN);
+        }
         fm = getFragmentManager();
         ft = fm.beginTransaction();
         ft.replace(R.id.library_learn_fl, mAllHaveLearnFragment, ALLHaveLearn);

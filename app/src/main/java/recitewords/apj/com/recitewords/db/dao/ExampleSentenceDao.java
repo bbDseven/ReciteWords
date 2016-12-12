@@ -21,12 +21,16 @@ import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
 public class ExampleSentenceDao {
     private SQLiteOpenHelper helper;
 
-    public ExampleSentenceDao(Context context){
+    public ExampleSentenceDao(Context context) {
         helper = new ReciteWordsSQLiteOpenHelper(context, MainActivity.dbName, 1);
     }
 
+    public ExampleSentenceDao(Context context,String dbName) {
+        helper = new ReciteWordsSQLiteOpenHelper(context,dbName, 1);
+    }
+
     //插入例句数据
-    public void insert(String word, String example_sentence, String example_sentence_mean, String example_sentence_pronounce, String example_sentence_resource){
+    public void insert(String word, String example_sentence, String example_sentence_mean, String example_sentence_pronounce, String example_sentence_resource) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("word", word);
@@ -38,14 +42,16 @@ public class ExampleSentenceDao {
         values.clear();
         db.close();
     }
+
     //删除例句数据
-    public void delete(String word){
+    public void delete(String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.delete("word_example_sentence", "word = ?", new String[]{word});
         db.close();
     }
+
     //修改例句数据
-    public void update(ContentValues value){
+    public void update(ContentValues value) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("word", value.getAsString("word"));
@@ -57,12 +63,13 @@ public class ExampleSentenceDao {
         values.clear();
         db.close();
     }
+
     //查询例句数据
-    public WordExampleSentence query(String word){
+    public WordExampleSentence query(String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor cursor = db.rawQuery("select * from word_example_sentence where word = ?", new String[]{word});
-        if (cursor != null && cursor.getCount() > 0){
-            if (cursor.moveToFirst()){
+        if (cursor != null && cursor.getCount() > 0) {
+            if (cursor.moveToFirst()) {
                 WordExampleSentence bean_example_sentence = new WordExampleSentence();
                 bean_example_sentence.setWord(cursor.getString(cursor.getColumnIndex("word")));
                 bean_example_sentence.setExample_sentence(cursor.getString(cursor.getColumnIndex("example_sentence")));

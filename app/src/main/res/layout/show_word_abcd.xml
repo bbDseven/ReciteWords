@@ -37,12 +37,12 @@
             android:textSize="18sp" />
 
     </LinearLayout>
-    <ImageView
+    <TextView
         android:layout_width="match_parent"
         android:background="#CCCCCC"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/viewpager_divide_height"/>
     <LinearLayout
         android:id="@+id/ll_"
         android:layout_weight="1"
@@ -78,7 +78,7 @@
         android:background="#CCCCCC"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/viewpager_divide_height"/>
     <LinearLayout
         android:id="@+id/ll_C"
         android:layout_weight="1"
@@ -114,7 +114,7 @@
     android:background="#CCCCCC"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
-    android:layout_height="1dp"/>
+    android:layout_height="@dimen/viewpager_divide_height"/>
 
     <LinearLayout
         android:id="@+id/ll_D"

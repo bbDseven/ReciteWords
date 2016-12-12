@@ -61,6 +61,8 @@ public class AllReviewingFragment extends BaseFragment {
             list = bookDao.queryAllRevewing("");   //词书名字为空，默认为从查询全部
         }else if (mode.equals(AppConfig.MODE_LIBRARY_LEARN)){
             list=bookDao.queryAllLearn(AppConfig.BOOK_NAME);
+        }else if(mode.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)){
+            list=bookDao.queryAllLearn(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS);
         }
         //单词按日期排序
         sortDate(list);

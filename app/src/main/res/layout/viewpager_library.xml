@@ -20,6 +20,7 @@
             android:paddingTop="15dp">
 
             <TextView
+                android:id="@+id/library_book_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -157,49 +158,75 @@
 
     </LinearLayout>
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:background="@color/textView_stroke_one" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
+        android:background="@color/themes_one"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@mipmap/uncheck" />
+                android:id="@+id/library_add_words"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:background="@mipmap/uncheck" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
+                android:layout_marginLeft="10dp"
+                android:clickable="true"
                 android:text="生词本"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/viewpager_text_large" />
 
             <TextView
+                android:id="@+id/library_new_words_sum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10sp"
                 android:text="单词数10"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                android:textColor="@color/textView_stroke_one"
+                android:textSize="@dimen/viewpager_text_small" />
 
-            <TextView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="查看 "
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/library_new_words_see"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:clickable="true"
+                    android:text="查看 "
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/viewpager_text_large" />
+            </RelativeLayout>
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/textView_stroke_one" />
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

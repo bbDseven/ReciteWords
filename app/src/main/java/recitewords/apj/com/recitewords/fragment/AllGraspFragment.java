@@ -67,6 +67,11 @@ public class AllGraspFragment extends BaseFragment {
             list = bookDao.queryAllGrasp("");  //词书名字为空，默认为从查询全部
         } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {
             list = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);
+        }else if (mode.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)){
+            //查询当前词书和生词本
+            list = bookDao.queryAllGrasp(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS);
+        }else if (mode.equals(AppConfig.BOOK_NEW_WORDS)){
+            list=bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本单词
         }
         //单词按日期排序
         sortDate(list);
@@ -214,8 +219,11 @@ public class AllGraspFragment extends BaseFragment {
                                 //重新学习
                                 if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {  //LIBRARY
                                     bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
-                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {  //STATISTICS
+                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)||
+                                        mode.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)) {  //STATISTICS
                                     bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                }else if (mode.equals(AppConfig.BOOK_NEW_WORDS)){
+                                    bookDao.deleteWords(AppConfig.BOOK_NEW_WORDS,list.get(position).getWord());
                                 }
                                 holderTwo.item_word_mean.setVisibility(View.VISIBLE);
                                 list.remove(position);
@@ -223,8 +231,11 @@ public class AllGraspFragment extends BaseFragment {
                                 //重新学习
                                 if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {
                                     bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
-                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {
+                                } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)||
+                                        mode.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)) {
                                     bookDao.updateLearnAgain(AppConfig.BOOK_NAME, list.get(position).getWord());
+                                }else if (mode.equals(AppConfig.BOOK_NEW_WORDS)){
+                                    bookDao.deleteWords(AppConfig.BOOK_NEW_WORDS,list.get(position).getWord());  //删除单词
                                 }
                                 holderTwo.item_word_mean.setVisibility(View.VISIBLE);
                                 list.remove(position);
