@@ -839,11 +839,13 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         holder.ll_show_word.getViewTreeObserver().removeOnGlobalLayoutListener(this);//取消视图树监听
     }
 
+
     //监听例句显示状态
     @Override
-    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
+    public void onToggleChange(SlidingUpMenu view,boolean oldMenuState, boolean isOpen) {
+
         if (mOnToggleListener != null) {
-            mOnToggleListener.onmToggleChange(view, isOpen);
+            mOnToggleListener.onmToggleChange(view,oldMenuState, isOpen);
         }
     }
 
@@ -852,7 +854,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     }
 
     public interface OnmToggleListener {
-        void onmToggleChange(SlidingUpMenu view, boolean isOpen);
+        void onmToggleChange(SlidingUpMenu view,boolean oldMenuState, boolean isOpen);
     }
 
 

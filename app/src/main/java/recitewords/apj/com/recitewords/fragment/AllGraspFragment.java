@@ -175,6 +175,7 @@ public class AllGraspFragment extends BaseFragment {
                     holderTwo.item_ll_root.setTag(position);
                     holderTwo.sl_word.setTag(position);
                     holderTwo.item_word.setText(list.get(position).getWord());
+                    holderTwo.item_delete.setText("删除");
                     holderTwo.item_word_mean.setText(list.get(position).getWord_mean());
 
                     // 显示隐藏词义，和删除按钮

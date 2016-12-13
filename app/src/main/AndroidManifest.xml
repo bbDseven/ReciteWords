@@ -125,7 +125,12 @@
         <activity android:name=".activity.TestActivity" />
         <activity android:name=".activity.LibraryAllLearnActivity" />
         <activity android:name=".activity.LibraryAllGraspActivity" />
-        <activity android:name=".activity.NewWordsActivity"></activity>
+        <activity android:name=".activity.NewWordsActivity" />
+
+        <provider
+            android:name="recitewords.apj.com.recitewords.contentprovider.BookProvider"
+            android:authorities="recitewords.apj.com.recitewords"
+            android:exported="true" /><!--词书表内容提供者-->
     </application>
 
 </manifest>

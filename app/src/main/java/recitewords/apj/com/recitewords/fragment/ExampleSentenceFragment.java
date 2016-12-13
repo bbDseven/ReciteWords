@@ -127,10 +127,12 @@ public class ExampleSentenceFragment extends BaseFragment implements LearnActivi
 
     //监听例句显示状态回调方法
     @Override
-    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
-        if (isOpen) {
-            //显示例句
-            MediaUtils.playWord(mActivity, word);
+    public void onToggleChange(SlidingUpMenu view,boolean oldMenuState ,boolean isOpen) {
+        if (oldMenuState!=isOpen){
+            if (isOpen) {
+                //显示例句
+                MediaUtils.playWord(mActivity, word);
+            }
         }
         // Toast.makeText(mActivity,"当前状态为："+isOpen,Toast.LENGTH_LONG).show();
     }

@@ -1,17 +1,23 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -67,7 +73,9 @@ public class SlidingFragment extends BaseFragment {
         //-------------------- 设置
         TextView settings_download;  // 下载
         TextView settings_clean;  // 清除
-        SlideSwitch settings_spell_test,settings_lock_learn,settings_automatic_play;//拼写测试开关，锁屏学单词开关，自动发音开关
+        //拼写测试开关，锁屏学单词开关，自动发音开关
+        SlideSwitch settings_spell_test, settings_lock_learn, settings_automatic_play;
+        LinearLayout settings_Reset;  //重置当前词书
         //--------------------统计
         TextView statistics_tv_today_learn;  //查看今日已学单词
         TextView statistics_tv_today_sum;  //显示今日已学习个数
@@ -118,8 +126,17 @@ public class SlidingFragment extends BaseFragment {
     private RadioButton rb_purple;  //主题页面的紫色按钮
     private SharedPreferences sp;
 
+    private List<Book> haveLearnList;  //当前词书已学习
+    private List<Book> haveGraspList;  //当前词书已掌握
+    private List<Book> newWordsList;  //生词本全部单词
+    private List<Book> newWordHaveLearnList;  //生词本已学习
+    private List<Book> newWordHaveGraspList;  //生词本已掌握
+
     public SlidingFragment(Context context) {
         this.mContext = context;
+    }
+
+    public SlidingFragment() {
     }
 
     @Override
@@ -188,6 +205,37 @@ public class SlidingFragment extends BaseFragment {
             setPurpleNum();
         }
         return view;
+    }
+
+
+    @Override
+    public void initData() {
+        super.initData();
+        //注册一个内容观察者，监听数据库内容的改变
+        ContentResolver cr = mActivity.getContentResolver();
+        cr.registerContentObserver(Uri.parse("content://recitewords.apj.com.recitewords"),
+                true, new MyObserver(new Handler()));
+    }
+
+    /**
+     * 内容监听（监听数据库数据变化）
+     */
+    class MyObserver extends ContentObserver {
+
+        public MyObserver(Handler handler) {
+            super(handler);
+        }
+
+        //收到数据改变的通知，此方法调用
+        @Override
+        public void onChange(boolean selfChange) {
+            // TODO Auto-generated method stub
+            super.onChange(selfChange);
+            BookDao bookDao = new BookDao(mActivity);
+            newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
+            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+        }
+
     }
 
     /**
@@ -260,6 +308,7 @@ public class SlidingFragment extends BaseFragment {
 
     /**
      * 设置SETTINGS
+     *
      * @param view view
      */
     private void settings(View view) {
@@ -270,32 +319,112 @@ public class SlidingFragment extends BaseFragment {
     /**
      * 初始化 设置SETTINGS  的控件
      */
-    public void init_SettView(View view){
-        holder.settings_download = findViewByIds(view,R.id.settings_download);//下载
-        holder.settings_clean = findViewByIds(view,R.id.settings_clean);//清除
-        holder.settings_spell_test = findViewByIds(view,R.id.settings_spell_test);//拼写测试开关
-        holder.settings_lock_learn = findViewByIds(view,R.id.settings_lock_learn);//锁屏学单词开关
-        holder.settings_automatic_play = findViewByIds(view,R.id.settings_automatic_play);//自动发音开关
+    public void init_SettView(View view) {
+        holder.settings_download = findViewByIds(view, R.id.settings_download);//下载
+        holder.settings_clean = findViewByIds(view, R.id.settings_clean);//清除
+        holder.settings_spell_test = findViewByIds(view, R.id.settings_spell_test);//拼写测试开关
+        holder.settings_lock_learn = findViewByIds(view, R.id.settings_lock_learn);//锁屏学单词开关
+        holder.settings_automatic_play = findViewByIds(view, R.id.settings_automatic_play);//自动发音开关
+        holder.settings_Reset = findViewByIds(view, R.id.settings_Reset);  //重置当前词书
     }
 
     /**
      * 设置SETTINGS 各个控件点击事件
      */
-    public void init_SettEvent(){
+    public void init_SettEvent() {
         holder.settings_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext,"下载的方法",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "下载的方法", Toast.LENGTH_SHORT).show();
             }
         });
         holder.settings_spell_test.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
             @Override
             public void onStateChanged(boolean state) {
-                if (state == true){
-                    Toast.makeText(mContext,"拼写测试开关为开",Toast.LENGTH_LONG).show();
-                }else {
-                    Toast.makeText(mContext,"拼写测试开关为关",Toast.LENGTH_LONG).show();
+                if (state == true) {
+                    Toast.makeText(mContext, "拼写测试开关为开", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, "拼写测试开关为关", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+
+        holder.settings_Reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final SharedPreferences pref = PrefUtils.getPref(mActivity);
+                final boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+                if (new_words) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("重置学习记录！");
+                    builder.setMessage("[" + AppConfig.BOOK_NAME  +
+                            "]中有" + haveGraspList.size() + "个已学的单词,有" + haveGraspList.size() +
+                            "个已掌握单词;[生词本]中有" + newWordHaveLearnList.size() + "个已学的单词,有"
+                            + newWordHaveGraspList.size() + "个已掌握单词。是否要重置这些单词的学习记录？");
+                    builder.setPositiveButton("重置", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //再次弹窗询问用户是否重置
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                            builder.setTitle("温馨提示：");
+                            builder.setMessage("此操作会将词书中所有的学习记录归零，你真的要这么做吗！！");
+                            builder.setNegativeButton("取消", null);
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //重置当前词书
+                                    BookDao bookDao = new BookDao(mActivity);
+                                    int bookSum = bookDao.updateResetBook(AppConfig.BOOK_NAME);
+                                    int newBookSum = bookDao.updateResetBook(AppConfig.BOOK_NEW_WORDS);
+                                    if (bookSum > 0 && newBookSum > 0) {
+                                        Toast.makeText(mActivity, "重置成功，请重新学习",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.create();
+                            builder.show();
+                        }
+                    });
+                    builder.setNegativeButton("不重置", null);
+                    builder.create();
+                    builder.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("重置学习记录！");
+                    builder.setMessage("[" + AppConfig.BOOK_NAME  +
+                            "]中有" + haveGraspList.size() + "个已学的单词,有" + haveGraspList.size() +
+                            "个已掌握单词。是否要重置这些单词的学习记录？");
+                    builder.setPositiveButton("重置", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //再次弹窗询问用户是否重置
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                            builder.setTitle("温馨提示：");
+                            builder.setMessage("此操作会将词书中所有的学习记录归零，你真的要这么做吗！！");
+                            builder.setNegativeButton("取消", null);
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //重置当前词书
+                                    BookDao bookDao = new BookDao(mActivity);
+                                    int bookSum = bookDao.updateResetBook(AppConfig.BOOK_NAME);
+                                    if (bookSum > 0) {
+                                        Toast.makeText(mActivity, "重置成功，请重新学习",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.create();
+                            builder.show();
+                        }
+                    });
+                    builder.setNegativeButton("不重置", null);
+                    builder.create();
+                    builder.show();
+                }
+
             }
         });
     }
@@ -310,7 +439,6 @@ public class SlidingFragment extends BaseFragment {
         init__LibraryData();
 
     }
-
 
     /**
      * 统计Viewpager
@@ -390,7 +518,7 @@ public class SlidingFragment extends BaseFragment {
             public void onClick(View v) {
                 //显示今天学习单词
                 Intent intent = new Intent(mActivity, ShowTodayLearnActivity.class);
-                intent.putExtra("TodayLearnSum",mLearnList.size());
+                intent.putExtra("TodayLearnSum", mLearnList.size());
                 startActivity(intent);
             }
         });
@@ -439,19 +567,23 @@ public class SlidingFragment extends BaseFragment {
      */
     public void init__LibraryData() {
         final BookDao bookDao = new BookDao(mActivity);
-        final List<Book> haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);
-        final List<Book> haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);
-        final List<Book> newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
-        final List<Book> newWordHaveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NEW_WORDS);  //生词本已学习
-        final List<Book> newWordHaveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NEW_WORDS);  //生词本已掌握
+        haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);  //当前词书已学习
+        haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);  //当前词书已掌握
+        newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
+        newWordHaveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NEW_WORDS);  //生词本已学习
+        newWordHaveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NEW_WORDS);  //生词本已掌握
         final SharedPreferences pref = PrefUtils.getPref(mActivity);
-        final boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+        boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+        if (newWordsList.size()==0){  //删除完单词后，进入没有选择状态
+            PrefUtils.setDBFlag(pref,"NEW_WORDS",false);
+            new_words=false;
+        }
 
         //设置显示已学习已掌握总数
         holder.library_have_learn_sum.setText(haveLearnList.size() + "");
         holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
         //显示生词总数
-        holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+        holder.library_new_words_sum.setText("单词数" + newWordsList.size());
         //打开已学习
         holder.library_have_learn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -466,9 +598,9 @@ public class SlidingFragment extends BaseFragment {
                 startActivity(new Intent(mActivity, LibraryAllGraspActivity.class));
             }
         });
-        if (new_words){
+        if (new_words) {
             holder.library_add_words_tick.setVisibility(View.VISIBLE);
-            holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
+            holder.library_book_name.setText(AppConfig.BOOK_NAME  + " + 生词本");
             //设置显示已学习已掌握总数
             holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
             holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
@@ -476,18 +608,19 @@ public class SlidingFragment extends BaseFragment {
             holder.library_new_words_sum.setText("单词数"+newWordsList.size());
         }else {
             holder.library_add_words_tick.setVisibility(View.GONE);
+            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
             //设置显示已学习已掌握总数
-            holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
+            holder.library_book_name.setText(AppConfig.BOOK_NAME);
             holder.library_have_learn_sum.setText(haveLearnList.size() + "");
             holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
             //显示生词总数
-            holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
         }
 
         holder.library_add_words.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean new_words =PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+                boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
                 if (newWordsList.size() <= 0) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setTitle("温馨提醒：");
@@ -506,11 +639,12 @@ public class SlidingFragment extends BaseFragment {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
                             holder.library_add_words_tick.setVisibility(View.GONE);
                             holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
+                            holder.library_book_name.setText(AppConfig.BOOK_NAME );
                             //设置显示已学习已掌握总数
                             holder.library_have_learn_sum.setText(haveLearnList.size() + "");
                             holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
                             //显示生词总数
-                            holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
 
                         }
                     });
@@ -531,7 +665,7 @@ public class SlidingFragment extends BaseFragment {
                             holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
                             holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
                             //显示生词总数
-                            holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
                         }
                     });
                     AlertDialog alertDialog = builder.create();
@@ -550,7 +684,7 @@ public class SlidingFragment extends BaseFragment {
                     builder.setPositiveButton("确定", null);
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
-                }else {
+                } else {
                     startActivity(new Intent(mActivity, NewWordsActivity.class));
                 }
             }

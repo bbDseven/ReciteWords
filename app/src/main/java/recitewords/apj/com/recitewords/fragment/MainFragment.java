@@ -1,6 +1,8 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -158,6 +160,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     //带参构造方法
     public MainFragment(Context context) {
         this.mContext = context;
+    }
+    public MainFragment(){
     }
 
     @Override
@@ -443,6 +447,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面
+
                 Intent intent = new Intent(mActivity, LearnActivity.class);
                 intent.putExtra("backgroundNum", num);
                 startActivity(intent);
@@ -529,17 +534,29 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.add_new_word:
                 //创建生词本数据库
-                BookDao bookDao = new BookDao(mActivity);
+
+                ContentResolver cr = mActivity.getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put("word",book.getWord());
+                values.put("soundmark_american",book.getSoundmark_american());
+                values.put("pronounce_american","");
+                values.put("soundmark_british",book.getSoundmark_british());
+                values.put("pronounce_british","");
+                values.put("word_mean",book.getWord_mean());
+                values.put("word_img","");
+                values.put("word_is_study",0);
+                values.put("word_is_grasp",0);
+                values.put("grasp_values","");
+                values.put("date",book.getDate());
+                values.put("book_name",AppConfig.BOOK_NEW_WORDS);
+                values.put("userID",book.getUserID());
+                cr.insert(Uri.parse("content://recitewords.apj.com.recitewords"), values);//插入数据
                 ExampleSentenceDao exampleDao = new ExampleSentenceDao(mActivity);
-                bookDao.addWord(book.getWord(), book.getSoundmark_american(),
-                        book.getSoundmark_british(), book.getWord_mean(),
-                        0, 0, "", book.getDate(), AppConfig.BOOK_NEW_WORDS, book.getUserID());
+
                 exampleDao.insert(bean_sentence.getWord(), bean_sentence.getExample_sentence(),
                         bean_sentence.getExample_sentence_mean(),
                         bean_sentence.getExample_sentence_pronounce(),
                         bean_sentence.getExample_sentence_resource());
-
-                Toast.makeText(mActivity, "成功添加到生词本", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.iv_word_voice:

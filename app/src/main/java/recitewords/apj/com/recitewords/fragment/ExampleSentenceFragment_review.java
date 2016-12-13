@@ -128,12 +128,15 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
         WordExampleSentence bean = dao.query(word);
         return bean;
     }
+
     //监听例句显示状态回调方法
     @Override
-    public void onmToggleChange(SlidingUpMenu view, boolean isOpen) {
-        if (isOpen) {
-            //显示例句
-            MediaUtils.playWord(mActivity, word);
+    public void onmToggleChange(SlidingUpMenu view, boolean oldMenuState, boolean isOpen) {
+        if (oldMenuState != isOpen) {
+            if (isOpen) {
+                //显示例句
+                MediaUtils.playWord(mActivity, word);
+            }
         }
     }
 
