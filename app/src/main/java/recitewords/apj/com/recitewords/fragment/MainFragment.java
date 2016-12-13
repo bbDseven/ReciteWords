@@ -126,6 +126,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private static final int TAKE_PHOTO = 1;    //打开相机的请求码
     private static final int CROP_PHOTO = 2;    //裁剪图片的请求码
     private static final int CHOICE_PHOTO = 3;    //选择图片的请求码
+    private static final int CHOICE_CROP = 4;    //选择图片后裁剪的请求码
+    private Uri selectedImage; //获取系统返回的照片的Uri
+    private Uri selectedImage_choice;   //选择图片裁剪后的Uri
     private Uri imageUri;   //图片uri地址
     private AlertDialog dialog; //查询单词的对话框
     private EditText et_query;  //查询单词的输入框
@@ -763,6 +766,16 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     //选择照片方法
     private void choicePhoto() {
+        File outputImage_choice = new File(Environment.getExternalStorageDirectory(), "tempImage_choice.jpg"); //创建文件在sd卡并命名
+        try {
+            if (outputImage_choice.exists()){
+                outputImage_choice.delete();   //如果文件存在则删除文件
+            }
+            outputImage_choice.createNewFile();    //创建文件
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        selectedImage_choice = Uri.fromFile(outputImage_choice);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);   //设置intent的action
         intent.setType("image/*");  //设置类型
@@ -793,16 +806,28 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             case CHOICE_PHOTO:      //选择完图片的回调
                 if (resultCode == mActivity.RESULT_OK) {     //从相册选择照片不裁切
                     try {
-                        Uri selectedImage = data.getData(); //获取系统返回的照片的Uri
-                        holder.main_img_circle.setImageURI(selectedImage);
-                        SharedPreferences sp = PrefUtils.getPref(mActivity);
-                        sp.edit().remove("imageUri").commit();
-                        PrefUtils.setImage(sp, "imageUri", selectedImage.toString());
+                        selectedImage = data.getData();//获取系统返回的照片的Uri
+                        Intent intent = new Intent("com.android.camera.action.CROP");   //跳转到图片裁剪
+                        intent.setDataAndType(selectedImage, "image/*"); //设置数据和类型
+                        intent.putExtra("scale", true);     //设置可缩放
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImage_choice); //设置位置
+                        startActivityForResult(intent, CHOICE_CROP); //裁剪执行完同样回调到onActivityResult方法
+//                        holder.main_img_circle.setImageURI(selectedImage);
+//                        SharedPreferences sp = PrefUtils.getPref(mActivity);
+//                        sp.edit().remove("imageUri").commit();
+//                        PrefUtils.setImage(sp, "imageUri", selectedImage.toString());
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                break;
+            case CHOICE_CROP:
+                holder.main_img_circle.setImageURI(null);   //先设置为null，防止第二次点击拍摄时头像不更新
+                holder.main_img_circle.setImageURI(selectedImage_choice);   //设置头像
+                SharedPreferences sp = PrefUtils.getPref(mActivity);
+                sp.edit().remove("imageUri").commit();
+                PrefUtils.setImage(sp, "imageUri", selectedImage_choice.toString());
                 break;
         }
     }

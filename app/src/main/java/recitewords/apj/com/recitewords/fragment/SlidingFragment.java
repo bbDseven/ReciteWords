@@ -42,7 +42,9 @@ import recitewords.apj.com.recitewords.activity.ShowAllLearnActivity;
 import recitewords.apj.com.recitewords.activity.ShowTodayLearnActivity;
 import recitewords.apj.com.recitewords.adapter.MyViewPagerAdapter;
 import recitewords.apj.com.recitewords.bean.Book;
+import recitewords.apj.com.recitewords.bean.User;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
+import recitewords.apj.com.recitewords.db.dao.UserDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
@@ -72,6 +74,10 @@ public class SlidingFragment extends BaseFragment {
         TextView statistics_tv_today_sum;  //显示今日已学习个数
         TextView statistics_tv_all_sum;  //显示全部已学习个数
         TextView statistics_tv_all_learn; //查看全部已学单词
+        TextView statistics_tv_sign_look;   //查看签到
+        TextView statistics_tv_sign;    //显示签到天数
+        TextView statistics_tv_money_add; //增加酷币
+        TextView statistics_tv_money;   //显示剩余酷币
 
         //-----------------LIBRARY图书馆
         RelativeLayout library_have_learn;  //点击查看已学习
@@ -298,6 +304,10 @@ public class SlidingFragment extends BaseFragment {
         holder.statistics_tv_today_sum = findViewByIds(view, R.id.statistics_tv_today_sum);
         holder.statistics_tv_all_learn = findViewByIds(view, R.id.statistics_tv_all_learn);
         holder.statistics_tv_all_sum = findViewByIds(view, R.id.statistics_tv_all_sum);
+        holder.statistics_tv_sign_look = findViewByIds(view, R.id.statistics_tv_sign_look);
+        holder.statistics_tv_sign = findViewByIds(view, R.id.statistics_tv_sign);
+        holder.statistics_tv_money_add = findViewByIds(view, R.id.statistics_tv_money_add);
+        holder.statistics_tv_money = findViewByIds(view, R.id.statistics_tv_money);
     }
 
     /**
@@ -309,6 +319,46 @@ public class SlidingFragment extends BaseFragment {
         final List<Book> mGraspList = bookDao.queryAllLearn("");  //全部已学
         holder.statistics_tv_today_sum.setText(mLearnList.size() + "个");  //今日已学单词总数
         holder.statistics_tv_all_sum.setText(mGraspList.size() + "个");  //全部已学单词总数
+
+        UserDao userDao = new UserDao(mContext);
+        User user = userDao.query();
+        holder.statistics_tv_sign.setText(user.getSign_in_continue() + "天");    //设置连续签到天数
+        holder.statistics_tv_money.setText(user.getCool_money() + "枚");     //设置剩余酷币枚数
+        //点击查看签到
+        holder.statistics_tv_sign_look.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.holder.mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+        //点击增加酷币
+        holder.statistics_tv_money_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("增加酷币");
+                builder.setMessage("学习一个单词消耗一枚酷币，你可以采取以下两种方式增加酷币。");
+                builder.setPositiveButton("支付宝购买", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(mActivity, "加我微信985115104", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNeutralButton("免费获得", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(mActivity, "每天签到即可", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+            }
+        });
         holder.statistics_tv_today_learn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -460,10 +510,20 @@ public class SlidingFragment extends BaseFragment {
                 }
             }
         });
+
         holder.library_new_words_see.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mActivity, NewWordsActivity.class));
+                if (newWordsList.size() <= 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }else {
+                    startActivity(new Intent(mActivity, NewWordsActivity.class));
+                }
             }
         });
 

@@ -8,7 +8,6 @@
         android:id="@+id/show_wordbook"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#7f6626"
         android:orientation="vertical"
         android:paddingBottom="15dp">
 
@@ -62,8 +61,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="4114"
-                        android:textColor="#C8AF5C"
-                        android:textSize="@dimen/viewpager_text_large" />
+                        android:textSize="@dimen/viewpager_text_large"
+                        android:id="@+id/textView" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -104,7 +103,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="48"
-                        android:textColor="#C8AF5C"
                         android:textSize="@dimen/viewpager_text_large" />
 
                     <TextView
@@ -140,7 +138,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="23"
-                    android:textColor="#C8AF5C"
                     android:textSize="@dimen/viewpager_text_large" />
 
                 <TextView
@@ -162,12 +159,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.3dp"
-        android:background="@color/textView_stroke_one" />
+        android:background="@color/color_item_divide" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/themes_one"
         android:orientation="vertical">
 
         <LinearLayout
@@ -200,7 +196,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10sp"
                 android:text="单词数10"
-                android:textColor="@color/textView_stroke_one"
                 android:textSize="@dimen/viewpager_text_small" />
 
             <RelativeLayout
@@ -224,7 +219,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0.3dp"
-            android:background="@color/textView_stroke_one" />
+            android:background="@color/color_item_divide" />
     </LinearLayout>
 
 

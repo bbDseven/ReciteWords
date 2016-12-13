@@ -3,7 +3,6 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -53,24 +52,12 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//
         mScroller = new Scroller(this);    // 创建scroller
         initView();
         initData();
         initEvent();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        //在onResume方法中，可以返回主页面时重新刷新
-//        mScroller = new Scroller(this);    // 创建scroller
-//        initView();
-//        initData();
-//        initEvent();
-
-    }
 
     private void initView() {
         holder = new ViewHolder();

@@ -130,7 +130,7 @@ public class ExampleSentenceFragment extends BaseFragment implements LearnActivi
     public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
         if (isOpen) {
             //显示例句
-            MediaUtils.playWord(mActivity, "abroad");
+            MediaUtils.playWord(mActivity, word);
         }
         // Toast.makeText(mActivity,"当前状态为："+isOpen,Toast.LENGTH_LONG).show();
     }
