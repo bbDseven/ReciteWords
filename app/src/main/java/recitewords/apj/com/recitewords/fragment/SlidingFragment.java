@@ -46,6 +46,7 @@ import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
+import recitewords.apj.com.recitewords.view.SlideSwitch;
 
 /**
  * Created by CGT on 2016/11/22.
@@ -62,6 +63,10 @@ public class SlidingFragment extends BaseFragment {
         private LinearLayout ll_setting, ll_theme, ll_library, ll_statistics;  //菜单导航栏
         private LinearLayout ll_top;  //导航栏父控件
         private LinearLayout sliding_layout_ll; //根布局用于设置背景颜色
+        //-------------------- 设置
+        TextView settings_download;  // 下载
+        TextView settings_clean;  // 清除
+        SlideSwitch settings_spell_test,settings_lock_learn,settings_automatic_play;//拼写测试开关，锁屏学单词开关，自动发音开关
         //--------------------统计
         TextView statistics_tv_today_learn;  //查看今日已学单词
         TextView statistics_tv_today_sum;  //显示今日已学习个数
@@ -217,10 +222,51 @@ public class SlidingFragment extends BaseFragment {
 
         statistics(holder.view_statistics);  //统计
         library(holder.view_library);  //图书馆
-        //holder.text_set.setTextColor(Color.CYAN);
+        settings(holder.view_settings); //设置
         holder.menu_viewPager.addOnPageChangeListener(new MyOnPageChangeListener());
     }
 
+    /**
+     * 设置SETTINGS
+     * @param view view
+     */
+    private void settings(View view) {
+        init_SettView(view);//初始化 设置SETTINGS  的控件
+        init_SettEvent();//设置SETTINGS 各个控件点击事件
+    }
+
+    /**
+     * 初始化 设置SETTINGS  的控件
+     */
+    public void init_SettView(View view){
+        holder.settings_download = findViewByIds(view,R.id.settings_download);//下载
+        holder.settings_clean = findViewByIds(view,R.id.settings_clean);//清除
+        holder.settings_spell_test = findViewByIds(view,R.id.settings_spell_test);//拼写测试开关
+        holder.settings_lock_learn = findViewByIds(view,R.id.settings_lock_learn);//锁屏学单词开关
+        holder.settings_automatic_play = findViewByIds(view,R.id.settings_automatic_play);//自动发音开关
+    }
+
+    /**
+     * 设置SETTINGS 各个控件点击事件
+     */
+    public void init_SettEvent(){
+        holder.settings_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext,"下载的方法",Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.settings_spell_test.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
+            @Override
+            public void onStateChanged(boolean state) {
+                if (state == true){
+                    Toast.makeText(mContext,"拼写测试开关为开",Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(mContext,"拼写测试开关为关",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
 
     /**
      * 为了保证每次返回页面时刷新数据
