@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/themes_one">
+        android:background="@color/Golden_Eye">
 
         <ImageView
             android:id="@+id/show_today_share"

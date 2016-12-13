@@ -108,6 +108,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         RelativeLayout main_rl_review;
         CircleImageView main_img_circle;
         ImageView main_img_dict;
+        TextView main_tv_learn_num;
         TextView main_tv_review_num;  //需复习单词总数
 
         ImageView iv_sign;  //签到的圆圈
@@ -172,6 +173,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.main_rl_review = findViewByIds(view, R.id.main_rl_review);
         holder.main_img_circle = findViewByIds(view, R.id.main_img_circle);
         holder.main_img_dict = findViewByIds(view, R.id.main_img_dict);
+        holder.main_tv_learn_num = findViewByIds(view, R.id.main_tv_learn_num);
         holder.main_tv_review_num = findViewByIds(view, R.id.main_tv_review_num);
 
         holder.iv_sign = findViewByIds(view, R.id.main_img_sign);
@@ -837,5 +839,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int num = (int) (Math.random() * 6);
         return num;
     }
-
+    public TextView getTV_learn_num(){
+        return holder.main_tv_learn_num;
+    }
+    public TextView getTV_review_num(){
+        return holder.main_tv_review_num;
+    }
 }

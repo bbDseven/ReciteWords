@@ -80,8 +80,10 @@ public class SlidingFragment extends BaseFragment {
         TextView statistics_tv_money;   //显示剩余酷币
 
         //-----------------LIBRARY图书馆
+        LinearLayout show_wordbook; //选中词书背景
         RelativeLayout library_have_learn;  //点击查看已学习
         LinearLayout library_have_grasp;  //点击查看已掌握
+        TextView library_word_sum;  //词书单词总数
         TextView library_have_learn_sum;  //显示已学习总数
         TextView library_have_grasp_sum;  //显示已掌握总数
         ImageView library_add_words;   //生词本打勾
@@ -93,7 +95,9 @@ public class SlidingFragment extends BaseFragment {
     }
 
     private static final String TAG = "SlidingFragment";
-
+    private static final String FRAGMENT_MAIN = "fragment_main";  //主页面Fragment标识,Tag
+    private TextView learn_num;//主界面学习数字
+    private TextView review_num;//主界面复习数字
     public Context mContext;
     private int offset = 0;// 动画图片偏移量
     private int currIndex = 0;// 当前页卡编号
@@ -146,20 +150,42 @@ public class SlidingFragment extends BaseFragment {
         InitImageView();
         InitViewPager();
 
+        MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag(FRAGMENT_MAIN);
+        learn_num = mainFragment.getTV_learn_num();//主界面学习数字
+        review_num = mainFragment.getTV_review_num();//主界面复习数字
+
         //通过用户选择的主题，重新进入应用时将背景设置为相应的颜色
         String theme = PrefUtils.getThemes(sp, "themes", "gold");
         if ("gold".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Golden_Eye);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setGoldNum();
         } else if ("night".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Night_Hawks);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setNightNum();
         } else if ("ocean".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Ocean_Deep);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setOceanNum();
         } else if ("green".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Green_Peace);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setGreenNum();
         } else if ("pink".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Pinky_Girl);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setPinkNum();
         } else if ("purple".equals(theme)) {
             holder.sliding_layout_ll.setBackgroundResource(R.color.Purple_Viola);
+            setTextColor(learn_num);
+            setTextColor(review_num);
+            setPurpleNum();
         }
         return view;
     }
@@ -383,8 +409,10 @@ public class SlidingFragment extends BaseFragment {
      * 初始化图书馆的UI
      */
     public void init_LibraryView(View view) {
+        holder.show_wordbook = findViewByIds(view, R.id.show_wordbook);
         holder.library_have_learn = findViewByIds(view, R.id.library_have_learn);
         holder.library_have_grasp = findViewByIds(view, R.id.library_have_grasp);
+        holder.library_word_sum = findViewByIds(view, R.id.library_word_sum);
         holder.library_have_learn_sum = findViewByIds(view, R.id.library_have_learn_sum);
         holder.library_have_grasp_sum = findViewByIds(view, R.id.library_have_grasp_sum);
         holder.library_add_words = findViewByIds(view, R.id.library_add_words);
@@ -778,6 +806,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.GONE);
                         iv_purple.setVisibility(View.GONE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.gold));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "gold");
                         break;
                     case R.id.themes_rb_night:
@@ -789,6 +818,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.GONE);
                         iv_purple.setVisibility(View.GONE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.night));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "night");
                         break;
                     case R.id.themes_rb_ocean:
@@ -800,6 +830,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.GONE);
                         iv_purple.setVisibility(View.GONE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "ocean");
                         break;
                     case R.id.themes_rb_green:
@@ -811,6 +842,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.GONE);
                         iv_purple.setVisibility(View.GONE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.green));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "green");
                         break;
                     case R.id.themes_rb_pink:
@@ -822,6 +854,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.VISIBLE);
                         iv_purple.setVisibility(View.GONE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.pink));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "pink");
                         break;
                     case R.id.themes_rb_purple:
@@ -833,6 +866,7 @@ public class SlidingFragment extends BaseFragment {
                         iv_pink.setVisibility(View.GONE);
                         iv_purple.setVisibility(View.VISIBLE);
                         holder.text_the.setTextColor(mActivity.getResources().getColor(R.color.purple));
+                        setNumColor();
                         PrefUtils.setThemes(sp, "themes", "purple");
                         break;
                 }
@@ -857,5 +891,101 @@ public class SlidingFragment extends BaseFragment {
         } else {
             tv.setTextColor(Color.WHITE);
         }
+    }
+    //设置数字颜色
+    private void setNumColor(){
+        if (rb_gold.isChecked()) {
+            setGoldNum();
+        } else if (rb_night.isChecked()) {
+            setNightNum();
+        } else if (rb_ocean.isChecked()) {
+            setOceanNum();
+        } else if (rb_green.isChecked()) {
+            setGreenNum();
+        } else if (rb_pink.isChecked()) {
+            setPinkNum();
+        } else if (rb_purple.isChecked()) {
+            setPurpleNum();
+        } else {
+
+        }
+    }
+    //黄色数字
+    private void setGoldNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.gold));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_gold));
+    }
+    //夜晚数字
+    private void setNightNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.night));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.night));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_night));
+    }
+    //海洋数字
+    private void setOceanNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.ocean));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_ocean));
+    }
+    //绿色数字
+    private void setGreenNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.green));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.green));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_green));
+    }
+    //粉色数字
+    private void setPinkNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.pink));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_pink));
+    }
+    //紫色数字
+    private void setPurpleNum(){
+        learn_num.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        review_num.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.statistics_tv_today_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.statistics_tv_all_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.statistics_tv_sign.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.statistics_tv_money.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.library_word_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
+        holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_purple));
     }
 }

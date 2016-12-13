@@ -8,6 +8,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import recitewords.apj.com.recitewords.R;
+
 /**
  * Created by Administrator on 2016/12/12 0012.
  */
@@ -100,22 +102,24 @@ public class SlideSwitch extends View {
         /*划线*/
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(lineWidth);
-        /*左边部分的线，绿色*/
-        mPaint.setColor(Color.YELLOW);
+        /*开关打开时左边的背景色*/
+        mPaint.setColor(getResources().getColor(R.color.colorWhite));
         canvas.drawLine(lineStart, centerY, curX, centerY, mPaint);
-        /*右边部分的线，灰色*/
-        mPaint.setColor(Color.GRAY);
+        /*开关关闭时右边的背景色*/
+        mPaint.setColor(getResources().getColor(R.color.color_item_word));
         canvas.drawLine(curX, centerY, lineEnd, centerY, mPaint);
 
         /*画圆*/
         /*画最左和最右的圆，直径为直线段宽度， 即在直线段两边分别再加上一个半圆*/
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setColor(Color.GRAY);
+        /*开关关闭时，右边圆形的颜色*/
+        mPaint.setColor(getResources().getColor(R.color.color_item_word));
         canvas.drawCircle(lineEnd, centerY, lineWidth / 2, mPaint);
-        mPaint.setColor(Color.YELLOW);
+        /*开关关闭时，左边圆形的颜色*/
+        mPaint.setColor(getResources().getColor(R.color.colorWhite));
         canvas.drawCircle(lineStart, centerY, lineWidth / 2, mPaint);
-        /*圆形滑块*/
-        mPaint.setColor(Color.WHITE);
+        /*圆形滑块的颜色*/
+        mPaint.setColor(getResources().getColor(R.color.color_item_word_mean));
         canvas.drawCircle(curX, centerY, radius , mPaint);
 
     }
