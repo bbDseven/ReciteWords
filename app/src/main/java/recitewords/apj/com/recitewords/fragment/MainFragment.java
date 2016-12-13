@@ -447,6 +447,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面
+
                 Intent intent = new Intent(mActivity, LearnActivity.class);
                 intent.putExtra("backgroundNum", num);
                 startActivity(intent);
