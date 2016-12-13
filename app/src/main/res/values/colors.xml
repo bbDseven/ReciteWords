@@ -3,8 +3,15 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
     <color name="colorRed">#FF0000</color>
     <color name="themes_one">#9D812E</color>
+    <color name="library_gold">#7C6724</color>
+    <color name="library_night">#292929</color>
+    <color name="library_ocean">#526A6E</color>
+    <color name="library_green">#46701E</color>
+    <color name="library_pink">#976063</color>
+    <color name="library_purple">#533865</color>
     <color name="textView_stroke_one">#D7C180</color>
     <color name="color_item_divide">#D2D2D2</color>  <!--查看今日学习单词时，item横线颜色-->
     <color name="color_item_word">#7b7a7a</color>  <!--查看今日学习单词时，item横线颜色-->

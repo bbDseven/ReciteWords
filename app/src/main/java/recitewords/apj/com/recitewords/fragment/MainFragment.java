@@ -1,6 +1,8 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -109,6 +111,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         RelativeLayout main_rl_review;
         CircleImageView main_img_circle;
         ImageView main_img_dict;
+        TextView main_tv_learn_num;
         TextView main_tv_review_num;  //需复习单词总数
 
         ImageView iv_sign;  //签到的圆圈
@@ -175,6 +178,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         holder.main_rl_review = findViewByIds(view, R.id.main_rl_review);
         holder.main_img_circle = findViewByIds(view, R.id.main_img_circle);
         holder.main_img_dict = findViewByIds(view, R.id.main_img_dict);
+        holder.main_tv_learn_num = findViewByIds(view, R.id.main_tv_learn_num);
         holder.main_tv_review_num = findViewByIds(view, R.id.main_tv_review_num);
 
         holder.iv_sign = findViewByIds(view, R.id.main_img_sign);
@@ -529,17 +533,29 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.add_new_word:
                 //创建生词本数据库
-                BookDao bookDao = new BookDao(mActivity);
+
+                ContentResolver cr = mActivity.getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put("word",book.getWord());
+                values.put("soundmark_american",book.getSoundmark_american());
+                values.put("pronounce_american","");
+                values.put("soundmark_british",book.getSoundmark_british());
+                values.put("pronounce_british","");
+                values.put("word_mean",book.getWord_mean());
+                values.put("word_img","");
+                values.put("word_is_study",0);
+                values.put("word_is_grasp",0);
+                values.put("grasp_values","");
+                values.put("date",book.getDate());
+                values.put("book_name",AppConfig.BOOK_NEW_WORDS);
+                values.put("userID",book.getUserID());
+                cr.insert(Uri.parse("content://recitewords.apj.com.recitewords"), values);//插入数据
                 ExampleSentenceDao exampleDao = new ExampleSentenceDao(mActivity);
-                bookDao.addWord(book.getWord(), book.getSoundmark_american(),
-                        book.getSoundmark_british(), book.getWord_mean(),
-                        0, 0, "", book.getDate(), AppConfig.BOOK_NEW_WORDS, book.getUserID());
+
                 exampleDao.insert(bean_sentence.getWord(), bean_sentence.getExample_sentence(),
                         bean_sentence.getExample_sentence_mean(),
                         bean_sentence.getExample_sentence_pronounce(),
                         bean_sentence.getExample_sentence_resource());
-
-                Toast.makeText(mActivity, "成功添加到生词本", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.iv_word_voice:
@@ -843,5 +859,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int num = (int) (Math.random() * 6);
         return num;
     }
-
+    public TextView getTV_learn_num(){
+        return holder.main_tv_learn_num;
+    }
+    public TextView getTV_review_num(){
+        return holder.main_tv_review_num;
+    }
 }

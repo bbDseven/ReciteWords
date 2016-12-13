@@ -232,6 +232,19 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                     if (SpellMode.equals("spell")) {
 
                     } else if (SpellMode.equals("spellTest")) {
+                        if (mSpellIndex>=mReviewWords.size()){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setTitle("温馨提醒：");
+                            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                            AlertDialog alertDialog = builder.create();
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            });
+                            alertDialog.show();
+                        }
                         UIUtil.toast(this, mPhonogram, 2000, Gravity.BOTTOM, 0, height / 2 - 20, 16);
                         holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
                         mHandler.postDelayed(new Runnable() {
@@ -241,22 +254,8 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                             }
                         }, 2000);
                     }
-
                     holder.spell_tv_correct.setVisibility(View.VISIBLE);
                     is_Pass = false;  //错误一次，不是一次通过
-                    if (mSpellIndex>=mReviewWords.size()){
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("温馨提醒：");
-                        builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-                        AlertDialog alertDialog = builder.create();
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        });
-                        alertDialog.show();
-                    }
                 }
                 havaing_comfirm = true;  //改变是否比较状态
                 break;

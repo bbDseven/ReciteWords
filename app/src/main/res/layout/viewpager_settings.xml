@@ -111,7 +111,7 @@
         <!--   拼写测试  部分-->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:orientation="horizontal"
@@ -130,8 +130,8 @@
             <!--  拼写测试 左右滑动开关控件 -->
             <recitewords.apj.com.recitewords.view.SlideSwitch
                 android:id="@+id/settings_spell_test"
-                android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
@@ -163,8 +163,8 @@
             <!--  锁屏学单词 左右滑动开关控件 -->
             <recitewords.apj.com.recitewords.view.SlideSwitch
                 android:id="@+id/settings_lock_learn"
-                android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
@@ -196,8 +196,8 @@
             <!--  自动发音 左右滑动开关控件 -->
             <recitewords.apj.com.recitewords.view.SlideSwitch
                 android:id="@+id/settings_automatic_play"
-                android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>

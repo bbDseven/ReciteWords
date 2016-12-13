@@ -27,7 +27,6 @@ public abstract class BaseFragment extends Fragment {
     // 处理fragment的布局
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("baseFragment","onStart");
         return initView();
     }
 
