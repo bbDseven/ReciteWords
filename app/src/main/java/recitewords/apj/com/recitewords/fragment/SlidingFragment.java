@@ -467,7 +467,6 @@ public class SlidingFragment extends BaseFragment {
             }
         });
         if (new_words){
-//            holder.library_add_words.setBackgroundResource(R.mipmap.check_gold);
             holder.library_add_words_tick.setVisibility(View.VISIBLE);
             holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
             //设置显示已学习已掌握总数
@@ -476,7 +475,6 @@ public class SlidingFragment extends BaseFragment {
             //显示生词总数
             holder.library_new_words_sum.setText("单词数"+newWordsList.size());
         }else {
-//            holder.library_add_words.setBackgroundResource(R.mipmap.uncheck);
             holder.library_add_words_tick.setVisibility(View.GONE);
             //设置显示已学习已掌握总数
             holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
@@ -506,7 +504,6 @@ public class SlidingFragment extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
-//                            holder.library_add_words.setBackgroundResource(R.mipmap.uncheck);  //没有选择生词
                             holder.library_add_words_tick.setVisibility(View.GONE);
                             holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
                             //设置显示已学习已掌握总数
@@ -528,7 +525,6 @@ public class SlidingFragment extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
-//                            holder.library_add_words.setBackgroundResource(R.mipmap.check_gold);  //选择生词
                             holder.library_add_words_tick.setVisibility(View.VISIBLE);
                             holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
                             //设置显示已学习已掌握总数
