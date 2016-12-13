@@ -814,10 +814,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                         intent.putExtra("scale", true);     //设置可缩放
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImage_choice); //设置位置
                         startActivityForResult(intent, CHOICE_CROP); //裁剪执行完同样回调到onActivityResult方法
-//                        holder.main_img_circle.setImageURI(selectedImage);
-//                        SharedPreferences sp = PrefUtils.getPref(mActivity);
-//                        sp.edit().remove("imageUri").commit();
-//                        PrefUtils.setImage(sp, "imageUri", selectedImage.toString());
 
                     } catch (Exception e) {
                         e.printStackTrace();
