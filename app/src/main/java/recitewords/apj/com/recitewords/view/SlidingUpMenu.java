@@ -1,4 +1,5 @@
 package recitewords.apj.com.recitewords.view;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,7 +10,7 @@ import android.widget.Scroller;
 
 /**
  * Created by CGT on 2016/11/29.
- * <p/>
+ * <p>
  * 滑动显示头部菜单
  */
 public class SlidingUpMenu extends ViewGroup {
@@ -19,19 +20,21 @@ public class SlidingUpMenu extends ViewGroup {
     private int mUpHeight;  //头部菜单的高度
     private float mDownX;
     private float mDownY;
-    private boolean mUpMenuOpen=false;  //是否打开头部菜单栏
+    private boolean mUpMenuOpen = false;  //是否打开头部菜单栏
     private OnToggleListener mListener;
+    private boolean oldMenuState = false;   //上一次菜单的状态（这一次状态的前一次）
+
 
     private Scroller scroller;
 
     public SlidingUpMenu(Context context) {
         super(context);
-        scroller=new Scroller(context);
+        scroller = new Scroller(context);
     }
 
     public SlidingUpMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
-        scroller=new Scroller(context);
+        scroller = new Scroller(context);
     }
 
     @Override
@@ -87,7 +90,7 @@ public class SlidingUpMenu extends ViewGroup {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         int action = event.getAction();
-        switch (action){
+        switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDownX = event.getX();
                 mDownY = event.getY();
@@ -153,22 +156,22 @@ public class SlidingUpMenu extends ViewGroup {
     /**
      * 该变布局
      *
-     * @param isTop  true --显示头部菜单
+     * @param isTop true --显示头部菜单
      */
     private void switchMenu(boolean isTop) {
-
-        if (mListener!=null){
-            mListener.onToggleChange(this,isTop);
+        if (mListener != null) {
+            mListener.onToggleChange(this,oldMenuState, isTop);
         }
-        this.mUpMenuOpen=isTop;
+        oldMenuState = isTop;
+        this.mUpMenuOpen = isTop;
 
         if (isTop) {
             // 开始移动时的X，Y坐标
             int startX = getScrollX();
             int startY = getScrollY();
             // XY的偏移量
-            int dx = 0 - startX ;
-            int dy =-mTopView.getHeight() - startY;
+            int dx = 0 - startX;
+            int dy = -mTopView.getHeight() - startY;
             int duration = Math.abs(dy) * 10;
             if (duration > 600) {
                 duration = 600;
@@ -198,23 +201,24 @@ public class SlidingUpMenu extends ViewGroup {
     public void computeScroll() {
         super.computeScroll();
         if (scroller.computeScrollOffset()) {
-            scrollTo(0,scroller.getCurrY());
+            scrollTo(0, scroller.getCurrY());
         }
         invalidate();
     }
 
     /**
      * 获取头部菜单状态
+     *
      * @return
      */
-    public boolean getMenuState(){
+    public boolean getMenuState() {
         return mUpMenuOpen;
     }
 
     /**
      * 打开头部菜单
      */
-    public void openMenu(){
+    public void openMenu() {
         switchMenu(true);
     }
 
@@ -222,20 +226,21 @@ public class SlidingUpMenu extends ViewGroup {
      * 关闭头部菜单
      */
 
-    public void closeMenu(){
+    public void closeMenu() {
         switchMenu(false);
     }
 
     /**
      * 监听头部菜单状态
-     * @param listener  监听者
+     *
+     * @param listener 监听者
      */
-    public void setOnToggleListener(OnToggleListener listener){
-        this.mListener=listener;
+    public void setOnToggleListener(OnToggleListener listener) {
+        this.mListener = listener;
     }
 
-    public interface  OnToggleListener{
-        void onToggleChange(SlidingUpMenu view,boolean isOpen);
+    public interface OnToggleListener {
+        void onToggleChange(SlidingUpMenu view,boolean oldMenuState, boolean isOpen);
     }
 
 }

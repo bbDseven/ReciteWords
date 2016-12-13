@@ -608,9 +608,9 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
 
     //监听例句是否显示
     @Override
-    public void onToggleChange(SlidingUpMenu view, boolean isOpen) {
+    public void onToggleChange(SlidingUpMenu view,boolean oldMenuState, boolean isOpen) {
         if (mOnToggleListner != null) {
-            mOnToggleListner.onToggleChange(view, isOpen);
+            mOnToggleListner.onToggleChange(view,oldMenuState, isOpen);
         }
     }
 
@@ -623,7 +623,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     }
 
     public interface OnToggleListner {
-        void onToggleChange(SlidingUpMenu view, boolean isOpen);
+        void onToggleChange(SlidingUpMenu view,boolean oldMenuState, boolean isOpen);
     }
 
     /**

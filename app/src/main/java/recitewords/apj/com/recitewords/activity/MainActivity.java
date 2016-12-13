@@ -3,6 +3,7 @@ package recitewords.apj.com.recitewords.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -51,7 +52,6 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mScroller = new Scroller(this);    // 创建scroller
         initView();
         initData();
@@ -101,7 +101,8 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     // SlidingUpPanelLayout页面滑动addPanelSlideListener的回调方法
     //状态改变
     @Override
-    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
+                                    SlidingUpPanelLayout.PanelState newState) {
         //状态由EXPANDED（打开）变成COLLAPSED（关闭），设置字体颜色为白色
         if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             FragmentManager fragmentManager = getFragmentManager();

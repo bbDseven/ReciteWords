@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 /**
  * Created by CGT on 2016/11/22.
+ *
+ * Fragment基类
  */
 public abstract class BaseFragment extends Fragment {
 
@@ -25,8 +27,8 @@ public abstract class BaseFragment extends Fragment {
     // 处理fragment的布局
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e("baseFragment","onStart");
         return initView();
-
     }
 
     // 承载Fragment的Activity创建完成

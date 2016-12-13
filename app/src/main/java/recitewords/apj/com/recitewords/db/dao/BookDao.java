@@ -479,6 +479,22 @@ public class BookDao {
     }
 
     /**
+     * 重置词书
+     *
+     * @param book_name 词书名字
+     * @return 受影响行数
+     */
+    public int updateResetBook(String book_name) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("word_is_study", 0);
+        values.put("word_is_grasp", 0);
+        values.put("grasp_values", "");
+        values.put("date", DateUtil.getNowDate("yyyy-MM-dd"));
+        return db.update("book", values, "book_name=?", new String[]{book_name});
+    }
+
+    /**
      * 更新单词是否为已掌握
      *
      * @param book_name 词书名字
@@ -524,7 +540,7 @@ public class BookDao {
     }
 
     /**
-     * 更新日期
+     * 重学
      *
      * @param book_name 词书名字
      * @param word      单词

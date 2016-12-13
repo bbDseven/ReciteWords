@@ -158,6 +158,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public MainFragment(Context context) {
         this.mContext = context;
     }
+    public MainFragment(){
+    }
 
     @Override
     public View initView() {
