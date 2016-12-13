@@ -122,7 +122,10 @@
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <!-- 添加ShareSDK必要的activit上面 -->
-        <activity android:name=".activity.TestActivity"></activity>
+        <activity android:name=".activity.TestActivity" />
+        <activity android:name=".activity.LibraryAllLearnActivity" />
+        <activity android:name=".activity.LibraryAllGraspActivity" />
+        <activity android:name=".activity.NewWordsActivity"></activity>
     </application>
 
 </manifest>

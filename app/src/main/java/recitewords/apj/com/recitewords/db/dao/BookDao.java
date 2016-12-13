@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
+import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.globle.Review;
 import recitewords.apj.com.recitewords.util.DateUtil;
 
@@ -32,6 +35,16 @@ public class BookDao {
         helper = new ReciteWordsSQLiteOpenHelper(context, MainActivity.dbName, 1);
     }
 
+    /**
+     * 创建不同的数据库
+     *
+     * @param context 上下文
+     * @param dbName  数据库名字
+     */
+    public BookDao(Context context, String dbName) {
+        helper = new ReciteWordsSQLiteOpenHelper(context, dbName, 1);
+    }
+
 
     /**
      * 增加单词的方法
@@ -48,8 +61,37 @@ public class BookDao {
     }
 
     /**
+     * 查询所有单词
+     *
+     * @param book_name 词书名字
+     * @return list
+     */
+
+    public List<Book> queryAllWOrd(String book_name) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ArrayList<Book> books = new ArrayList<>();
+        Cursor cursor = db.query("book", null, "book_name=?",
+                new String[]{book_name}, null, null, null, null);
+        while (cursor.moveToNext()) {
+            Book book = new Book();
+            book.setWord(cursor.getString(cursor.getColumnIndex("word")));
+            book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
+            book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
+            book.setWord_mean(cursor.getString(cursor.getColumnIndex("word_mean")));
+            book.setBook_name(cursor.getString(cursor.getColumnIndex("book_name")));
+            book.setGrasp_values(cursor.getString(cursor.getColumnIndex("grasp_values")));
+            book.setDate(cursor.getString(cursor.getColumnIndex("date")));
+            book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
+            books.add(book);
+        }
+        return books;
+    }
+
+
+    /**
      * 查询需要复习的单词，返回20条数据
      *
+     * @param book_name 词书名字
      * @return 单词信息
      */
     public List<Book> queryReviewWOrd(String book_name) {
@@ -153,10 +195,17 @@ public class BookDao {
      */
     public List<Book> queryALLReviewWords(String book_name) {
         int day;   //相差日期
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         ArrayList<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
-                new String[]{"1", "0", book_name}, null, null, null, null);
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
+                    new String[]{"1", "0"}, null, null, null, null);
+        } else {
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=? and book_name=?",
+                    new String[]{"1", "0", book_name}, null, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             //熟悉程度
@@ -278,17 +327,17 @@ public class BookDao {
 
 
     /**
-     * 查看某一天已学习的单词总数
+     * 查看某一天已学习的单词总数,如果词书名字为空，则为查询全部词书
      *
-     * @param book_name 词书名字
-     * @param date      日期
+     * @param date 日期
      * @return list
      */
-    public List<Book> queryDayLearn(String book_name, String date) {
+    public List<Book> queryDayLearn(String date) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and date=? and word_is_study=?",
-                new String[]{book_name, date, "1"}, null, null, null);
+        cursor = db.query("book", null, "date=? and word_is_study=?",
+                new String[]{date, "1"}, null, null, null);
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -306,16 +355,27 @@ public class BookDao {
 
 
     /**
-     * 查看全部已学习的单词总数
+     * 查看全部已学习的单词总数，如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllLearn(String book_name) {
         SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor;
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_study=?",
-                new String[]{book_name, "1"}, null, null, null);
+        if (TextUtils.isEmpty(book_name)) {  //查询所有完成学习单词（不管是否掌握，不管词书）
+            cursor = db.query("book", null, "word_is_study=?",
+                    new String[]{"1"}, null, null, null);
+        } else if (book_name.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)) {
+            //查询某一个词书和生词本已完成学习的（不管是否掌握）
+            cursor = db.query("book", null, "( book_name=? or book_name=? ) and word_is_study=?",
+                    new String[]{AppConfig.BOOK_NAME, AppConfig.BOOK_NEW_WORDS, "1"}, null, null, null);
+        } else {  //查询某一个词书已完成学习的（不管是否掌握）
+            cursor = db.query("book", null, "book_name=? and word_is_study=?",
+                    new String[]{book_name, "1"}, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -328,21 +388,30 @@ public class BookDao {
             book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
             books.add(book);
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
 
     /**
-     * 查看正在复习的单词（已完成学习但未掌握的）
+     * 查看正在复习的单词（已完成学习但未掌握的），
+     * 如果词书名字为空，则为查询全部词书,
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllRevewing(String book_name) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_study=? and word_is_grasp=?",
-                new String[]{book_name, "1","0"}, null, null, null);
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "word_is_study=? and word_is_grasp=?",
+                    new String[]{"1", "0"}, null, null, null);
+        } else {
+            cursor = db.query("book", null, "book_name=? and word_is_study=? and word_is_grasp=?",
+                    new String[]{book_name, "1", "0"}, null, null, null);
+        }
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -359,18 +428,28 @@ public class BookDao {
     }
 
 
-
     /**
-     * 查看全部已掌握的单词总数
+     * 查看全部已掌握的单词总数，如果词书名字为空，则为查询全部词书
      *
      * @param book_name 词书名字
      * @return list
      */
     public List<Book> queryAllGrasp(String book_name) {
+        Cursor cursor;
         SQLiteDatabase db = helper.getWritableDatabase();
         List<Book> books = new ArrayList<>();
-        Cursor cursor = db.query("book", null, "book_name=? and word_is_grasp =?",
-                new String[]{book_name, "1"}, null, null, null);
+
+        if (TextUtils.isEmpty(book_name)) {
+            cursor = db.query("book", null, "word_is_grasp =?",
+                    new String[]{"1"}, null, null, null);
+        } else if (book_name.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)) {
+            cursor = db.query("book", null, "word_is_grasp =? and ( book_name=? or book_name=? )",
+                    new String[]{"1", AppConfig.BOOK_NAME, AppConfig.BOOK_NEW_WORDS}, null, null, null);
+        } else {
+            cursor = db.query("book", null, "book_name=? and word_is_grasp =?",
+                    new String[]{book_name, "1"}, null, null, null);
+        }
+
         while (cursor.moveToNext()) {
             Book book = new Book();
             book.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -387,6 +466,17 @@ public class BookDao {
     }
 
 
+    /**
+     * 删除单词
+     *
+     * @param book_name 词书名字
+     * @param word      单词
+     * @return 受影响行数
+     */
+    public int deleteWords(String book_name, String word) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        return db.delete("book", "book_name=? and word=?", new String[]{book_name, word});
+    }
 
     /**
      * 更新单词是否为已掌握
@@ -440,16 +530,15 @@ public class BookDao {
      * @param word      单词
      * @return 受影响行数
      */
-    public int updateLearnAgain(String book_name, String word){
+    public int updateLearnAgain(String book_name, String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("date ", DateUtil.getNowDate("yyyy-MM-dd"));
-        values.put("word_is_study",0);
-        values.put("word_is_grasp",0);
-        values.put("grasp_values","F");
+        values.put("word_is_study", 0);
+        values.put("word_is_grasp", 0);
+        values.put("grasp_values", "F");
         return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
     }
-
 
 
     /**
@@ -519,6 +608,13 @@ public class BookDao {
             if (wordInfo.moveToFirst()) {
                 book.setSoundmark_american(wordInfo.getString(wordInfo.getColumnIndex("soundmark_american")));
                 book.setWord_mean(wordInfo.getString(wordInfo.getColumnIndex("word_mean")));
+                book.setWord(wordInfo.getString(wordInfo.getColumnIndex("word")));
+                book.setSoundmark_british(wordInfo.getString(wordInfo.getColumnIndex("soundmark_british")));
+                book.setWord_mean(wordInfo.getString(wordInfo.getColumnIndex("word_mean")));
+                book.setBook_name(wordInfo.getString(wordInfo.getColumnIndex("book_name")));
+                book.setGrasp_values(wordInfo.getString(wordInfo.getColumnIndex("grasp_values")));
+                book.setDate(wordInfo.getString(wordInfo.getColumnIndex("date")));
+                book.setUserID(wordInfo.getInt(wordInfo.getColumnIndex("userID")));
                 return book;
             }
         }

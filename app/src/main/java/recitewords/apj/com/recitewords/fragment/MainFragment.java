@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +52,7 @@ import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.UserDao;
 import recitewords.apj.com.recitewords.db.dao.WordReviewDao;
 import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
+import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.PrefUtils;
@@ -59,7 +61,7 @@ import recitewords.apj.com.recitewords.view.CircleImageView;
 
 /**
  * Created by CGT on 2016/11/22.
- * <p>
+ * <p/>
  * 主页面Fragment
  */
 public class MainFragment extends BaseFragment implements View.OnClickListener {
@@ -73,10 +75,28 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             R.mipmap.haixin_bg_dim_03, R.mipmap.haixin_bg_dim_04,
             R.mipmap.haixin_bg_dim_05, R.mipmap.haixin_bg_dim_06};
     //单词集合
-    private static List<String> list = new ArrayList(){{add("abandon"); add("ability"); add("able");
-        add("aboard"); add("about"); add("abroad"); add("absorb"); add("angry"); add("animal");
-        add("anniversary"); add("announce"); add("bankrupt"); add("barber"); add("computer"); add("economic");
-        add("election"); add("murder"); add("progress"); add("religious"); add("smart"); }};
+    private static List<String> list = new ArrayList() {{
+        add("abandon");
+        add("ability");
+        add("able");
+        add("aboard");
+        add("about");
+        add("abroad");
+        add("absorb");
+        add("angry");
+        add("animal");
+        add("anniversary");
+        add("announce");
+        add("bankrupt");
+        add("barber");
+        add("computer");
+        add("economic");
+        add("election");
+        add("murder");
+        add("progress");
+        add("religious");
+        add("smart");
+    }};
 
     private class ViewHolder {
         RelativeLayout activity_main;
@@ -113,6 +133,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private EditText et_query;  //查询单词的输入框
     private MyAdapter mAdapter; //lv的适配器
     private ImageView iv_query_delete;//输入框的叉叉按钮
+    private TextView add_new_word;  //添加到生词本
     private List<String> list_word = new ArrayList<>(); //lv的数据源
     private ListView lv_query;  //listview
     private LinearLayout ll_query_wordInfo;    //单词信息的布局
@@ -124,10 +145,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private TextView tv_word_sentence_mean;//例句意思
     private TextView tv_word_sentence1;    //例句2
     private TextView tv_word_sentence_mean1;  //例句2意思
-    private String book_name="CET4";
+    private String book_name = "CET4";
+    private Book book;
+    private WordExampleSentence bean_sentence;
+
 
     private int mReviewWordSum;  //需要复习的单词总数
     private UserDao userDao;
+
     //带参构造方法
     public MainFragment(Context context) {
         this.mContext = context;
@@ -210,17 +235,17 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         User bean_user = userDao.query();
         String sign_in = bean_user.getSign_in();    //获取签到信息
         int day = bean_user.getSign_in_continue();
-        if (!sign_in.equals(DateUtil.getYMD())){    //判断今天是否签到
+        if (!sign_in.equals(DateUtil.getYMD())) {    //判断今天是否签到
             holder.ll_sign.setVisibility(View.VISIBLE); //显示签到布局
             holder.ll_sign_succeed.setVisibility(View.GONE);    //隐藏签到成功布局
-        }else {
+        } else {
             holder.ll_sign.setVisibility(View.GONE);    //隐藏签到布局
             holder.ll_sign_succeed.setVisibility(View.VISIBLE); //显示签到成功布局
             //设置酷币和连续签到天数  数字的颜色
             setMoneyColor();
             setDayColor(day);
         }
-        if (holder.ll_sign.getVisibility() == View.VISIBLE){    //如果还没签到
+        if (holder.ll_sign.getVisibility() == View.VISIBLE) {    //如果还没签到
             holder.iv_sign.setOnClickListener(this);    //设置签到圆圈的点击事件
         }
     }
@@ -278,14 +303,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         BookDao bookDao = new BookDao(mContext);
         bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
         bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "F","2001-11-11", "CET4", 0);
+        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "F", "2001-11-11", "CET4", 0);
         bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
         bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的 n.修士，修女，出家人", 1, 0, "F", "2016-01-28", "CET4", 0);
         bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "F",  "2016-01-28", "CET4", 0);
+        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "F", "2016-01-28", "CET4", 0);
         bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性 adj.动物的;肉体的;肉欲的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
         bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 n.放任，放纵;完全屈从于压制", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "F",  "2016-10-28", "CET4", 0);
+        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "F", "2016-10-28", "CET4", 0);
         bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 1, 0, "F", "2016-10-28", "CET4", 0);
         bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车） adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
         bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
@@ -293,45 +318,45 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;吞并，合并;忍受，承担（费用）", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
         bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;（伤口等）发炎的", 1, 0, "F", "2016-05-01", "CET4", 0);
         bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;周年纪念的;年年的;每年的", 1, 0, "F", "2016-05-01", "CET4", 0);
-        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "F","2016-12-01", "CET4", 0);
+        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "F", "2016-12-01", "CET4", 0);
         bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "F","2016-12-01", "CET4", 0);
+        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "F", "2016-12-01", "CET4", 0);
     }
 
     /**
      * 插入复习单词
-     * <p>
+     * <p/>
      * 模拟需要复习的单词
      */
     public void insertWordReview() {
         WordReviewDao dao = new WordReviewDao(mContext);
 
         dao.addWord("economic", "", "", "", "", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]",
-                "adj.经济的;经济学的;合算的;有经济效益的", "", 0, "","", "CET4", 0);
+                "adj.经济的;经济学的;合算的;有经济效益的", "", 0, "", "", "CET4", 0);
 
         dao.addWord("election", "", "", "", "", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]",
-                "n.选举，当选;选举权;[神]神的选择", "", 0, "","", "CET4", 0);
+                "n.选举，当选;选举权;[神]神的选择", "", 0, "", "", "CET4", 0);
 
         dao.addWord("murder", "", "", "", "", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]",
                 "n.谋杀;杀戮;极艰难[令人沮丧]的经历\n" +
                         "vt.凶杀;糟蹋;打垮\n" +
-                        "vi.杀人\n", "", 0, "", "","CET4", 0);
+                        "vi.杀人\n", "", 0, "", "", "CET4", 0);
 
         dao.addWord("progress", "", "", "", "", "[ˈprɑ:gres]", "[ˈprəʊgres]",
                 "n.进步;前进;[生物学]进化;（向更高方向）增长\n" +
                         "v.发展;（使）进步，（使）进行;促进\n" +
-                        "vi.发展;（向更高方向）增进\n", "", 0, "", "","CET4", 0);
+                        "vi.发展;（向更高方向）增进\n", "", 0, "", "", "CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]",
                 "adj.宗教的;虔诚的;笃信宗教的;谨慎的\n" +
-                        "n.修士，修女，出家人\n", "", 0, "", "","CET4", 0);
+                        "n.修士，修女，出家人\n", "", 0, "", "", "CET4", 0);
 
         dao.addWord("religious", "", "", "", "", "[smɑ:rt]", "[smɑ:t]",
                 "adj.聪明的;敏捷的;漂亮的;整齐的\n" +
                         "vi.疼痛;感到刺痛;难过\n" +
                         "n.创伤;刺痛;疼痛;痛苦\n" +
                         "vt.引起…的疼痛（或痛苦、苦恼等）\n" +
-                        "adv.聪明伶俐地，轻快地，漂亮地\n", "", 0, "", "","CET4", 0);
+                        "adv.聪明伶俐地，轻快地，漂亮地\n", "", 0, "", "", "CET4", 0);
 //        dao.addWord("religious", "", "", "", "", "", "", "","", "", "CET4", 0);
     }
 
@@ -388,8 +413,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         dao.addWord("bankrupt", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
         dao.addWord("computer", "", "", "", "", "", "", "", "", 0, "", "CET4", 0);
     }
+
     //添加用户信息表信息
-    private void insertUser(){
+    private void insertUser() {
         UserDao dao = new UserDao(mContext);
         dao.add("11", 0, 0);
     }
@@ -407,7 +433,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                     mainActivity.setNavigateShow();
                 }
                 mainActivity.setNavigateShowState(!navigateShowState);
-               // Log.e("ha", "点击了，状态后为：" + navigateShowState);
+                // Log.e("ha", "点击了，状态后为：" + navigateShowState);
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面
@@ -462,6 +488,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 et_query = UIUtil.findViewByIds(view, R.id.et_query);
                 iv_query_delete = UIUtil.findViewByIds(view, R.id.iv_query_delete);//输入框的叉叉按钮
                 Button btn_cancel_query = UIUtil.findViewByIds(view, R.id.btn_cancel_query);//取消按钮
+                add_new_word = UIUtil.findViewByIds(view, R.id.add_new_word);  //添加到生词本
                 lv_query = UIUtil.findViewByIds(view, R.id.lv_query);//listview
                 ll_query_wordInfo = UIUtil.findViewByIds(view, R.id.ll_query_wordInfo);    //单词信息的布局
                 iv_word_voice = UIUtil.findViewByIds(view, R.id.iv_word_voice); //单词的发音图标
@@ -482,6 +509,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 iv_query_delete.setOnClickListener(this);
                 btn_cancel_query.setOnClickListener(this);
                 iv_word_voice.setOnClickListener(this);
+                add_new_word.setOnClickListener(this);
                 this.dialog.show();
                 break;
             case R.id.iv_query_delete:
@@ -492,6 +520,21 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 //取消查询的点击事件
                 this.dialog.dismiss();
                 list_word.clear();
+                break;
+            case R.id.add_new_word:
+                //创建生词本数据库
+                BookDao bookDao = new BookDao(mActivity);
+                ExampleSentenceDao exampleDao = new ExampleSentenceDao(mActivity);
+                bookDao.addWord(book.getWord(), book.getSoundmark_american(),
+                        book.getSoundmark_british(), book.getWord_mean(),
+                        0, 0, "", book.getDate(), AppConfig.BOOK_NEW_WORDS, book.getUserID());
+                exampleDao.insert(bean_sentence.getWord(), bean_sentence.getExample_sentence(),
+                        bean_sentence.getExample_sentence_mean(),
+                        bean_sentence.getExample_sentence_pronounce(),
+                        bean_sentence.getExample_sentence_resource());
+
+                Toast.makeText(mActivity, "成功添加到生词本", Toast.LENGTH_SHORT).show();
+
                 break;
             case R.id.iv_word_voice:
                 //查询单词界面发音
@@ -508,7 +551,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 int cool_money = bean_user.getCool_money(); //获取酷币
                 int sign_in_continue1 = 1;
                 int cool_money1 = cool_money + 20;
-                if (Integer.parseInt(DateUtil.getYMD()) - Integer.parseInt(sign_in) == 1){
+                if (Integer.parseInt(DateUtil.getYMD()) - Integer.parseInt(sign_in) == 1) {
                     sign_in_continue1 = sign_in_continue + 1;
                 }
                 userDao.update(DateUtil.getYMD(), sign_in_continue1, cool_money1);  //更新用户信息
@@ -522,16 +565,17 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     //设置获取酷币个数的数字颜色
-    private void setMoneyColor(){
+    private void setMoneyColor() {
         String sign_money = holder.tv_sign_money.getText().toString();
         SpannableStringBuilder style = new SpannableStringBuilder(sign_money);
         int start = sign_money.indexOf("20");
-        style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, start+2, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, start + 2, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         holder.tv_sign_money.setText(style);
     }
+
     //设置连续签到天数的颜色
-    private void setDayColor(int day){
-        String sign_day = "连续签到"+day+"天";
+    private void setDayColor(int day) {
+        String sign_day = "连续签到" + day + "天";
         SpannableStringBuilder style1 = new SpannableStringBuilder(sign_day);
         int start1 = sign_day.indexOf(String.valueOf(day));
         int end1 = String.valueOf(day).length() + start1;
@@ -540,18 +584,18 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     //搜索框ext和ListView设置监听
-    private void setListener(){
+    private void setListener() {
         et_query.setOnKeyListener(onKeyListener);   //设置输入法软键盘右下角按钮监听器
         et_query.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     data = et_query.getText().toString();
-                    if (list.contains(data)){
+                    if (list.contains(data)) {
                         //设置单词信息
                         setWordInfo();
                         return false;
-                    }else {
+                    } else {
                         ll_query_wordInfo.setVisibility(View.GONE);//隐藏单词信息
                         lv_query.setVisibility(View.VISIBLE);   //显示listView
                         return true;//这里返回true表示方法回调完系统不需再处理。
@@ -571,17 +615,18 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
+
             //文本变化后
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() > 0){    //文本内容大于0
+                if (s.length() > 0) {    //文本内容大于0
                     iv_query_delete.setVisibility(View.VISIBLE);    //显示删除按钮
                     list_word.clear();  //先清空lv集合数据
                     showListViewData(); //再添加数据
                     mAdapter.notifyDataSetChanged();    //通知lv更新
                     lv_query.setVisibility(View.VISIBLE);   //显示listview
                     ll_query_wordInfo.setVisibility(View.GONE); //隐藏单词信息
-                }else {
+                } else {
                     iv_query_delete.setVisibility(View.GONE);   //隐藏删除按钮
                     list_word.clear();  //清空集合数据
                     mAdapter.notifyDataSetChanged();    //通知lv更新
@@ -601,7 +646,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 setWordInfo();  //设置单词信息
                 //隐藏软键盘
                 InputMethodManager manager = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (manager.isActive()){
+                if (manager.isActive()) {
                     manager.hideSoftInputFromWindow(et_query.getWindowToken(), 0);
                 }
             }
@@ -609,10 +654,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     //设置单词信息
-    private void setWordInfo(){
+    private void setWordInfo() {
         lv_query.setVisibility(View.GONE);//隐藏lv
         ll_query_wordInfo.setVisibility(View.VISIBLE);//显示单词信息布局
-        Book book = queryBook(data);//查询单词信息
+
+        book = queryBook(data); //查询单词信息
         tv_word_soundmark.setText(book.getSoundmark_american());//设置音标
         tv_word_mean.setText(book.getWord_mean());//设置单词意思
 
@@ -633,18 +679,19 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         Book book = bookDao.query_wordInfo(word);
         return book;
     }
+
     //获取例句表的查询例句信息方法返回WordExampleSentence的bean对象
-    private WordExampleSentence querySentence(String word){
+    private WordExampleSentence querySentence(String word) {
         ExampleSentenceDao sentenceDao = new ExampleSentenceDao(mActivity);
-        WordExampleSentence bean_sentence = sentenceDao.query(word);
+        bean_sentence = sentenceDao.query(word);  //查询例句
         return bean_sentence;
     }
 
     //将总集合里的数据里包含文本框的数据添加到ListView数据集合
     private void showListViewData() {
         String data = et_query.getText().toString();
-        for (int i=0; i<list.size(); i++){
-            if (list.get(i).contains(data)){
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).contains(data)) {
                 list_word.add(list.get(i));
             }
         }
@@ -665,7 +712,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         }
     };
 
-    class MyAdapter extends BaseAdapter{
+    class MyAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
@@ -684,15 +731,15 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-                View view;
-                if (convertView != null) {
-                    view = convertView;
-                } else {
-                    view = View.inflate(mActivity, R.layout.listview_query, null);
-                }
-                TextView tv_lv = UIUtil.findViewByIds(view, R.id.tv_lv);
-                tv_lv.setText(list_word.get(position));
-                return view;
+            View view;
+            if (convertView != null) {
+                view = convertView;
+            } else {
+                view = View.inflate(mActivity, R.layout.listview_query, null);
+            }
+            TextView tv_lv = UIUtil.findViewByIds(view, R.id.tv_lv);
+            tv_lv.setText(list_word.get(position));
+            return view;
         }
     }
 
@@ -700,7 +747,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private void takePhoto() {
         File outputImage = new File(Environment.getExternalStorageDirectory(), "tempImage.jpg"); //创建文件在sd卡并命名
         try {
-            if (outputImage.exists()){
+            if (outputImage.exists()) {
                 outputImage.delete();   //如果文件存在则删除文件
             }
             outputImage.createNewFile();    //创建文件
@@ -733,9 +780,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode){
+        switch (requestCode) {
             case TAKE_PHOTO:    //相机执行完的回调
-                if (resultCode == mActivity.RESULT_OK){
+                if (resultCode == mActivity.RESULT_OK) {
                     Intent intent = new Intent("com.android.camera.action.CROP");   //跳转到图片裁剪
                     intent.setDataAndType(imageUri, "image/*"); //设置数据和类型
                     intent.putExtra("scale", true);     //设置可缩放
@@ -744,7 +791,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 }
                 break;
             case CROP_PHOTO:    //裁剪执行完的回调
-                if (resultCode == mActivity.RESULT_OK){
+                if (resultCode == mActivity.RESULT_OK) {
                     holder.main_img_circle.setImageURI(null);   //先设置为null，防止第二次点击拍摄时头像不更新
                     holder.main_img_circle.setImageURI(imageUri);   //设置头像
                     SharedPreferences sp = PrefUtils.getPref(mActivity);
@@ -753,7 +800,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 }
                 break;
             case CHOICE_PHOTO:      //选择完图片的回调
-                if (resultCode == mActivity.RESULT_OK){     //从相册选择照片不裁切
+                if (resultCode == mActivity.RESULT_OK) {     //从相册选择照片不裁切
                     try {
                         selectedImage = data.getData();//获取系统返回的照片的Uri
                         Intent intent = new Intent("com.android.camera.action.CROP");   //跳转到图片裁剪

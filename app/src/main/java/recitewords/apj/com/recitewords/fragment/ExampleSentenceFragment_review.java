@@ -117,7 +117,7 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
         sentence_pronounce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MediaUtils.playWord(mActivity, "abroad");
+                MediaUtils.playWord(mActivity, word);
             }
         });
     }
@@ -133,7 +133,7 @@ public class ExampleSentenceFragment_review extends BaseFragment implements Revi
     public void onmToggleChange(SlidingUpMenu view, boolean isOpen) {
         if (isOpen) {
             //显示例句
-            MediaUtils.playWord(mActivity, "abroad");
+            MediaUtils.playWord(mActivity, word);
         }
     }
 

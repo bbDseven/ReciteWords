@@ -31,7 +31,8 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     private static final String FRAGMENT_SLIDING = "fragment_sliding";  //滑动页面Fragment标识
 
     public static int userID = 0;  //userID,用户的登陆ID
-    public static String dbName = "ReciteWords_" + userID + ".db";   //数据库名字
+    public static final String dbName = "ReciteWords_" + userID + ".db";   //数据库名字
+    public static final String NEWWORDSDB="ReciteWords_NewWords"+userID+".db";  //生词本数据库名字
 
     private static final String TAG = "MainActivity";
     public ViewHolder holder;

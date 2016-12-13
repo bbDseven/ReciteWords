@@ -12,7 +12,7 @@ import android.view.View;
 /**
  * Created by Greetty on 2016/12/9.
  *
- * 分割线
+ * RecyclerView分割线
  */
 public class MyDecoration  extends RecyclerView.ItemDecoration{
 

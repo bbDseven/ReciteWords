@@ -210,11 +210,24 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                             holder.spell_tv_situation.setText(passIndexs.size() + "/" + mReviewWords.size());
                         }
                     }
+                    if (mSpellIndex>=mReviewWords.size()){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("温馨提醒：");
+                        builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                        AlertDialog alertDialog = builder.create();
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                        alertDialog.show();
+                    }
 
                 } else {
                     //改变文字颜色--红色
                     holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
-                    MediaUtils.playWord(this, "abroad");  //播放单词
+                    MediaUtils.playWord(this, mWord);  //播放单词
                     holder.spell_tv_correct.setText(mWord);  //显示正确的单词
                     if (SpellMode.equals("spell")) {
 
@@ -231,6 +244,19 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
 
                     holder.spell_tv_correct.setVisibility(View.VISIBLE);
                     is_Pass = false;  //错误一次，不是一次通过
+                    if (mSpellIndex>=mReviewWords.size()){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("温馨提醒：");
+                        builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                        AlertDialog alertDialog = builder.create();
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                        alertDialog.show();
+                    }
                 }
                 havaing_comfirm = true;  //改变是否比较状态
                 break;
@@ -282,7 +308,12 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             builder.setTitle("温馨提醒：");
             builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
             AlertDialog alertDialog = builder.create();
-            builder.setPositiveButton("确定", null);
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
             alertDialog.show();
         }
     }
