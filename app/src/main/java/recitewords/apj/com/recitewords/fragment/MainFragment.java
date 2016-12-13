@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -194,11 +195,20 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //每次进入页面时，刷新数据
+        BookDao bookDao = new BookDao(mActivity);
+        mReviewWordSum = bookDao.queryALLReviewWords(book_name).size();
+        //显示需要复习的单词总数
+        holder.main_tv_review_num.setText(mReviewWordSum + "");
+    }
+
+    @Override
     public void initData() {
         num = randomNum();
         //为主界面设置随机图片和图片对应单词
         holder.activity_main.setBackgroundResource(imgs[num]);
-
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
@@ -226,12 +236,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         if (!TextUtils.isEmpty(sp_imageUri)) {
             holder.main_img_circle.setImageURI(Uri.parse(sp_imageUri));
         }
-        //获取徐复习单词总数，并显示
-
-        BookDao bookDao = new BookDao(mActivity);
-        mReviewWordSum = bookDao.queryALLReviewWords(book_name).size();
-        holder.main_tv_review_num.setText(mReviewWordSum + "");
-
         //获取今天是否已签到
         userDao = new UserDao(mActivity);
         User bean_user = userDao.query();

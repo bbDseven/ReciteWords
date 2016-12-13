@@ -301,13 +301,25 @@ public class SlidingFragment extends BaseFragment {
     }
 
     /**
+     * 为了保证每次返回页面时刷新数据
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        init_StatData();
+        init__LibraryData();
+
+    }
+
+
+    /**
      * 统计Viewpager
      *
      * @param view view
      */
     private void statistics(View view) {
         init_StatView(view);
-        init_StatData();
+//        init_StatData();
     }
 
     /**
@@ -401,7 +413,7 @@ public class SlidingFragment extends BaseFragment {
      */
     private void library(View view) {
         init_LibraryView(view);
-        init__LibraryData();
+//        init__LibraryData();
     }
 
 
@@ -526,10 +538,20 @@ public class SlidingFragment extends BaseFragment {
                 }
             }
         });
+
         holder.library_new_words_see.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mActivity, NewWordsActivity.class));
+                if (newWordsList.size() <= 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }else {
+                    startActivity(new Intent(mActivity, NewWordsActivity.class));
+                }
             }
         });
 
