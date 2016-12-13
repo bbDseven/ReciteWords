@@ -74,7 +74,8 @@ public class NewWordsActivity extends BaseActivity implements View.OnClickListen
                 //提示说明
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("温馨提示：");
-                builder.setMessage("向左滑动后悔出现”删除“按钮，点击删除按钮可以将单词从生词本中删除");
+                builder.setMessage("向左滑动后会出现”删除“按钮，点击删除按钮可以将单词从生词本中删除，" +
+                        "如果生词本中有两个或两个以上一样的单词，会全部删除喔");
                 builder.setPositiveButton("臣妾知道啦", null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();

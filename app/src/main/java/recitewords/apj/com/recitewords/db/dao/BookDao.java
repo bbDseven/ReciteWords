@@ -505,6 +505,7 @@ public class BookDao {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("word_is_grasp ", 1);
+        values.put("date",DateUtil.getNowDate("yyyy-MM-dd"));
         return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
     }
 

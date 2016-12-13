@@ -52,11 +52,12 @@ public class BookProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        return db.delete("book", selection, selectionArgs);
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        return db.update("book", values, selection, selectionArgs);
+
     }
 }

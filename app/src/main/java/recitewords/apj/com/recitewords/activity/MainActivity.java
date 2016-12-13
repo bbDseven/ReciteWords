@@ -144,6 +144,7 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
 //                    int dy=startY;
 //                    mScroller.startScroll(0,startY,0,dy,1000);
                     holder.mLayout.scrollTo(0, 0);
+//                    holder.mLayout.
                 } else {
                     //显示底部菜单栏
 //                    int startY=holder.mLayout.getScrollY();

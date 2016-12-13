@@ -532,8 +532,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 list_word.clear();
                 break;
             case R.id.add_new_word:
-                //创建生词本数据库
-
+                //插入到数据库中
                 ContentResolver cr = mActivity.getContentResolver();
                 ContentValues values = new ContentValues();
                 values.put("word",book.getWord());
