@@ -54,10 +54,10 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         setContentView(R.layout.activity_main);
 
 //
-//        mScroller = new Scroller(this);    // 创建scroller
-//        initView();
-//        initData();
-//        initEvent();
+        mScroller = new Scroller(this);    // 创建scroller
+        initView();
+        initData();
+        initEvent();
     }
 
     @Override
@@ -65,10 +65,10 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         super.onResume();
 
         //在onResume方法中，可以返回主页面时重新刷新
-        mScroller = new Scroller(this);    // 创建scroller
-        initView();
-        initData();
-        initEvent();
+//        mScroller = new Scroller(this);    // 创建scroller
+//        initView();
+//        initData();
+//        initEvent();
 
     }
 

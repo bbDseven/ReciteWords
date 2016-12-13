@@ -223,13 +223,25 @@ public class SlidingFragment extends BaseFragment {
 
 
     /**
+     * 为了保证每次返回页面时刷新数据
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        init_StatData();
+        init__LibraryData();
+
+    }
+
+
+    /**
      * 统计Viewpager
      *
      * @param view view
      */
     private void statistics(View view) {
         init_StatView(view);
-        init_StatData();
+//        init_StatData();
     }
 
     /**
@@ -279,7 +291,7 @@ public class SlidingFragment extends BaseFragment {
      */
     private void library(View view) {
         init_LibraryView(view);
-        init__LibraryData();
+//        init__LibraryData();
     }
 
 

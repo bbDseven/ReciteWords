@@ -3,6 +3,7 @@ package recitewords.apj.com.recitewords.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,7 @@ public abstract class BaseFragment extends Fragment {
         initData();
     }
 
-    public <E extends View>E findViewByIds(View view,int id){
+    public <E extends View>E findViewByIds(View view, int id){
         return (E) view.findViewById(id);
     }
 
