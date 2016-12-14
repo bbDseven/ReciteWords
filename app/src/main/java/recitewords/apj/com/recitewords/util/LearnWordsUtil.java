@@ -29,7 +29,7 @@ public class LearnWordsUtil {
         int a,b,c,num = 0;
         ArrayList<WordStudy> wordList = new ArrayList<WordStudy>();
         WordStudyDao wordStudyDao = new WordStudyDao(context);
-        wordList = wordStudyDao.getWordStudy(context);// 获取WordStudy 学习表的20个单词
+        wordList = wordStudyDao.getWordStudy();// 获取WordStudy 学习表的20个单词
         for(int i=0;i<wordList.size();i++){
             if(word == wordList.get(i).getWord()){
                 num = i;
@@ -72,7 +72,7 @@ public class LearnWordsUtil {
     public static ArrayList<WordStudy> getWords(Context context){
         ArrayList<WordStudy> wordStudies = new ArrayList<WordStudy>();
         WordStudyDao wordStudyDao = new WordStudyDao(context);
-        wordStudies = wordStudyDao.getWordStudy(context);
+        wordStudies = wordStudyDao.getWordStudy();
         for (int i=0;i<wordStudies.size();i++){
             Log.i("查看从WordStudy表里获取的20个数据",""+wordStudies.get(i).getWord()+wordStudies.get(i).getSoundmark_american()+
             wordStudies.get(i).getSoundmark_british()+wordStudies.get(i).getAnswer_right());

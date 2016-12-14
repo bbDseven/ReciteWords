@@ -69,7 +69,7 @@ public class ExampleSentenceFragment extends BaseFragment implements LearnActivi
             setSentence_pronounce();
             str = example_sentences[i];
             style = new SpannableStringBuilder(str);
-            int start = str.indexOf(word);  //单词第一次出现的索引
+            int start = str.toUpperCase().indexOf(word.toUpperCase());  //单词第一次出现的索引
             int end = start + word.length();
             style.setSpan(new ForegroundColorSpan(Color.parseColor("#d1f57f")), start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
             vp_example_sentence.setText(style);
@@ -112,7 +112,7 @@ public class ExampleSentenceFragment extends BaseFragment implements LearnActivi
         sentence_pronounce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MediaUtils.playWord(mActivity, "abroad");
+                MediaUtils.playWord(mActivity, word);
             }
         });
     }

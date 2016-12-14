@@ -132,7 +132,10 @@ public class WordReviewDao {
         ContentValues mValues = new ContentValues();
         mValues.put("word_is_review", 1);
         SQLiteDatabase db = helper.getWritableDatabase();
-        return db.update("word_review", mValues, "word=? and book_name=?", new String[]{word, book_name});
+        int word_review = db.update("word_review", mValues, "word=? and book_name=?",
+                new String[]{word, book_name});
+        db.close();
+        return word_review;
     }
 
 //    /**
