@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,6 +94,7 @@ public class SlidingFragment extends BaseFragment {
         TextView library_have_learn_sum;  //显示已学习总数
         TextView library_have_grasp_sum;  //显示已掌握总数
         ImageView library_add_words;   //生词本打勾
+        ImageView library_add_words_tick;   //生词本打勾
         TextView library_new_words_sum;  //显示单词数
         TextView library_new_words_see;  //查看生词
         TextView library_book_name;   //选中的词书名字
@@ -556,6 +556,7 @@ public class SlidingFragment extends BaseFragment {
         holder.library_have_learn_sum = findViewByIds(view, R.id.library_have_learn_sum);
         holder.library_have_grasp_sum = findViewByIds(view, R.id.library_have_grasp_sum);
         holder.library_add_words = findViewByIds(view, R.id.library_add_words);
+        holder.library_add_words_tick = findViewByIds(view, R.id.library_add_words_tick);
         holder.library_new_words_sum = findViewByIds(view, R.id.library_new_words_sum);
         holder.library_new_words_see = findViewByIds(view, R.id.library_new_words_see);
         holder.library_book_name = findViewByIds(view, R.id.library_book_name);
@@ -598,15 +599,16 @@ public class SlidingFragment extends BaseFragment {
             }
         });
         if (new_words) {
-            holder.library_add_words.setBackgroundResource(R.mipmap.check_true);
+            holder.library_add_words_tick.setVisibility(View.VISIBLE);
             holder.library_book_name.setText(AppConfig.BOOK_NAME  + " + 生词本");
             //设置显示已学习已掌握总数
             holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
             holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
             //显示生词总数
+            holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+        }else {
+            holder.library_add_words_tick.setVisibility(View.GONE);
             holder.library_new_words_sum.setText("单词数" + newWordsList.size());
-        } else {
-            holder.library_add_words.setBackgroundResource(R.mipmap.uncheck);
             //设置显示已学习已掌握总数
             holder.library_book_name.setText(AppConfig.BOOK_NAME);
             holder.library_have_learn_sum.setText(haveLearnList.size() + "");
@@ -635,7 +637,8 @@ public class SlidingFragment extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
-                            holder.library_add_words.setBackgroundResource(R.mipmap.uncheck);  //没有选择生词
+                            holder.library_add_words_tick.setVisibility(View.GONE);
+                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
                             holder.library_book_name.setText(AppConfig.BOOK_NAME );
                             //设置显示已学习已掌握总数
                             holder.library_have_learn_sum.setText(haveLearnList.size() + "");
@@ -656,8 +659,8 @@ public class SlidingFragment extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
-                            holder.library_add_words.setBackgroundResource(R.mipmap.check_true);  //选择生词
-                            holder.library_book_name.setText(AppConfig.BOOK_NAME + " + 生词本");
+                            holder.library_add_words_tick.setVisibility(View.VISIBLE);
+                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
                             //设置显示已学习已掌握总数
                             holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
                             holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
