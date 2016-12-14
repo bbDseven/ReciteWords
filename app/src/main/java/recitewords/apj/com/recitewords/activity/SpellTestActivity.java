@@ -165,7 +165,9 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                         }
                     });
                     builder.setNegativeButton("取消", null);
-                    AlertDialog alertDialog = alertDialog = builder.create();
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.setCancelable(false);
                     alertDialog.show();
 
                 }
@@ -209,19 +211,22 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                             holder.spell_Dot.getChildAt(mSpellIndex - 1).setBackgroundResource(R.drawable.circle_white_shape);
                             holder.spell_tv_situation.setText(passIndexs.size() + "/" + mReviewWords.size());
                         }
-                    }
-                    if (mSpellIndex>=mReviewWords.size()){
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("温馨提醒：");
-                        builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-                        AlertDialog alertDialog = builder.create();
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        });
-                        alertDialog.show();
+                        if (mSpellIndex>=mReviewWords.size()){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setTitle("温馨提醒：");
+                            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.setCanceledOnTouchOutside(false);
+                            alertDialog.setCancelable(false);
+                            alertDialog.show();
+                        }
+
                     }
 
                 } else {
@@ -236,13 +241,15 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
                             AlertDialog.Builder builder = new AlertDialog.Builder(this);
                             builder.setTitle("温馨提醒：");
                             builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-                            AlertDialog alertDialog = builder.create();
                             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     finish();
                                 }
                             });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.setCanceledOnTouchOutside(false);
+                            alertDialog.setCancelable(false);
                             alertDialog.show();
                         }
                         UIUtil.toast(this, mPhonogram, 2000, Gravity.BOTTOM, 0, height / 2 - 20, 16);
@@ -306,13 +313,15 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("温馨提醒：");
             builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-            AlertDialog alertDialog = builder.create();
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     finish();
                 }
             });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.setCancelable(false);
             alertDialog.show();
         }
     }

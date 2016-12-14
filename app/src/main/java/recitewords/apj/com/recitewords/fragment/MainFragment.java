@@ -534,8 +534,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 list_word.clear();
                 break;
             case R.id.add_new_word:
-                //创建生词本数据库
-
+                //插入到数据库中
                 ContentResolver cr = mActivity.getContentResolver();
                 ContentValues values = new ContentValues();
                 values.put("word",book.getWord());
@@ -558,6 +557,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                         bean_sentence.getExample_sentence_mean(),
                         bean_sentence.getExample_sentence_pronounce(),
                         bean_sentence.getExample_sentence_resource());
+
+                Toast.makeText(mActivity,"成功添加到数据库",Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.iv_word_voice:

@@ -339,7 +339,6 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         switch (v.getId()) {
             case R.id.tv_complete:
                 UIUtil.toast(this, "复习完成" + complete_review_word + "个", 3000, Gravity.TOP, 0, 0, 16);
-                startActivity(new Intent(this, SpellTestActivity.class));
                 break;
             case R.id.tv_need_complete:
                 UIUtil.toast(this, "本组剩余" + need_review_word + "个", 3000, Gravity.TOP, 0, 0, 16);
@@ -466,6 +465,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 final AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
                 View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
                 mLoadingAlertDialog.setView(mLoadingView);
+                mLoadingAlertDialog.setCanceledOnTouchOutside(false);
+                mLoadingAlertDialog.setCancelable(false);
                 mLoadingAlertDialog.show();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -795,6 +796,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             }
         });
         AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
         alertDialog.show();
     }
 
@@ -866,6 +869,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
         View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
         mLoadingAlertDialog.setView(mLoadingView);
         mLoadingAlertDialog.show();
+        mLoadingAlertDialog.setCanceledOnTouchOutside(false);
+        mLoadingAlertDialog.setCancelable(false);
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
