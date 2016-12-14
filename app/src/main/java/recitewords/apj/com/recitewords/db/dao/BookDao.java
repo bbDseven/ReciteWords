@@ -61,6 +61,17 @@ public class BookDao {
     }
 
     /**
+     * 更改单词的：是否已掌握 word_is_grasp  字段 变为 1
+     * 表示已掌握
+     */
+    public void updateWord_is_grasp(String word) {
+        String update_sql = "update book set word_is_grasp=? where word=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(update_sql, new Object[]{1, word});
+        db.close();
+    }
+
+    /**
      * 查询所有单词
      *
      * @param book_name 词书名字
