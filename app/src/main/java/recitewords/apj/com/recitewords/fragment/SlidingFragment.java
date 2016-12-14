@@ -1,10 +1,12 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.graphics.BitmapFactory;
@@ -102,6 +104,7 @@ public class SlidingFragment extends BaseFragment {
 
     }
 
+    private SignBroadcast receiver;//点击签到发出广播更新数据
     private static final String TAG = "SlidingFragment";
     private static final String FRAGMENT_MAIN = "fragment_main";  //主页面Fragment标识,Tag
     private TextView learn_num;//主界面学习数字
@@ -437,7 +440,10 @@ public class SlidingFragment extends BaseFragment {
         super.onResume();
         init_StatData();
         init__LibraryData();
-
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("recitewords.apj.com.recitewords.fragment.SlidingFragment.SignBroadcast");
+        receiver = new SignBroadcast();//点击签到发出广播更新数据
+        mActivity.registerReceiver(receiver, filter);
     }
 
     /**
@@ -1144,5 +1150,21 @@ public class SlidingFragment extends BaseFragment {
         holder.library_have_learn_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
         holder.library_have_grasp_sum.setTextColor(mActivity.getResources().getColor(R.color.purple));
         holder.show_wordbook.setBackgroundColor(mActivity.getResources().getColor(R.color.library_purple));
+    }
+    //广播更新签到天数
+    class SignBroadcast extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            UserDao userDao = new UserDao(mContext);
+            User user = userDao.query();
+            holder.statistics_tv_sign.setText(user.getSign_in_continue() + "天");    //设置连续签到天数
+            holder.statistics_tv_money.setText(user.getCool_money() + "枚");     //设置剩余酷币枚数
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mActivity.unregisterReceiver(receiver);
     }
 }

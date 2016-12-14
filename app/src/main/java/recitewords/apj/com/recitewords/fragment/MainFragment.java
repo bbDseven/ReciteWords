@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -579,6 +580,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                     sign_in_continue1 = sign_in_continue + 1;
                 }
                 userDao.update(DateUtil.getYMD(), sign_in_continue1, cool_money1);  //更新用户信息
+                Intent intent1 = new Intent("recitewords.apj.com.recitewords.fragment.SlidingFragment.SignBroadcast");
+                mActivity.sendBroadcast(intent1);
                 //设置酷币和连续签到天数  数字的颜色
                 setMoneyColor();
                 setDayColor(sign_in_continue1);
