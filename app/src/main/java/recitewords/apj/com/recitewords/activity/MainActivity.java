@@ -32,7 +32,6 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
 
     public static int userID = 0;  //userID,用户的登陆ID
     public static final String dbName = "ReciteWords_" + userID + ".db";   //数据库名字
-    public static final String NEWWORDSDB="ReciteWords_NewWords"+userID+".db";  //生词本数据库名字
 
     private static final String TAG = "MainActivity";
     public ViewHolder holder;
@@ -119,13 +118,10 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDownY = event.getY();
-//                Log.e("mDownY","mDownY:  "+mDownY);
-//                Log.e("mDownX","mDownX:  "+event.getX());
                 break;
             case MotionEvent.ACTION_MOVE:
                 mMoveY = event.getY();
                 diffY = (int) (mDownY - mMoveY + 0.5);
-//                Log.e("ha","diffY:  "+diffY);
                 //防止向上滑出屏幕
                 if ((holder.mLayout.getScrollY() + diffY) > NavigateHeight) {
                     holder.mLayout.scrollTo(0, NavigateHeight);

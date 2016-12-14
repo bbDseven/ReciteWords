@@ -141,42 +141,21 @@ public class AllGraspFragment extends BaseFragment {
                     ((MyViewHolderOne) holder).item_word_date.
                             setText(time[0] + "年" + time[1] + "月" + time[2] + "日    " +
                                     (calculateDate(list, list.get(position).getDate()) - 1) + "个单词");
-//                    //显示隐藏词义
-//                    holderOne.item_ll_root.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            //item复用问题
-//                            if (!mClickList.contains(holderOne.item_ll_root.getTag())) {
-//                                mClickList.add(position);
-//                                holderOne.item_word_mean.setVisibility(View.VISIBLE);
-//                            } else {
-//                                for (int i = 0; i < mClickList.size(); i++) {
-//                                    if (mClickList.get(i) == holderOne.item_ll_root.getTag()) {
-//                                        mClickList.remove(i);
-//                                        holderOne.item_word_mean.setVisibility(View.GONE);
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    });
-//                    //最后一条横线隐藏
-//                    if (position == list.size()) {
-//                        holderOne.item_word_divide.setVisibility(View.GONE);
-//                    }
-//                    //解决item复用问题
-//                    if (mClickList.contains(position)) {
-//                        holderOne.item_word_mean.setVisibility(View.VISIBLE);
-//                    } else {
-//                        holderOne.item_word_mean.setVisibility(View.GONE);
-//                    }
                     break;
                 case 1:
                     final MyViewHolderTwo holderTwo = (MyViewHolderTwo) holder;
                     holderTwo.item_ll_root.setTag(position);
                     holderTwo.sl_word.setTag(position);
                     holderTwo.item_word.setText(list.get(position).getWord());
-                    holderTwo.item_delete.setText("删除");
                     holderTwo.item_word_mean.setText(list.get(position).getWord_mean());
+                    if (mode.equals(AppConfig.MODE_STATISTICS_GRASP)) {
+                        holderTwo.item_delete.setText("重学");
+                    } else if (mode.equals(AppConfig.MODE_LIBRARY_GRASP)) {
+                    }else if (mode.equals(AppConfig.MODE_BOOK_NAME_AND_NEWWORDS)){
+                        holderTwo.item_delete.setText("重学");
+                    }else if (mode.equals(AppConfig.BOOK_NEW_WORDS)){
+                        holderTwo.item_delete.setText("删除");
+                    }
 
                     // 显示隐藏词义，和删除按钮
                     holderTwo.item_ll_root.setOnClickListener(new View.OnClickListener() {

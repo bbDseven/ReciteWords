@@ -550,8 +550,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 values.put("book_name",AppConfig.BOOK_NEW_WORDS);
                 values.put("userID",book.getUserID());
                 cr.insert(Uri.parse("content://recitewords.apj.com.recitewords"), values);//插入数据
-                ExampleSentenceDao exampleDao = new ExampleSentenceDao(mActivity);
 
+                ExampleSentenceDao exampleDao = new ExampleSentenceDao(mActivity);
                 exampleDao.insert(bean_sentence.getWord(), bean_sentence.getExample_sentence(),
                         bean_sentence.getExample_sentence_mean(),
                         bean_sentence.getExample_sentence_pronounce(),

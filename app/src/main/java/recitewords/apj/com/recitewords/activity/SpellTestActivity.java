@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,7 +35,7 @@ import recitewords.apj.com.recitewords.util.UIUtil;
  * <p/>
  * 拼写测试
  * <p/>
- * 默认为不管是不是一次性通过，学完一篇后就不再复习
+ * 默认为不管是不是一次性通过，学完一篇后就不再拼写
  */
 public class SpellTestActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
 
@@ -144,6 +145,17 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
             spellNextWOrd();
         }
 
+        holder.spell_et_input.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    compare();
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     @Override
@@ -192,79 +204,7 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
 
                 break;
             case R.id.spell_tv_confirm:
-                //比较用户输入单词和正确单词
-                input = holder.spell_et_input.getText().toString();  //获取用户输入的单词
-                height = holder.spell_rl_bottom.getHeight();
-                if (input.equals(mWord)) {
-                    //改变文字颜色--淡黄
-                    holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
-                    MediaUtils.playWord(this, mWord);  //播放单词
-                    //拼写测试的模式下,隐藏比较图标，显示下一个图标
-                    if (SpellMode.equals("spell")) {
-
-                    } else if (SpellMode.equals("spellTest")) {
-                        holder.spell_tv_confirm.setVisibility(View.GONE);
-                        holder.spell_tv_spell_next.setVisibility(View.VISIBLE);
-                        if (is_Pass) {
-                            //一次通过，改变圆点颜色
-                            passIndexs.add(mSpellIndex);  //增加到一次性通过的集合中去
-                            holder.spell_Dot.getChildAt(mSpellIndex - 1).setBackgroundResource(R.drawable.circle_white_shape);
-                            holder.spell_tv_situation.setText(passIndexs.size() + "/" + mReviewWords.size());
-                        }
-                        if (mSpellIndex>=mReviewWords.size()){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle("温馨提醒：");
-                            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            });
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.setCanceledOnTouchOutside(false);
-                            alertDialog.setCancelable(false);
-                            alertDialog.show();
-                        }
-
-                    }
-
-                } else {
-                    //改变文字颜色--红色
-                    holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
-                    MediaUtils.playWord(this, mWord);  //播放单词
-                    holder.spell_tv_correct.setText(mWord);  //显示正确的单词
-                    if (SpellMode.equals("spell")) {
-
-                    } else if (SpellMode.equals("spellTest")) {
-                        if (mSpellIndex>=mReviewWords.size()){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle("温馨提醒：");
-                            builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
-                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            });
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.setCanceledOnTouchOutside(false);
-                            alertDialog.setCancelable(false);
-                            alertDialog.show();
-                        }
-                        UIUtil.toast(this, mPhonogram, 2000, Gravity.BOTTOM, 0, height / 2 - 20, 16);
-                        holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt);
-                            }
-                        }, 2000);
-                    }
-                    holder.spell_tv_correct.setVisibility(View.VISIBLE);
-                    is_Pass = false;  //错误一次，不是一次通过
-                }
-                havaing_comfirm = true;  //改变是否比较状态
+                compare();
                 break;
             case R.id.spell_tv_spell_next:
                 spellNextWOrd();
@@ -275,6 +215,84 @@ public class SpellTestActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * 比较是否正确
+     */
+    public void compare(){
+        //比较用户输入单词和正确单词
+        input = holder.spell_et_input.getText().toString();  //获取用户输入的单词
+        height = holder.spell_rl_bottom.getHeight();
+        if (input.equals(mWord)) {
+            //改变文字颜色--淡黄
+            holder.spell_et_input.setTextColor(Color.parseColor("#D1F57F"));
+            MediaUtils.playWord(this, mWord);  //播放单词
+            //拼写测试的模式下,隐藏比较图标，显示下一个图标
+            if (SpellMode.equals("spell")) {
+
+            } else if (SpellMode.equals("spellTest")) {
+                holder.spell_tv_confirm.setVisibility(View.GONE);
+                holder.spell_tv_spell_next.setVisibility(View.VISIBLE);
+                if (is_Pass) {
+                    //一次通过，改变圆点颜色
+                    passIndexs.add(mSpellIndex);  //增加到一次性通过的集合中去
+                    holder.spell_Dot.getChildAt(mSpellIndex - 1).setBackgroundResource(R.drawable.circle_white_shape);
+                    holder.spell_tv_situation.setText(passIndexs.size() + "/" + mReviewWords.size());
+                }
+                if (mSpellIndex>=mReviewWords.size()){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.setCancelable(false);
+                    alertDialog.show();
+                }
+
+            }
+
+        } else {
+            //改变文字颜色--红色
+            holder.spell_et_input.setTextColor(Color.parseColor("#FF4444"));
+            MediaUtils.playWord(this, mWord);  //播放单词
+            holder.spell_tv_correct.setText(mWord);  //显示正确的单词
+            if (SpellMode.equals("spell")) {
+
+            } else if (SpellMode.equals("spellTest")) {
+                if (mSpellIndex>=mReviewWords.size()){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你已完成本组单词复习，赶快去领取酷币吧！");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.setCancelable(false);
+                    alertDialog.show();
+                }
+                UIUtil.toast(this, mPhonogram, 2000, Gravity.BOTTOM, 0, height / 2 - 20, 16);
+                holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt_highlight);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.spell_tv_prompt.setBackgroundResource(R.mipmap.ic_spell_prompt);
+                    }
+                }, 2000);
+            }
+            holder.spell_tv_correct.setVisibility(View.VISIBLE);
+            is_Pass = false;  //错误一次，不是一次通过
+        }
+        havaing_comfirm = true;  //改变是否比较状态
+    }
 
     /**
      * 拼写下一个单词
