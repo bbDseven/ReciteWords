@@ -112,7 +112,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         RelativeLayout main_rl_review;
         CircleImageView main_img_circle;
         ImageView main_img_dict;
-        TextView main_tv_learn_num;
+        TextView main_tv_learn_num;     //需要学习单词总数
         TextView main_tv_review_num;  //需复习单词总数
 
         ImageView iv_sign;  //签到的圆圈
@@ -207,6 +207,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         mReviewWordSum = bookDao.queryALLReviewWords(book_name).size();
         //显示需要复习的单词总数
         holder.main_tv_review_num.setText(mReviewWordSum + "");
+        WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
+        Log.e("123","获取要学习的单词总数");
+        int needLearnWordsNum = wordStudyDao.queryALLLearnWordsNum();
+        holder.main_tv_learn_num.setText(""+needLearnWordsNum);
     }
 
     @Override
@@ -448,10 +452,19 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面
-
-                Intent intent = new Intent(mActivity, LearnActivity.class);
-                intent.putExtra("backgroundNum", num);
-                startActivity(intent);
+                WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
+                if (wordStudyDao.queryALLLearnWordsNum() == 0){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你已经学完20个单词了！");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }else {
+                    Intent intent = new Intent(mActivity, LearnActivity.class);
+                    intent.putExtra("backgroundNum", num);
+                    startActivity(intent);
+                }
                 break;
             case R.id.main_rl_review:
                 //判断是否跳转到复习界面

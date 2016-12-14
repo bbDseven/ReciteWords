@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -26,7 +27,7 @@ public class WordStudyDao {
     /**
      * 获取要学习的20个 单词,美式音标，英式音标，词义，星号（认识次数）
      * */
-    public ArrayList<WordStudy> getWordStudy(Context context){
+    public ArrayList<WordStudy> getWordStudy(){
         SQLiteDatabase db = helper.getReadableDatabase();
         ArrayList<WordStudy> words = new ArrayList<WordStudy>();
         Cursor cursor = db.rawQuery("select word,soundmark_american,soundmark_british,answer_right,asterisk from word_study",null);
@@ -164,6 +165,21 @@ public class WordStudyDao {
     }
 
     /**
+     * 查询所有需要学习的单词
+     * */
+    public int queryALLLearnWordsNum(){
+        int needLearnWordsNum = getWordStudy().size();
+        for (int i =0;i<getWordStudy().size();i++){
+            if (getWordStudy().get(i).getAsterisk() == 4){
+                Log.e("123",""+getWordStudy().get(i).getWord()+"星号是："+getWordStudy().get(i).getAsterisk());
+                needLearnWordsNum--;
+            }
+        }
+        Log.e("123",""+needLearnWordsNum);
+        return needLearnWordsNum;
+    }
+
+    /**
      * 获取单词的星号的方法
      * */
     public int getWordAsterisk(String word){
@@ -173,6 +189,8 @@ public class WordStudyDao {
         while (cursor.moveToNext()){
             asterisk = cursor.getInt(cursor.getColumnIndex("asterisk"));
         }
+        cursor.close();
+        db.close();
         return asterisk;
     }
 

@@ -164,13 +164,12 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
         //用Fragment替换帧布局来显示例句
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment("abroad"), FRAGMENT_SENTENCE);
-        transaction.commit();
+//        FragmentManager fm = getFragmentManager();
+//        FragmentTransaction transaction = fm.beginTransaction();
+//        //transaction.replace(R.id.fl_example, new ExampleSentenceFragment("abroad"), FRAGMENT_SENTENCE);
+//        transaction.commit();
         studyWords = LearnWordsUtil.getWords(this);//初始化20个单词数据
         showWordMode();         //显示下一个单词的逻辑模式（注：很乱）
-        //init_fragment(studyWords.get(order).getWord());     //例句Fragment替换例句布局文件
     }
 
     private void initEvent() {
@@ -440,6 +439,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.learn_tv_soundMark.setText(studyWords.get(order).getSoundmark_american());  //显示单词音标
         showAsterisk(getWordAsterisk(order));        //显示单词的星号
         showFinishWords();     //显示已学习单词，剩余学习单词
+        init_fragment(studyWords.get(order).getWord());//显示例句
     }
 
     /**
@@ -677,7 +677,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     private void init_fragment(String word) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review(word), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.fl_example, new ExampleSentenceFragment(word), FRAGMENT_SENTENCE);
         transaction.commit();
     }
 
