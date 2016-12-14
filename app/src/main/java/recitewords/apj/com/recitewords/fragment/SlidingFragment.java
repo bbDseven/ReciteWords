@@ -1153,7 +1153,6 @@ public class SlidingFragment extends BaseFragment {
     }
     //广播更新签到天数
     class SignBroadcast extends BroadcastReceiver{
-
         @Override
         public void onReceive(Context context, Intent intent) {
             UserDao userDao = new UserDao(mContext);
