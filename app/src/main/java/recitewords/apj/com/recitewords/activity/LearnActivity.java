@@ -246,6 +246,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 showWordMode();
                 break;
             case R.id.tv_memory_cognize:          // 点击记忆模式的 认识
+                reset();
                 addWordAsterisk(order);            // 认识该单词，星号加1
                 order++;
                 showWordMode();
@@ -387,11 +388,16 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         if (order < studyWords.size()){
             while (getWordAsterisk(order) == 4){
                 order++;
-                if (order == 20){   //  说明单词已经学习完毕
-                    b = true;
-                    break;
+                if (order == 20){
+                    if (isFinishWord()){
+                        b = isFinishWord();
+                        break;
+                    }else {
+                        order = 0;
+                    }
                 }
             }
+            Log.e("abcd","判断是否为0"+order);
             if (b){
                 //弹出窗口，提醒用户学习完毕
                 completeDialog();
@@ -413,9 +419,13 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             order = 0;
             while (getWordAsterisk(order) == 4){
                 order++;
-                if (order == 20){   //  说明单词已经学习完毕
-                    b = true;
-                    break;
+                if (order == 20){
+                    if (isFinishWord()){
+                        b = isFinishWord();
+                        break;
+                    }else {
+                        order = 0;
+                    }
                 }
             }
             if (b){
@@ -436,6 +446,20 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 }
             }
         }
+    }
+
+    /**
+     * 判断20个单词是否已经学完的方法
+     * */
+    public boolean isFinishWord(){
+        boolean b = true;
+        for(int i =0;i<studyWords.size();i++){
+            if (getWordAsterisk(i) != 4){
+                b = false;
+                break;
+            }
+        }
+        return b;
     }
 
     /**
@@ -544,6 +568,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     //取消handler处理，并设置进度条为0，时间重置为4秒
     private void reset() {
         holder.progress.setProgress(0);
+        holder.progress.setVisibility(View.INVISIBLE);
         mHandler.removeMessages(msg.what);
         num = 4;
     }
@@ -575,6 +600,9 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         int asterisk = getWordAsterisk(order);
         if (asterisk>=0 && asterisk<=3){
             wordStudyDao.updateWordAsterisk(asterisk+1,studyWords.get(order).getWord());
+            if (getWordAsterisk(order) == 4){
+                setWord_is_study(studyWords.get(order).getWord());
+            }
         }
     }
 
