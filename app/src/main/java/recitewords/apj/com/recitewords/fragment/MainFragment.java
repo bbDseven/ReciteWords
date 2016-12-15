@@ -927,4 +927,5 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public TextView getTV_review_num(){
         return holder.main_tv_review_num;
     }
+
 }

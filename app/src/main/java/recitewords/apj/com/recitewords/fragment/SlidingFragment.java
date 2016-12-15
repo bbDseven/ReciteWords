@@ -249,14 +249,15 @@ public class SlidingFragment extends BaseFragment {
             newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
             int size = newWordsList.size();
             if (size>0){
-                final SharedPreferences pref = PrefUtils.getPref(mActivity);
+                SharedPreferences pref = PrefUtils.getPref(mActivity);
                 PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
-                holder.show_word__book_info.setVisibility(View.VISIBLE);
-                holder.show_word__book_tip.setVisibility(View.INVISIBLE);
+//                holder.show_word__book_info.setVisibility(View.VISIBLE);
+//                holder.show_word__book_tip.setVisibility(View.INVISIBLE);
             }
-            holder.library_add_words_tick.setVisibility(View.VISIBLE);
-            holder.library_new_words_sum.setText("单词数" + size);
-            holder.library_book_name.setText(" 生词本");
+//            holder.library_add_words_tick.setVisibility(View.VISIBLE);
+//            holder.library_new_words_sum.setText("单词数" + size);
+//            holder.library_book_name.setText(" 生词本");
+            setLibraryView();
         }
 
     }
@@ -598,6 +599,135 @@ public class SlidingFragment extends BaseFragment {
      * 初始化图书馆的数据
      */
     public void init__LibraryData() {
+
+        setLibraryView();
+        final SharedPreferences pref = PrefUtils.getPref(mActivity);
+        //打开已学习
+        holder.library_have_learn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mActivity, LibraryAllLearnActivity.class));
+            }
+        });
+        //打开已掌握
+        holder.library_have_grasp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mActivity, LibraryAllGraspActivity.class));
+            }
+        });
+        //选择学习生词本
+        holder.library_add_words.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+                if (newWordsList.size() <= 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                } else if (new_words) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("是否取消学习生词本里的单词");
+                    builder.setNegativeButton("取消", null);
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
+                            holder.library_add_words_tick.setVisibility(View.GONE);
+                            setLibraryView();
+
+//                            holder.library_book_name.setText(AppConfig.BOOK_NAME );
+//                            //设置显示已学习已掌握总数
+//                            holder.library_have_learn_sum.setText(haveLearnList.size() + "");
+//                            holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
+//                            //显示生词总数
+//                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("是否学习生词本里的单词");
+                    builder.setNegativeButton("取消", null);
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
+                            holder.library_add_words_tick.setVisibility(View.VISIBLE);
+                            setLibraryView();
+
+//                            holder.library_book_name.setText(AppConfig.BOOK_NAME + " + 生词本");
+//                            //设置显示已学习已掌握总数
+//                            holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
+//                            holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
+//                            //显示生词总数
+//                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            }
+        });
+
+        holder.library_new_words_see.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (newWordsList.size() <= 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                } else {
+                    startActivity(new Intent(mActivity, NewWordsActivity.class));
+                }
+            }
+        });
+
+        holder.library_book_cet_four.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PrefUtils.getDBFlag(pref,AppConfig.BOOK_STATE,false)){
+                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, false);
+                }else {
+                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                }
+                setLibraryView();
+                Toast.makeText(mActivity,"四级单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        }); holder.library_book_cet_six.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"六级单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        }); holder.library_book_ielts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"雅思单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.library_book_toefl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"托福单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    /**
+     * 设置Library的页面数据
+     */
+    public void setLibraryView(){
         final BookDao bookDao = new BookDao(mActivity);
         List<Book> bookList = bookDao.queryAllWOrd(AppConfig.BOOK_NAME);  //所有单词
         haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);  //当前词书已学习
@@ -605,7 +735,7 @@ public class SlidingFragment extends BaseFragment {
         newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
         newWordHaveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NEW_WORDS);  //生词本已学习
         newWordHaveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NEW_WORDS);  //生词本已掌握
-        final SharedPreferences pref = PrefUtils.getPref(mActivity);
+        SharedPreferences pref = PrefUtils.getPref(mActivity);
         boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
         boolean book_state = PrefUtils.getDBFlag(pref, AppConfig.BOOK_STATE, false);
         if (newWordsList.size()==0){  //删除完单词后，进入没有选择状态
@@ -659,118 +789,8 @@ public class SlidingFragment extends BaseFragment {
             }
         }
 
-        //打开已学习
-        holder.library_have_learn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(mActivity, LibraryAllLearnActivity.class));
-            }
-        });
-        //打开已掌握
-        holder.library_have_grasp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(mActivity, LibraryAllGraspActivity.class));
-            }
-        });
-        //选择学习生词本
-        holder.library_add_words.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
-                if (newWordsList.size() <= 0) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setTitle("温馨提醒：");
-                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
-                    builder.setPositiveButton("确定", null);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                } else if (new_words) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setTitle("温馨提醒：");
-                    builder.setMessage("是否取消学习生词本里的单词");
-                    builder.setNegativeButton("取消", null);
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
-                            holder.library_add_words_tick.setVisibility(View.GONE);
-                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
-                            holder.library_book_name.setText(AppConfig.BOOK_NAME );
-                            //设置显示已学习已掌握总数
-                            holder.library_have_learn_sum.setText(haveLearnList.size() + "");
-                            holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
-                            //显示生词总数
-                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
-
-                        }
-                    });
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                } else {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setTitle("温馨提醒：");
-                    builder.setMessage("是否学习生词本里的单词");
-                    builder.setNegativeButton("取消", null);
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
-                            holder.library_add_words_tick.setVisibility(View.VISIBLE);
-                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
-                            //设置显示已学习已掌握总数
-                            holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
-                            holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
-                            //显示生词总数
-                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
-                        }
-                    });
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
-            }
-        });
-
-        holder.library_new_words_see.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (newWordsList.size() <= 0) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                    builder.setTitle("温馨提醒：");
-                    builder.setMessage("你的生词本还没生词，赶快去添加生词吧");
-                    builder.setPositiveButton("确定", null);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                } else {
-                    startActivity(new Intent(mActivity, NewWordsActivity.class));
-                }
-            }
-        });
-
-        holder.library_book_cet_four.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mActivity,"四级单词开始下载。。。",Toast.LENGTH_SHORT).show();
-            }
-        }); holder.library_book_cet_six.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mActivity,"六级单词开始下载。。。",Toast.LENGTH_SHORT).show();
-            }
-        }); holder.library_book_ielts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mActivity,"雅思单词开始下载。。。",Toast.LENGTH_SHORT).show();
-            }
-        });
-        holder.library_book_toefl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mActivity,"托福单词开始下载。。。",Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
+
 
 
     @Override
