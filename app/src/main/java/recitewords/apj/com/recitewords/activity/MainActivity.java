@@ -2,6 +2,7 @@ package recitewords.apj.com.recitewords.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,7 +18,9 @@ import net.youmi.android.offers.OffersManager;
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.fragment.MainFragment;
 import recitewords.apj.com.recitewords.fragment.SlidingFragment;
+import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.NumUtil;
+import recitewords.apj.com.recitewords.util.PrefUtils;
 
 public class MainActivity extends BaseActivity implements PanelSlideListener, View.OnTouchListener {
 
@@ -66,6 +69,14 @@ public class MainActivity extends BaseActivity implements PanelSlideListener, Vi
     }
 
     private void initData() {
+        //判断是否选择了词书
+        SharedPreferences pref = PrefUtils.getPref(this);
+        if (PrefUtils.getDBFlag(pref,AppConfig.BOOK_STATE,false)){
+            PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE,true);
+        }else {
+            PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE,false);
+        }
+
         holder.mLayout.setPanelHeight(0);
         mainFragment = new MainFragment(this);
         slidingFragment = new SlidingFragment(this);

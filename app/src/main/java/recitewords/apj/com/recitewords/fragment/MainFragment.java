@@ -849,7 +849,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     //选择照片方法
     private void choicePhoto() {
-        File outputImage_choice = new File(Environment.getExternalStorageDirectory(), "tempImage_choice.jpg"); //创建文件在sd卡并命名
+        File outputImage_choice = new File(Environment.getExternalStorageDirectory(),
+                "tempImage_choice.jpg"); //创建文件在sd卡并命名
         try {
             if (outputImage_choice.exists()){
                 outputImage_choice.delete();   //如果文件存在则删除文件
