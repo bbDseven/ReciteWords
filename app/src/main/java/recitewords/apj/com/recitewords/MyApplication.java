@@ -19,6 +19,7 @@ public class MyApplication extends Application {
     //leancloud key id
     final String AV_ID = "2NCdWBghb5IsN8V6keRWFYH3-gzGzoHsz";
     final String AV_KEY = "fMWW1770FGU3aLUYWDoL0APH";
+
     @Override
     public void onCreate() {
         super.onCreate();
