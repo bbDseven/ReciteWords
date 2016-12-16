@@ -169,6 +169,7 @@ public class WordStudyDao {
      * */
     public int queryALLLearnWordsNum(){
         int needLearnWordsNum = getWordStudy().size();
+        Log.e("123456",""+getWordStudy().size());
         for (int i =0;i<getWordStudy().size();i++){
             if (getWordStudy().get(i).getAsterisk() == 4){
                 Log.e("123",""+getWordStudy().get(i).getWord()+"星号是："+getWordStudy().get(i).getAsterisk());
