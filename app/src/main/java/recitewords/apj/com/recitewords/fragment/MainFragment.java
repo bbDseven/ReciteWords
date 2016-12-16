@@ -232,12 +232,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         boolean dbFlag = PrefUtils.getDBFlag(sp, "dbFlag", true);//获取sp中dbFlag的标记
         if (dbFlag) {
             insertExampleSentence();//插入词书表book
-            insertBook();//插入词书表book
+//            insertBook();//插入词书表book
             insertLexicon();//插入词库表lexicon*/
             insertUser();//插入用户信息表
             //insertWordStudy();//插入学习单词
-            BookDao bookDao = new BookDao(mContext);
-            bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
+//            BookDao bookDao = new BookDao(mContext);
+//            bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
             // insertWordReview();  //插入复习单词，模拟数据
 
 
@@ -500,12 +500,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 // Log.e("ha", "点击了，状态后为：" + navigateShowState);
                 break;
             case R.id.main_rl_learn:
+                BookDao bookDao = new BookDao(mActivity);
+                bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
                 //跳转到学习界面
                 WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
                 if (wordStudyDao.queryALLLearnWordsNum() == 0){
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setTitle("温馨提醒：");
-                    builder.setMessage("你已经学完20个单词了！");
+                    builder.setMessage("没有单词了！");
                     builder.setPositiveButton("确定", null);
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();

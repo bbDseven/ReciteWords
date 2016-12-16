@@ -67,6 +67,7 @@ import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.UserDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.util.DateUtil;
+import recitewords.apj.com.recitewords.util.DownloadWordsUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
 import recitewords.apj.com.recitewords.view.SlideSwitch;
 
@@ -136,6 +137,7 @@ public class SlidingFragment extends BaseFragment {
     private int currIndex = 0;// 当前页卡编号
     private int bmpW;// 动画图片宽度
 
+    private HashMap<String, Object> metaData;
     private MainActivity mainActivity;
     private List<View> viewList;//用于存放4个View的集合
     private holder holder;
@@ -254,7 +256,6 @@ public class SlidingFragment extends BaseFragment {
         //收到数据改变的通知，此方法调用
         @Override
         public void onChange(boolean selfChange) {
-            // TODO Auto-generated method stub
             super.onChange(selfChange);
             BookDao bookDao = new BookDao(mActivity);
             newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
@@ -703,29 +704,88 @@ public class SlidingFragment extends BaseFragment {
                 }
             }
         });
-
+        // 点击四级单词下载四级单词词库
         holder.library_book_cet_four.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (PrefUtils.getDBFlag(pref,AppConfig.BOOK_STATE,false)){
-                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, false);
-                }else {
-                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                if (PrefUtils.getDBFlag(pref,AppConfig.BOOK_STATE,false)){  //取消该词书
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("是否取消学习该词书");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, false);
+                            setLibraryView();
+
+                        }
+                    });
+                    builder.setNegativeButton("取消", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }else {  //选择该词书
+//                    File file =new File( "/data/data/recitewords.apj.com.recitewords/" +
+//                            "databases/ReciteWords_0.db");
+                    boolean new_words = PrefUtils.getDBFlag(pref, "DOWN_LOAD_BOOK", false);
+
+
+//                    if (file.exists()){  //已下载该词书
+                    if (new_words){  //已下载该词书
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                        builder.setTitle("温馨提醒：");
+                        builder.setMessage("是否选择该词书");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                                setLibraryView();
+                            }
+                        });
+                        builder.setNegativeButton("取消", null);
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }else{  //未下载该词书
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                        builder.setTitle("温馨提醒：");
+                        builder.setMessage("是否下载该词书");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {  //下载
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new Thread(){
+                                    @Override
+                                    public void run() {
+                                        String url = "https://dn-2NCdWBgh.qbox.me/bdd7cd3de40bae640f79.db";
+                                        DownloadWordsUtil.DownloadBook("bdd7cd3de40bae640f79.db",url,metaData);
+                                    }
+                                }.start();
+                                //判断是否下载完毕（成功），如果下载成功，执行下面代码
+                                PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                                PrefUtils.setDBFlag(pref, "DOWN_LOAD_BOOK", true);
+                                setLibraryView();
+                            }
+                        });
+                        builder.setNegativeButton("取消", null);
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
                 }
-                setLibraryView();
-                Toast.makeText(mActivity,"四级单词开始下载。。。",Toast.LENGTH_SHORT).show();
             }
-        }); holder.library_book_cet_six.setOnClickListener(new View.OnClickListener() {
+        });
+
+        holder.library_book_cet_six.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mActivity,"六级单词开始下载。。。",Toast.LENGTH_SHORT).show();
             }
-        }); holder.library_book_ielts.setOnClickListener(new View.OnClickListener() {
+        });
+
+        holder.library_book_ielts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mActivity,"雅思单词开始下载。。。",Toast.LENGTH_SHORT).show();
             }
         });
+
         holder.library_book_toefl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -739,8 +799,10 @@ public class SlidingFragment extends BaseFragment {
      * 设置Library的页面数据
      */
     public void setLibraryView(){
+        Log.e(TAG,"设置Library的页面数据");
         final BookDao bookDao = new BookDao(mActivity);
         List<Book> bookList = bookDao.queryAllWOrd(AppConfig.BOOK_NAME);  //所有单词
+        Log.e(TAG,"bookList: "+bookList.size());
         haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);  //当前词书已学习
         haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);  //当前词书已掌握
         newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
