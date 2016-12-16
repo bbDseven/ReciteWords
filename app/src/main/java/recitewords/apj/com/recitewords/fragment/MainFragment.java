@@ -38,10 +38,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.GetDataCallback;
+import com.avos.avoscloud.ProgressCallback;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LearnActivity;
@@ -112,7 +123,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         RelativeLayout main_rl_review;
         CircleImageView main_img_circle;
         ImageView main_img_dict;
-        TextView main_tv_learn_num;
+        TextView main_tv_learn_num;     //需要学习单词总数
         TextView main_tv_review_num;  //需复习单词总数
 
         ImageView iv_sign;  //签到的圆圈
@@ -204,9 +215,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         super.onResume();
         //每次进入页面时，刷新数据
         BookDao bookDao = new BookDao(mActivity);
-        mReviewWordSum = bookDao.queryALLReviewWords(book_name).size();
+
+        mReviewWordSum = bookDao.queryALLReviewWords(AppConfig.BOOK_NAME).size();
         //显示需要复习的单词总数
         holder.main_tv_review_num.setText(mReviewWordSum + "");
+        WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
+        Log.e("123","获取要学习的单词总数");
+        int needLearnWordsNum = wordStudyDao.queryALLLearnWordsNum();
+        holder.main_tv_learn_num.setText(""+needLearnWordsNum);
     }
 
     @Override
@@ -228,12 +244,31 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             insertBook();//插入词书表book
             insertLexicon();//插入词库表lexicon*/
             insertUser();//插入用户信息表
-            //insertWordStudy();//插入学习单词
+//            insertWordStudy();//插入学习单词
             BookDao bookDao = new BookDao(mContext);
             bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
-            // insertWordReview();  //插入复习单词，模拟数据
-
-
+//             insertWordReview();  //插入复习单词，模拟数据
+//            HttpUtils httpUtils = new HttpUtils();
+//            String url = "https://dn-2NCdWBgh.qbox.me/bdd7cd3de40bae640f79.db";
+//            String packageName = "recitewords.apj.com.recitewords";
+//            String path = "/data/data/" + packageName + "/databases/" + MainActivity.dbName;
+//            httpUtils.download(url, path, new RequestCallBack<File>() {
+//                @Override
+//                public void onSuccess(ResponseInfo<File> responseInfo) {
+//                    Toast.makeText(mContext, "下载成功", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onFailure(HttpException e, String s) {
+//                    Toast.makeText(mContext, "下载失败", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onLoading(long total, long current, boolean isUploading) {
+//                    super.onLoading(total, current, isUploading);
+//                    Toast.makeText(mContext, "下载进度："+ current*100 / total +"%", Toast.LENGTH_SHORT).show();
+//                }
+//            });
             PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
         }
 
@@ -312,26 +347,72 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
      */
     private void insertBook() {
         BookDao bookDao = new BookDao(mContext);
-        bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;糟蹋;打垮 vi.杀人", 1, 0, "F", "2001-11-11", "CET4", 0);
-        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的 n.修士，修女，出家人", 1, 0, "F", "2016-01-28", "CET4", 0);
-        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop) vt.为…理发剃须;修整 vi.当理发师;给人理发", 1, 0, "F", "2016-01-28", "CET4", 0);
-        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;兽性 adj.动物的;肉体的;肉欲的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 n.放任，放纵;完全屈从于压制", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 1, 0, "F", "2016-10-28", "CET4", 0);
-        bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 1, 0, "F", "2016-10-28", "CET4", 0);
-        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车） adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地 adj.往国外的 n.海外，异国", 1, 0, "F", "2016-10-28", "CET4", 0);
-        bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;吞并，合并;忍受，承担（费用）", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;（伤口等）发炎的", 1, 0, "F", "2016-05-01", "CET4", 0);
-        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;周年纪念的;年年的;每年的", 1, 0, "F", "2016-05-01", "CET4", 0);
-        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;声称;预告", 1, 0, "F", "2016-12-01", "CET4", 0);
-        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 1, 0, "F", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
-        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，电脑", 1, 0, "F", "2016-12-01", "CET4", 0);
+
+        bookDao.addWord("economic", "[i:kəˈnɑ:mɪk]", "[ˌi:kəˈnɒmɪk]", "adj.经济的;经济学的;合算的;有经济效益的",
+                0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("election", "[ɪˈlɛkʃən]", "[ɪˈlekʃn]", "n.选举，当选;选举权;[神]神的选择", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("murder", "[ˈmɜ:rdə(r)]", "[ˈmɜ:də(r)]", "n.谋杀;杀戮;极艰难[令人沮丧]的经历 vt.凶杀;" +
+                "糟蹋;打垮 vi.杀人", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("progress", "[ˈprɑ:gres]", "[ˈprəʊgres]", "n.进步;前进;[生物学]进化;（向更高方向）" +
+                "增长 v.发展;（使）进步，（使）进行;促进 vi.发展;（向更高方向）增进", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("religious", "[rɪˈlɪdʒəs]", "[rɪˈlɪdʒəs]", "adj.宗教的;虔诚的;笃信宗教的;谨慎的" +
+                " n.修士，修女，出家人", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("smart", "[smɑ:rt]", "[smɑ:t]", "adj.聪明的;敏捷的;漂亮的;整齐的 vi.疼痛;感到刺痛;" +
+                "难过 n.创伤;刺痛;疼痛;痛苦 vt.引起…的疼痛（或痛苦、苦恼等） adv.聪明伶俐地，轻快地，漂亮地", 0, 0,
+                "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("barber", "[ˈbɑ:rbə(r)]", "[ˈbɑ:bə(r)]", "n.理发师;理发店(= barber's shop)" +
+                " vt.为…理发剃须;修整 vi.当理发师;给人理发", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("animal", "[ˈænəməl]", "[ˈænɪml]", "n.动物，兽，牲畜;<俚>家畜，牲口;<俚>畜生（一般的人）;" +
+                "兽性 adj.动物的;肉体的;肉欲的", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("abandon", "[əˈbændən]", "[əˈbændən]", "vt.放弃，抛弃;离弃，丢弃;使屈从;停止进行，终止 " +
+                "n.放任，放纵;完全屈从于压制", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("ability", "[əˈbɪlɪti]", "[əˈbɪləti]", "n.能力，资格;能耐，才能", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("able", "[ˈebəl]", "[ˈeɪbl]", "adj.能够的;有能力的;有才干的;干练的", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("aboard", "[əˈbɔ:rd]", "[əˈbɔ:d]", "prep.上车;在（船、飞机、车）上，上（船、飞机、车）" +
+                " adv.在船（或飞机、车）上，上船（或飞机、车）;靠船边;在船上;在火车上", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("about", "[əˈbaʊt]", "[əˈbaʊt]", "prep.关于;大约;在…周围 adv.大约;在附近;" +
+                "在四周;几乎 adj.在附近的;四处走动的;在起作用的;在流行中的", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("abroad", "[əˈbrɔd]", "[əˈbrɔ:d]", "adv.到国外，在海外;广为流传地 adj.往国外的 " +
+                "n.海外，异国", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("absorb", "[əbˈsɔ:rb]", "[əbˈsɔ:b]", "vt.吸收（液体、气体等）;吸引（注意）;" +
+                "吞并，合并;忍受，承担（费用）", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("angry", "[ˈæŋɡri]", "[ˈæŋgri]", "adj.生气的;愤怒的，发怒的;（颜色等）刺目的;" +
+                "（伤口等）发炎的", 0, 0, "",DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("anniversary", "[ˌænɪˈvɜ:rsəri]", "[ˌænɪˈvɜ:səri]", "n.周年纪念日 adj.周年的;" +
+                "周年纪念的;年年的;每年的", 0, 0, "",DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("announce", "[əˈnaʊns]", "[əˈnaʊns]", "vi.宣布参加竞选;当播音员 vt.宣布;述说;" +
+                "声称;预告", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("bankrupt", "[ˈbæŋkˌrʌpt, -rəpt]", "[ˈbæŋkrʌpt]", "adj.破产的，倒闭的;" +
+                "完全缺乏的;（名誉）扫地的，（智力等）完全丧失的;垮了的，枯竭的 n.破产者;无力偿还" +
+                "债务者;丧失（名誉，智力等）的人  vt.使破产，使枯竭，使极端贫困", 0, 0, "",
+                DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
+
+        bookDao.addWord("computer", "[kəmˈpjutɚ]", "[kəmˈpju:tə(r)]", "n.（电子）计算机，" +
+                "电脑", 0, 0, "", DateUtil.getNowDate("yyyy-MM-dd"), "CET4", 0);
     }
 
     /**
@@ -448,10 +529,19 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.main_rl_learn:
                 //跳转到学习界面
-
-                Intent intent = new Intent(mActivity, LearnActivity.class);
-                intent.putExtra("backgroundNum", num);
-                startActivity(intent);
+                WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
+                if (wordStudyDao.queryALLLearnWordsNum() == 0){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setTitle("温馨提醒：");
+                    builder.setMessage("你已经学完20个单词了！");
+                    builder.setPositiveButton("确定", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }else {
+                    Intent intent = new Intent(mActivity, LearnActivity.class);
+                    intent.putExtra("backgroundNum", num);
+                    startActivity(intent);
+                }
                 break;
             case R.id.main_rl_review:
                 //判断是否跳转到复习界面

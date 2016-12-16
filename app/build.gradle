@@ -53,4 +53,9 @@ dependencies {
     compile files('libs/ShareSDK-Wechat-Favorite-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Moments-2.7.10.jar')
     compile files('libs/ShareSDK-YouDao-2.7.10.jar')
+    compile files('libs/avoscloud-sdk-v3.15.4.jar')
+    compile files('libs/fastjson.jar')
+    compile files('libs/okhttp-2.6.0-leancloud.jar')
+    compile files('libs/okio-1.6.0-leancloud.jar')
+    compile files('libs/xUtils-2.6.14.jar')
 }

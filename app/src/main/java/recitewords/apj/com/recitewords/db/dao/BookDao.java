@@ -61,6 +61,17 @@ public class BookDao {
     }
 
     /**
+     * 更改单词的：是否已掌握 word_is_grasp  字段 变为 1
+     * 表示已掌握
+     */
+    public void updateWord_is_grasp(String word) {
+        String update_sql = "update book set word_is_grasp=? where word=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(update_sql, new Object[]{1, word});
+        db.close();
+    }
+
+    /**
      * 查询所有单词
      *
      * @param book_name 词书名字
@@ -84,6 +95,8 @@ public class BookDao {
             book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
             books.add(book);
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -180,9 +193,23 @@ public class BookDao {
                         book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                         books.add(book);
                     }
+                }else {
+                    if (day >= Review.REVIEW_DAY_F) {
+                        book.setWord(cursor.getString(cursor.getColumnIndex("word")));
+                        book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
+                        book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
+                        book.setWord_mean(cursor.getString(cursor.getColumnIndex("word_mean")));
+                        book.setBook_name(cursor.getString(cursor.getColumnIndex("book_name")));
+                        book.setGrasp_values(cursor.getString(cursor.getColumnIndex("grasp_values")));
+                        book.setDate(cursor.getString(cursor.getColumnIndex("date")));
+                        book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
+                        books.add(book);
+                    }
                 }
             }
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -284,8 +311,22 @@ public class BookDao {
                     book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
                     books.add(book);
                 }
+            }else{
+                if (day >= Review.REVIEW_DAY_F) {
+                    book.setWord(cursor.getString(cursor.getColumnIndex("word")));
+                    book.setSoundmark_american(cursor.getString(cursor.getColumnIndex("soundmark_american")));
+                    book.setSoundmark_british(cursor.getString(cursor.getColumnIndex("soundmark_british")));
+                    book.setWord_mean(cursor.getString(cursor.getColumnIndex("word_mean")));
+                    book.setBook_name(cursor.getString(cursor.getColumnIndex("book_name")));
+                    book.setGrasp_values(cursor.getString(cursor.getColumnIndex("grasp_values")));
+                    book.setDate(cursor.getString(cursor.getColumnIndex("date")));
+                    book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
+                    books.add(book);
+                }
             }
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -304,6 +345,8 @@ public class BookDao {
         while (cursor.moveToNext()) {
             date = cursor.getString(cursor.getColumnIndex("date"));
         }
+        db.close();
+        cursor.close();
         return date;
     }
 
@@ -322,6 +365,8 @@ public class BookDao {
         while (cursor.moveToNext()) {
             grasp = cursor.getString(cursor.getColumnIndex("grasp_values"));
         }
+        db.close();
+        cursor.close();
         return grasp;
     }
 
@@ -350,6 +395,8 @@ public class BookDao {
             book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
             books.add(book);
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -424,6 +471,8 @@ public class BookDao {
             book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
             books.add(book);
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -462,6 +511,8 @@ public class BookDao {
             book.setUserID(cursor.getInt(cursor.getColumnIndex("userID")));
             books.add(book);
         }
+        db.close();
+        cursor.close();
         return books;
     }
 
@@ -475,7 +526,9 @@ public class BookDao {
      */
     public int deleteWords(String book_name, String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        return db.delete("book", "book_name=? and word=?", new String[]{book_name, word});
+        int book = db.delete("book", "book_name=? and word=?", new String[]{book_name, word});
+        db.close();
+        return book;
     }
 
     /**
@@ -491,7 +544,9 @@ public class BookDao {
         values.put("word_is_grasp", 0);
         values.put("grasp_values", "");
         values.put("date", DateUtil.getNowDate("yyyy-MM-dd"));
-        return db.update("book", values, "book_name=?", new String[]{book_name});
+        int book = db.update("book", values, "book_name=?", new String[]{book_name});
+        db.close();
+        return book;
     }
 
     /**
@@ -506,7 +561,9 @@ public class BookDao {
         ContentValues values = new ContentValues();
         values.put("word_is_grasp ", 1);
         values.put("date",DateUtil.getNowDate("yyyy-MM-dd"));
-        return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        int book= db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        db.close();
+        return book;
     }
 
 
@@ -522,7 +579,9 @@ public class BookDao {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("grasp_values  ", graspValues);
-        return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        int book= db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        db.close();
+        return book;
     }
 
     /**
@@ -537,7 +596,9 @@ public class BookDao {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("date ", date);
-        return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        int book= db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        db.close();
+        return book;
     }
 
     /**
@@ -554,7 +615,9 @@ public class BookDao {
         values.put("word_is_study", 0);
         values.put("word_is_grasp", 0);
         values.put("grasp_values", "F");
-        return db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        int book= db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});
+        db.close();
+        return book;
     }
 
 

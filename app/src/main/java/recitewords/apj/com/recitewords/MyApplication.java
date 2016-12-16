@@ -3,6 +3,8 @@ package recitewords.apj.com.recitewords;
 import android.app.Activity;
 import android.app.Application;
 
+import com.avos.avoscloud.AVOSCloud;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +16,15 @@ import cn.sharesdk.framework.ShareSDK;
 public class MyApplication extends Application {
 
     public static List<Activity> mActivityList = new ArrayList<Activity>();
-
+    //leancloud key id
+    final String AV_ID = "2NCdWBghb5IsN8V6keRWFYH3-gzGzoHsz";
+    final String AV_KEY = "fMWW1770FGU3aLUYWDoL0APH";
     @Override
     public void onCreate() {
         super.onCreate();
+
+        AVOSCloud.initialize(this, AV_ID, AV_KEY);
+        AVOSCloud.useAVCloudCN();
 
         ShareSDK.initSDK(getBaseContext(),"19cb550c85b26");
     }

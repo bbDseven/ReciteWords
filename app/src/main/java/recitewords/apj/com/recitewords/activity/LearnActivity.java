@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -29,6 +30,7 @@ import recitewords.apj.com.recitewords.db.dao.LexiconDao;
 import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment;
 import recitewords.apj.com.recitewords.fragment.ExampleSentenceFragment_review;
+import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.LearnWordsUtil;
 import recitewords.apj.com.recitewords.util.MediaUtils;
 import recitewords.apj.com.recitewords.util.NumUtil;
@@ -55,6 +57,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     private final String FRAGMENT_SENTENCE = "fragment_sentence";
     private int backgroundNum;  //背景图片序号
     private OnToggleListner mOnToggleListner;  //监听例句显示状态
+    private String book_name = "CET4";  //词书名字
     private AlertDialog alertDialog;  //评写界面弹窗
     private boolean havaing_comfirm = false;  //拼写是否已经和正确单词比较,默认为false
     private Message msg;
@@ -110,6 +113,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         public TextView tv_spell;  //底部拼写按钮
         public TextView tv_delete;  //底部删除按钮
         public SlidingUpMenu learn_sliding;  //上下滑动控件
+        public FrameLayout fr_learn_progress;   //记忆模式父布局
 
         public TextView learn_tv_word;           //要学习的单词
         public TextView learn_tv_soundMark;     // 音标
@@ -147,6 +151,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_spell = findViewByIds(R.id.tv_spell);
         holder.tv_delete = findViewByIds(R.id.tv_delete);
 
+        holder.fr_learn_progress = (FrameLayout)holder.ll_information.findViewById(R.id.fr_learn_progress);
         holder.tv_incognizance_example = findViewByIds(R.id.tv_incognizance_example);//不认识--看例句
         holder.tv_incognizance_next = findViewByIds(R.id.tv_incognizance_next);//不认识--下一个
         holder.tv_memory_cognize = findViewByIds(R.id.tv_memory_cognize);//回忆模式--认识
@@ -163,14 +168,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.learn_sliding.getBackground().setAlpha(170);  //更改学习界面透明度
         holder.fl_example.getBackground().setAlpha(70);  //更改例句界面透明度
 
-        //用Fragment替换帧布局来显示例句
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment("abroad"), FRAGMENT_SENTENCE);
-        transaction.commit();
         studyWords = LearnWordsUtil.getWords(this);//初始化20个单词数据
         showWordMode();         //显示下一个单词的逻辑模式（注：很乱）
-        //init_fragment(studyWords.get(order).getWord());     //例句Fragment替换例句布局文件
     }
 
     private void initEvent() {
@@ -194,6 +193,8 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.tv_memory_cognize.setOnClickListener(this);
         //监听 回忆模式--不认识
         holder.tv_memory_incognizance.setOnClickListener(this);
+        //监听记忆模式父布局
+        holder.fr_learn_progress.setOnClickListener(this);
 
         holder.learn_tv_word = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_word);//获取要学习单词的控件
         holder.learn_tv_soundMark = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_soundmark);//获取音标控件
@@ -245,6 +246,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 showWordMode();
                 break;
             case R.id.tv_memory_cognize:          // 点击记忆模式的 认识
+                reset();
                 addWordAsterisk(order);            // 认识该单词，星号加1
                 order++;
                 showWordMode();
@@ -336,10 +338,14 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                 startActivity(intent);
                 break;
             case R.id.tv_delete:                        //点击删除从学习单词表中删除单词，表示已经掌握
-                    WordStudyDao wordStudyDao = new WordStudyDao(this);
-                    wordStudyDao.updateWordAsterisk(4,studyWords.get(order).getWord());
-                    order++;
-                    showWordMode();
+                WordStudyDao wordStudyDao = new WordStudyDao(this);
+                wordStudyDao.updateWordAsterisk(4,studyWords.get(order).getWord()); //星号变为4
+                BookDao bookDao = new BookDao(this);
+                bookDao.updateWord_is_study(studyWords.get(order).getWord());//修改已学习字段标记为1
+                bookDao.updateWord_is_grasp(studyWords.get(order).getWord());//修改已掌握字段标记为1
+                bookDao.updateDate(book_name,studyWords.get(order).getWord(), DateUtil.getNowDate("yyyy-MM-dd"));  //更新日期
+                order++;
+                showWordMode();
                 break;
             case R.id.tv_incognizance_example:          //点击看例句
                 if (holder.learn_sliding.getMenuState()) {
@@ -362,6 +368,12 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             case R.id.learn_progress:           //点击圆形进度条，直接显示单词答案
                 holder.progress.setVisibility(View.INVISIBLE);
                 holder.tv_word_information.setVisibility(View.VISIBLE); //显示单词词义
+                reset();
+                break;
+            case R.id.fr_learn_progress:
+                holder.progress.setVisibility(View.INVISIBLE);
+                holder.tv_word_information.setVisibility(View.VISIBLE); //显示单词词义
+                reset();
                 break;
             default:
                 break;
@@ -376,11 +388,16 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         if (order < studyWords.size()){
             while (getWordAsterisk(order) == 4){
                 order++;
-                if (order == 20){   //  说明单词已经学习完毕
-                    b = true;
-                    break;
+                if (order == 20){
+                    if (isFinishWord()){
+                        b = isFinishWord();
+                        break;
+                    }else {
+                        order = 0;
+                    }
                 }
             }
+            Log.e("abcd","判断是否为0"+order);
             if (b){
                 //弹出窗口，提醒用户学习完毕
                 completeDialog();
@@ -402,9 +419,13 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             order = 0;
             while (getWordAsterisk(order) == 4){
                 order++;
-                if (order == 20){   //  说明单词已经学习完毕
-                    b = true;
-                    break;
+                if (order == 20){
+                    if (isFinishWord()){
+                        b = isFinishWord();
+                        break;
+                    }else {
+                        order = 0;
+                    }
                 }
             }
             if (b){
@@ -428,6 +449,20 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     }
 
     /**
+     * 判断20个单词是否已经学完的方法
+     * */
+    public boolean isFinishWord(){
+        boolean b = true;
+        for(int i =0;i<studyWords.size();i++){
+            if (getWordAsterisk(i) != 4){
+                b = false;
+                break;
+            }
+        }
+        return b;
+    }
+
+    /**
      * 显示 单词 各个信息
      * 包括：单词，音标，星号，已学习单词，剩余学习单词
      * */
@@ -440,6 +475,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.learn_tv_soundMark.setText(studyWords.get(order).getSoundmark_american());  //显示单词音标
         showAsterisk(getWordAsterisk(order));        //显示单词的星号
         showFinishWords();     //显示已学习单词，剩余学习单词
+        init_fragment(studyWords.get(order).getWord());//显示例句
     }
 
     /**
@@ -506,9 +542,11 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.completed_words = (TextView)holder.ll_show_word.findViewById(R.id.tv_complete);
         holder.no_completed_words = (TextView)holder.ll_show_word.findViewById(R.id.tv_need_complete);
         int completedNum = 0;
+        BookDao bookDao = new BookDao(this);
         for (int i=0;i<studyWords.size();i++){
             if (getWordAsterisk(i)==4){
-                setWord_is_study(studyWords.get(i).getWord());//修改Book里面的 word_is_study 字段
+                setWord_is_study(studyWords.get(i).getWord());//修改Book里面的 word_is_study 字段变为1，表示已学习
+                bookDao.updateDate(book_name,studyWords.get(i).getWord(), DateUtil.getNowDate("yyyy-MM-dd"));  //更新日期
                 completedNum++;
             }
         }
@@ -525,6 +563,14 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             msg.what = num;
             mHandler.sendMessageDelayed(msg, 1000);
         }
+    }
+
+    //取消handler处理，并设置进度条为0，时间重置为4秒
+    private void reset() {
+        holder.progress.setProgress(0);
+        holder.progress.setVisibility(View.INVISIBLE);
+        mHandler.removeMessages(msg.what);
+        num = 4;
     }
 
     /**
@@ -554,6 +600,9 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         int asterisk = getWordAsterisk(order);
         if (asterisk>=0 && asterisk<=3){
             wordStudyDao.updateWordAsterisk(asterisk+1,studyWords.get(order).getWord());
+            if (getWordAsterisk(order) == 4){
+                setWord_is_study(studyWords.get(order).getWord());
+            }
         }
     }
 
@@ -677,7 +726,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     private void init_fragment(String word) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fl_example, new ExampleSentenceFragment_review(word), FRAGMENT_SENTENCE);
+        transaction.replace(R.id.fl_example, new ExampleSentenceFragment(word), FRAGMENT_SENTENCE);
         transaction.commit();
     }
 
