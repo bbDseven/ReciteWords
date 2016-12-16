@@ -550,7 +550,7 @@ public class BookDao {
     }
 
     /**
-     * 更新单词是否为已掌握
+     * 更新单词为已掌握
      *
      * @param book_name 词书名字
      * @param word      更新的单词
@@ -559,6 +559,7 @@ public class BookDao {
     public int updateGraspWord(String book_name, String word) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("word_is_study ", 1);
         values.put("word_is_grasp ", 1);
         values.put("date",DateUtil.getNowDate("yyyy-MM-dd"));
         int book= db.update("book", values, "book_name=? and word=?", new String[]{book_name, word});

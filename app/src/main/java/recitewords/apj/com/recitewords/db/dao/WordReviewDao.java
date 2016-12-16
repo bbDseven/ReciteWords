@@ -15,7 +15,7 @@ import recitewords.apj.com.recitewords.db.ReciteWordsSQLiteOpenHelper;
 
 /**
  * Created by Greetty on 2016/12/5.
- * <p>
+ * <p/>
  * 单词复习表工具类
  */
 public class WordReviewDao {
@@ -136,6 +136,18 @@ public class WordReviewDao {
                 new String[]{word, book_name});
         db.close();
         return word_review;
+    }
+
+    /**
+     * 清空当前数据库
+     *
+     * @return 受影响行数 int
+     */
+    public int clearAll() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        int word_review = db.delete("word_review", null, null);
+        db.close();
+        return  word_review;
     }
 
 //    /**

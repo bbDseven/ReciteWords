@@ -1,3 +1,4 @@
+
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
@@ -38,21 +39,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVFile;
-import com.avos.avoscloud.GetDataCallback;
-import com.avos.avoscloud.ProgressCallback;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LearnActivity;
@@ -233,6 +223,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
+
         holder.iv_sign.setAlpha(150);//主界面签到那里设置透明度
         holder.linearLayout.getBackground().setAlpha(150);  //主界面学习复习按钮设置透明度
 
@@ -243,31 +234,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             insertBook();//插入词书表book
             insertLexicon();//插入词库表lexicon*/
             insertUser();//插入用户信息表
-//            insertWordStudy();//插入学习单词
+            //insertWordStudy();//插入学习单词
             BookDao bookDao = new BookDao(mContext);
             bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
-//             insertWordReview();  //插入复习单词，模拟数据
-//            HttpUtils httpUtils = new HttpUtils();
-//            String url = "https://dn-2NCdWBgh.qbox.me/bdd7cd3de40bae640f79.db";
-//            String packageName = "recitewords.apj.com.recitewords";
-//            String path = "/data/data/" + packageName + "/databases/" + MainActivity.dbName;
-//            httpUtils.download(url, path, new RequestCallBack<File>() {
-//                @Override
-//                public void onSuccess(ResponseInfo<File> responseInfo) {
-//                    Toast.makeText(mContext, "下载成功", Toast.LENGTH_SHORT).show();
-//                }
-//
-//                @Override
-//                public void onFailure(HttpException e, String s) {
-//                    Toast.makeText(mContext, "下载失败", Toast.LENGTH_SHORT).show();
-//                }
-//
-//                @Override
-//                public void onLoading(long total, long current, boolean isUploading) {
-//                    super.onLoading(total, current, isUploading);
-//                    Toast.makeText(mContext, "下载进度："+ current*100 / total +"%", Toast.LENGTH_SHORT).show();
-//                }
-//            });
+            // insertWordReview();  //插入复习单词，模拟数据
+
+
             PrefUtils.setDBFlag(sp, "dbFlag", false);//插入完数据将标记设置为false，下次则不会再插入数据
         }
 
@@ -878,7 +850,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     //选择照片方法
     private void choicePhoto() {
-        File outputImage_choice = new File(Environment.getExternalStorageDirectory(), "tempImage_choice.jpg"); //创建文件在sd卡并命名
+        File outputImage_choice = new File(Environment.getExternalStorageDirectory(),
+                "tempImage_choice.jpg"); //创建文件在sd卡并命名
         try {
             if (outputImage_choice.exists()){
                 outputImage_choice.delete();   //如果文件存在则删除文件
@@ -955,4 +928,5 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public TextView getTV_review_num(){
         return holder.main_tv_review_num;
     }
+
 }

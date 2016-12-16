@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -762,7 +763,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onBackPressed() {
         AlertDialog.Builder mLoadingBuilder=new AlertDialog.Builder(this);
-        AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
+        final AlertDialog mLoadingAlertDialog = mLoadingBuilder.create();
         View mLoadingView = getLayoutInflater().inflate(R.layout.dialog_save_loading, null);
         mLoadingAlertDialog.setView(mLoadingView);
         mLoadingAlertDialog.show();
@@ -774,6 +775,7 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
                         setWord_is_study(studyWords.get(i).getWord());//修改Book里面的 word_is_study 字段
                     }
                 }
+                mLoadingAlertDialog.dismiss();
                 finish();
             }
         }, 1000);

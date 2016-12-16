@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -64,7 +65,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private int need_review_word;  //需要复习的单词个数
     private boolean review_is_complete;   //是否已经完成了本次20个单词的复习
     private int review_word_index = 0;  //当前学习单词位置
-    private String review_mode = Mode.MODE_MEMORY_MEAN;  //选择题模式
+    private String review_mode = Mode.MODE_MEMORY_WORD;  //选择题模式
     private WordReviewDao wordReviewDao;
     private List<WordReview> wordReviews;  //当前复习的20个单词
     private int answer_right;  //正确答案的位置
@@ -352,6 +353,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             case R.id.ll_word_progress:
                 holder.word_progress.setVisibility(View.GONE);   //隐藏进度条
                 holder.ll_word_root.setVisibility(View.VISIBLE);  //显示单词
+                Log.e(TAG,"隐藏单词进度条");
                 break;
             case R.id.tv_know:   //认识
                 if (review_mode.equals(Mode.MODE_MEMORY_MEAN)) {
@@ -497,6 +499,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                     MediaUtils.playWord(this, mWord);  //读单词
                     is_US_Phonogram = true;
                 }
+                Log.e(TAG,"切换音标");
+
                 break;
             case R.id.tv_spell:
                 //打开拼写界面
@@ -548,8 +552,8 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
                 " mGraspValues: " + mGraspValues);
 
         if (completeIndex.size() == wordReviews.size()) {  //已完成学复习
-            for (int i = 0; i < completeIndex.size(); i++) {
-            }
+//            for (int i = 0; i < completeIndex.size(); i++) {
+//            }
             completeDialog();  //询问用户是否拼写测试
         }
         if (wordReviews.size() == review_word_index) {
@@ -681,6 +685,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
             bookDao.updateGraspValues(book_name, mWord, grasp);
         }
         bookDao.updateDate(book_name,mWord, DateUtil.getNowDate("yyyy-MM-dd"));  //更新日期
+//        Log.e(TAG, "更新的单词为："+mWord);
     }
 
     /**
@@ -762,6 +767,12 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     public void completeDialog() {
         holder.tv_complete.setText(wordReviews.size() + "");
         holder.tv_need_complete.setText(0 + "");
+
+        SharedPreferences pref = PrefUtils.getPref(this);
+       PrefUtils.setDBFlag(pref, "review_is_complete", true);  //下次进入再次获取数据
+        //清空当前复习数据库
+        wordReviewDao.clearAll();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("恭喜你");
         builder.setMessage("你已经复习完了本次的任务，立即去拼写测试吧！");

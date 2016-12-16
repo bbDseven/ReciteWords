@@ -15,5 +15,7 @@ public class AppConfig {
     public static final String MODE_STATISTICS_GRASP = "statistics_all_grasp";  //所有已掌握的单词
     public static final String MODE_BOOK_NAME_AND_NEWWORDS="ALL";  //当前词书和生词本
 
+    public static final String BOOK_STATE="book_state";   //保存是否已经选择词书的键
+
 
 }

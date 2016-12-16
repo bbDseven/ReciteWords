@@ -17,12 +17,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -89,7 +91,7 @@ public class SlidingFragment extends BaseFragment {
         TextView statistics_tv_money;   //显示剩余酷币
 
         //-----------------LIBRARY图书馆
-        LinearLayout show_wordbook; //选中词书背景
+        FrameLayout show_wordbook; //选中词书背景
         RelativeLayout library_have_learn;  //点击查看已学习
         LinearLayout library_have_grasp;  //点击查看已掌握
         TextView library_word_sum;  //词书单词总数
@@ -100,6 +102,15 @@ public class SlidingFragment extends BaseFragment {
         TextView library_new_words_sum;  //显示单词数
         TextView library_new_words_see;  //查看生词
         TextView library_book_name;   //选中的词书名字
+
+        LinearLayout show_word__book_info;  //显示词书信息
+        LinearLayout show_word__book_tip;  //显示选择词书提示
+        LinearLayout library_book_cet_four;  //四级单词根布局
+        LinearLayout library_book_cet_six;  //六级单词根布局
+        LinearLayout library_book_ielts;  //雅思单词根布局
+        LinearLayout library_book_toefl;  //托福单词根布局
+
+
 
 
     }
@@ -236,7 +247,17 @@ public class SlidingFragment extends BaseFragment {
             super.onChange(selfChange);
             BookDao bookDao = new BookDao(mActivity);
             newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
-            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+            int size = newWordsList.size();
+            if (size>0){
+                SharedPreferences pref = PrefUtils.getPref(mActivity);
+                PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
+//                holder.show_word__book_info.setVisibility(View.VISIBLE);
+//                holder.show_word__book_tip.setVisibility(View.INVISIBLE);
+            }
+//            holder.library_add_words_tick.setVisibility(View.VISIBLE);
+//            holder.library_new_words_sum.setText("单词数" + size);
+//            holder.library_book_name.setText(" 生词本");
+            setLibraryView();
         }
 
     }
@@ -566,30 +587,21 @@ public class SlidingFragment extends BaseFragment {
         holder.library_new_words_sum = findViewByIds(view, R.id.library_new_words_sum);
         holder.library_new_words_see = findViewByIds(view, R.id.library_new_words_see);
         holder.library_book_name = findViewByIds(view, R.id.library_book_name);
+        holder.show_word__book_info=findViewByIds(view,R.id.show_word_book_info);
+        holder.show_word__book_tip=findViewByIds(view,R.id.show_word__book_tip);
+        holder.library_book_cet_four=findViewByIds(view,R.id.library_book_cet_four);
+        holder.library_book_cet_six=findViewByIds(view,R.id.library_book_cet_six);
+        holder.library_book_ielts=findViewByIds(view,R.id.library_book_ielts);
+        holder.library_book_toefl=findViewByIds(view,R.id.library_book_toefl);
     }
 
     /**
      * 初始化图书馆的数据
      */
     public void init__LibraryData() {
-        final BookDao bookDao = new BookDao(mActivity);
-        haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);  //当前词书已学习
-        haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);  //当前词书已掌握
-        newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
-        newWordHaveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NEW_WORDS);  //生词本已学习
-        newWordHaveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NEW_WORDS);  //生词本已掌握
-        final SharedPreferences pref = PrefUtils.getPref(mActivity);
-        boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
-        if (newWordsList.size()==0){  //删除完单词后，进入没有选择状态
-            PrefUtils.setDBFlag(pref,"NEW_WORDS",false);
-            new_words=false;
-        }
 
-        //设置显示已学习已掌握总数
-        holder.library_have_learn_sum.setText(haveLearnList.size() + "");
-        holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
-        //显示生词总数
-        holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+        setLibraryView();
+        final SharedPreferences pref = PrefUtils.getPref(mActivity);
         //打开已学习
         holder.library_have_learn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -604,25 +616,7 @@ public class SlidingFragment extends BaseFragment {
                 startActivity(new Intent(mActivity, LibraryAllGraspActivity.class));
             }
         });
-        if (new_words) {
-            holder.library_add_words_tick.setVisibility(View.VISIBLE);
-            holder.library_book_name.setText(AppConfig.BOOK_NAME  + " + 生词本");
-            //设置显示已学习已掌握总数
-            holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
-            holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
-            //显示生词总数
-            holder.library_new_words_sum.setText("单词数"+newWordsList.size());
-        }else {
-            holder.library_add_words_tick.setVisibility(View.GONE);
-            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
-            //设置显示已学习已掌握总数
-            holder.library_book_name.setText(AppConfig.BOOK_NAME);
-            holder.library_have_learn_sum.setText(haveLearnList.size() + "");
-            holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
-            //显示生词总数
-            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
-        }
-
+        //选择学习生词本
         holder.library_add_words.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -644,13 +638,14 @@ public class SlidingFragment extends BaseFragment {
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", false);
                             holder.library_add_words_tick.setVisibility(View.GONE);
-                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name());
-                            holder.library_book_name.setText(AppConfig.BOOK_NAME );
-                            //设置显示已学习已掌握总数
-                            holder.library_have_learn_sum.setText(haveLearnList.size() + "");
-                            holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
-                            //显示生词总数
-                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+                            setLibraryView();
+
+//                            holder.library_book_name.setText(AppConfig.BOOK_NAME );
+//                            //设置显示已学习已掌握总数
+//                            holder.library_have_learn_sum.setText(haveLearnList.size() + "");
+//                            holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
+//                            //显示生词总数
+//                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
 
                         }
                     });
@@ -666,12 +661,14 @@ public class SlidingFragment extends BaseFragment {
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, "NEW_WORDS", true);
                             holder.library_add_words_tick.setVisibility(View.VISIBLE);
-                            holder.library_book_name.setText(haveLearnList.get(0).getBook_name() + " + 生词本");
-                            //设置显示已学习已掌握总数
-                            holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
-                            holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
-                            //显示生词总数
-                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+                            setLibraryView();
+
+//                            holder.library_book_name.setText(AppConfig.BOOK_NAME + " + 生词本");
+//                            //设置显示已学习已掌握总数
+//                            holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
+//                            holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
+//                            //显示生词总数
+//                            holder.library_new_words_sum.setText("单词数" + newWordsList.size());
                         }
                     });
                     AlertDialog alertDialog = builder.create();
@@ -696,7 +693,104 @@ public class SlidingFragment extends BaseFragment {
             }
         });
 
+        holder.library_book_cet_four.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PrefUtils.getDBFlag(pref,AppConfig.BOOK_STATE,false)){
+                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, false);
+                }else {
+                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                }
+                setLibraryView();
+                Toast.makeText(mActivity,"四级单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        }); holder.library_book_cet_six.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"六级单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        }); holder.library_book_ielts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"雅思单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.library_book_toefl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity,"托福单词开始下载。。。",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
+    /**
+     * 设置Library的页面数据
+     */
+    public void setLibraryView(){
+        final BookDao bookDao = new BookDao(mActivity);
+        List<Book> bookList = bookDao.queryAllWOrd(AppConfig.BOOK_NAME);  //所有单词
+        haveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NAME);  //当前词书已学习
+        haveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NAME);  //当前词书已掌握
+        newWordsList = bookDao.queryAllWOrd(AppConfig.BOOK_NEW_WORDS);  //生词本全部单词
+        newWordHaveLearnList = bookDao.queryAllLearn(AppConfig.BOOK_NEW_WORDS);  //生词本已学习
+        newWordHaveGraspList = bookDao.queryAllGrasp(AppConfig.BOOK_NEW_WORDS);  //生词本已掌握
+        SharedPreferences pref = PrefUtils.getPref(mActivity);
+        boolean new_words = PrefUtils.getDBFlag(pref, "NEW_WORDS", false);
+        boolean book_state = PrefUtils.getDBFlag(pref, AppConfig.BOOK_STATE, false);
+        if (newWordsList.size()==0){  //删除完单词后，进入没有选择状态
+            PrefUtils.setDBFlag(pref,"NEW_WORDS",false);
+            new_words=false;
+        }
+
+        if (new_words) {
+            if (book_state){
+                holder.library_add_words_tick.setVisibility(View.VISIBLE);
+                holder.library_book_name.setText(AppConfig.BOOK_NAME  + " + 生词本");
+                holder.library_word_sum.setText((bookList.size()+newWordsList.size())+"");
+                //设置显示已学习已掌握总数
+                holder.library_have_learn_sum.setText((haveLearnList.size() + newWordHaveLearnList.size()) + "");
+                holder.library_have_grasp_sum.setText((haveGraspList.size() + newWordHaveGraspList.size()) + "");
+                //显示生词总数
+                holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+            }else {
+                holder.library_add_words_tick.setVisibility(View.VISIBLE);
+                holder.library_book_name.setText(" 生词本");
+                //设置显示已学习已掌握总数
+                holder.library_have_learn_sum.setText(newWordHaveLearnList.size() + "");
+                holder.library_have_grasp_sum.setText(newWordHaveGraspList.size() + "");
+                //显示生词总数
+                holder.library_new_words_sum.setText("单词数"+newWordsList.size());
+                holder.library_word_sum.setText(newWordsList.size()+"");
+            }
+            holder.show_word__book_info.setVisibility(View.VISIBLE);
+            holder.show_word__book_tip.setVisibility(View.INVISIBLE);
+        }else {
+            if (book_state){
+                holder.library_add_words_tick.setVisibility(View.GONE);
+                //设置显示已学习已掌握总数
+                holder.library_book_name.setText(AppConfig.BOOK_NAME);
+                holder.library_have_learn_sum.setText(haveLearnList.size() + "");
+                holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
+                //显示生词总数
+                holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+                holder.show_word__book_info.setVisibility(View.VISIBLE);
+                holder.show_word__book_tip.setVisibility(View.INVISIBLE);
+                holder.library_word_sum.setText(bookList.size()+"");
+            }else {
+                holder.library_book_name.setText(AppConfig.BOOK_NAME);
+                holder.library_have_learn_sum.setText(haveLearnList.size() + "");
+                holder.library_have_grasp_sum.setText(haveGraspList.size() + "");
+                //显示生词总数
+                holder.library_new_words_sum.setText("单词数" + newWordsList.size());
+                holder.show_word__book_info.setVisibility(View.INVISIBLE);
+                holder.show_word__book_tip.setVisibility(View.VISIBLE);
+                holder.library_add_words_tick.setVisibility(View.GONE);
+            }
+        }
+
+    }
+
 
 
     @Override

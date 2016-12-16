@@ -4,156 +4,195 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+
+
+    <FrameLayout
         android:id="@+id/show_wordbook"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="15dp">
-
+        android:layout_height="wrap_content">
         <LinearLayout
+            android:id="@+id/show_word_book_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="15dp"
-            android:paddingTop="15dp">
+            android:visibility="invisible"
+            android:orientation="vertical"
+            android:paddingBottom="15dp">
 
-            <TextView
-                android:id="@+id/library_book_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:text="四级"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/viewpager_text_large" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="下载例句 "
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/viewpager_text_large" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <!--词书名字-->
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="4114"
-                        android:textSize="@dimen/viewpager_text_large"
-                        android:id="@+id/library_word_sum" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="单词"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/viewpager_text_large" />
-
-                </LinearLayout>
-
-                <!--分割线-->
-                <TextView
-                    android:layout_width="0.3dp"
-                    android:layout_height="50dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@color/color_item_divide" />
-            </RelativeLayout>
-
-            <!--已学习-->
-            <RelativeLayout
-                android:id="@+id/library_have_learn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/library_have_learn_sum"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="48"
-                        android:textSize="@dimen/viewpager_text_large" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="已学习"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/viewpager_text_large" />
-
-                </LinearLayout>
-
-                <!--分割线-->
-                <TextView
-                    android:layout_width="0.3dp"
-                    android:layout_height="50dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@color/color_item_divide" />
-            </RelativeLayout>
-
-            <!--已掌握-->
             <LinearLayout
-                android:id="@+id/library_have_grasp"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:paddingBottom="15dp"
+                android:paddingTop="15dp">
 
                 <TextView
-                    android:id="@+id/library_have_grasp_sum"
+                    android:id="@+id/library_book_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="23"
-                    android:textSize="@dimen/viewpager_text_large" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="已掌握"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="四级"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/viewpager_text_large" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="下载例句 "
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/viewpager_text_large" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <!--词书名字-->
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/library_word_sum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0"
+                            android:textSize="@dimen/viewpager_text_large" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingTop="10dp"
+                            android:text="单词"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/viewpager_text_large" />
+
+                    </LinearLayout>
+
+                    <!--分割线-->
+                    <TextView
+                        android:layout_width="0.3dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentRight="true"
+                        android:background="@color/color_item_divide" />
+                </RelativeLayout>
+
+                <!--已学习-->
+                <RelativeLayout
+                    android:id="@+id/library_have_learn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/library_have_learn_sum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="48"
+                            android:textSize="@dimen/viewpager_text_large" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingTop="10dp"
+                            android:text="已学习"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/viewpager_text_large" />
+
+                    </LinearLayout>
+
+                    <!--分割线-->
+                    <TextView
+                        android:layout_width="0.3dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentRight="true"
+                        android:background="@color/color_item_divide" />
+                </RelativeLayout>
+
+                <!--已掌握-->
+                <LinearLayout
+                    android:id="@+id/library_have_grasp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/library_have_grasp_sum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="23"
+                        android:textSize="@dimen/viewpager_text_large" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="10dp"
+                        android:text="已掌握"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/viewpager_text_large" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/show_word__book_tip"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/viewpager_divide_height"
+                android:background="@color/color_item_divide" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="22sp"
+                android:layout_marginTop="15dp"
+                android:text="请在下方选择词书"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:drawableBottom="@mipmap/library_arrow_down"
+                />
 
 
         </LinearLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
 
     <TextView
@@ -173,25 +212,29 @@
             android:orientation="horizontal"
             android:paddingBottom="15dp"
             android:paddingTop="15dp">
+
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/library_add_words"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
-                android:background="@mipmap/uncheck"
-                android:layout_centerVertical="true"/>
+
+                <ImageView
+                    android:id="@+id/library_add_words"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:background="@mipmap/uncheck" />
+
                 <ImageView
                     android:id="@+id/library_add_words_tick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/checked"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:visibility="visible"/>
+                    android:src="@mipmap/checked"
+                    android:visibility="visible" />
             </RelativeLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -206,7 +249,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10sp"
-                android:text="单词数10"
+                android:text="单词数 0"
                 android:textSize="@dimen/viewpager_text_small" />
 
             <RelativeLayout
@@ -235,16 +278,199 @@
 
 
     <LinearLayout
+        android:id="@+id/library_book_cet_four"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycle_wbs"
+        <TextView
+            android:paddingTop="8dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:text="四级"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/viewpager_text_large"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:orientation="horizontal"
+            android:layout_height="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="英语四级词汇"
+                android:textColor="@color/color_item_word_mean"
+                android:textSize="@dimen/viewpager_text_small"/>
+
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="单词数4114"
+                android:textColor="@color/color_item_word_mean"
+                android:paddingBottom="8dp"
+                android:textSize="@dimen/viewpager_text_small"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_height="@dimen/viewpager_divide_height"
+            android:background="@color/color_item_divide" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/library_book_cet_six"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:paddingTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:text="六级"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/viewpager_text_large"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:orientation="horizontal"
+            android:layout_height="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="英语六级词汇"
+                android:textColor="@color/color_item_word_mean"
+                android:textSize="@dimen/viewpager_text_small"/>
+
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="单词数6888"
+                android:textColor="@color/color_item_word_mean"
+                android:paddingBottom="8dp"
+                android:textSize="@dimen/viewpager_text_small"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_height="@dimen/viewpager_divide_height"
+            android:background="@color/color_item_divide" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/library_book_ielts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:paddingTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:text="雅思"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/viewpager_text_large"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:orientation="horizontal"
+            android:layout_height="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="英语雅思词汇"
+                android:textColor="@color/color_item_word_mean"
+                android:textSize="@dimen/viewpager_text_small"/>
+
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="单词数8888"
+                android:textColor="@color/color_item_word_mean"
+                android:paddingBottom="8dp"
+                android:textSize="@dimen/viewpager_text_small"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_height="@dimen/viewpager_divide_height"
+            android:background="@color/color_item_divide" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/library_book_toefl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:paddingTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:text="托福"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/viewpager_text_large"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:orientation="horizontal"
+            android:layout_height="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="英语托福词汇"
+                android:textColor="@color/color_item_word_mean"
+                android:textSize="@dimen/viewpager_text_small"/>
+
+            <TextView
+                android:layout_marginLeft="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="单词数6666"
+                android:textColor="@color/color_item_word_mean"
+                android:paddingBottom="8dp"
+                android:textSize="@dimen/viewpager_text_small"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_height="@dimen/viewpager_divide_height"
+            android:background="@color/color_item_divide" />
     </LinearLayout>
 
 </LinearLayout>

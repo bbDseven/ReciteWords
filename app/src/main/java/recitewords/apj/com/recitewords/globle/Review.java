@@ -3,9 +3,7 @@ package recitewords.apj.com.recitewords.globle;
 /**
  * Created by Greetty on 2016/12/8.
  *
- * 单词熟悉程度
- *
- * 六个等级
+ *复习的常量
  */
 public class Review {
     public static final String GRASP_A="A";  //熟悉程度，6个等级
