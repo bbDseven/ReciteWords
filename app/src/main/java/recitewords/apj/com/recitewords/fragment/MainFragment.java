@@ -134,7 +134,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private static final int CHOICE_CROP = 4;    //选择图片后裁剪的请求码
     private Uri selectedImage; //获取系统返回的照片的Uri
     private Uri selectedImage_choice;   //选择图片裁剪后的Uri
-    private Uri imageUri;   //图片uri地址
+    private Uri imageUri_camera;   //图片照相uri地址
+    private Uri imageUri_crop;   //图片照相完剪切uri地址
     private AlertDialog dialog; //查询单词的对话框
     private EditText et_query;  //查询单词的输入框
     private MyAdapter mAdapter; //lv的适配器
@@ -833,18 +834,20 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     //拍摄方法
     private void takePhoto() {
-        File outputImage = new File(Environment.getExternalStorageDirectory(), "tempImage.jpg"); //创建文件在sd卡并命名
-        try {
-            if (outputImage.exists()) {
-                outputImage.delete();   //如果文件存在则删除文件
-            }
-            outputImage.createNewFile();    //创建文件
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        imageUri = Uri.fromFile(outputImage);   //将文件转化为Uri地址
+        File outputImage_camera = new File(Environment.getExternalStorageDirectory(), "tempImage_camera.jpg"); //创建文件在sd卡并命名
+        File outputImage_crop = new File(Environment.getExternalStorageDirectory(), "tempImage_crop.jpg"); //创建文件在sd卡并命名
+//        try {
+//            if (outputImage.exists()) {
+//                outputImage.delete();   //如果文件存在则删除文件
+//            }
+//            outputImage.createNewFile();    //创建文件
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        imageUri_camera = Uri.fromFile(outputImage_camera);   //将文件转化为Uri地址
+        imageUri_crop = Uri.fromFile(outputImage_crop);   //将文件转化为Uri地址
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");   //设置Intent的action
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); //跳转到相机拍摄
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri_camera); //跳转到相机拍摄
         startActivityForResult(intent, TAKE_PHOTO); //相机执行完回调到onActivityResult方法
     }
 
@@ -852,14 +855,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private void choicePhoto() {
         File outputImage_choice = new File(Environment.getExternalStorageDirectory(),
                 "tempImage_choice.jpg"); //创建文件在sd卡并命名
-        try {
-            if (outputImage_choice.exists()){
-                outputImage_choice.delete();   //如果文件存在则删除文件
-            }
-            outputImage_choice.createNewFile();    //创建文件
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (outputImage_choice.exists()){
+//                outputImage_choice.delete();   //如果文件存在则删除文件
+//            }
+//            outputImage_choice.createNewFile();    //创建文件
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         selectedImage_choice = Uri.fromFile(outputImage_choice);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);   //设置intent的action
@@ -873,19 +876,19 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             case TAKE_PHOTO:    //相机执行完的回调
                 if (resultCode == mActivity.RESULT_OK) {
                     Intent intent = new Intent("com.android.camera.action.CROP");   //跳转到图片裁剪
-                    intent.setDataAndType(imageUri, "image/*"); //设置数据和类型
+                    intent.setDataAndType(imageUri_camera, "image/*"); //设置数据和类型
                     intent.putExtra("scale", true);     //设置可缩放
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); //设置位置
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri_crop); //设置位置
                     startActivityForResult(intent, CROP_PHOTO); //裁剪执行完同样回调到onActivityResult方法
                 }
                 break;
             case CROP_PHOTO:    //裁剪执行完的回调
                 if (resultCode == mActivity.RESULT_OK) {
                     holder.main_img_circle.setImageURI(null);   //先设置为null，防止第二次点击拍摄时头像不更新
-                    holder.main_img_circle.setImageURI(imageUri);   //设置头像
+                    holder.main_img_circle.setImageURI(imageUri_crop);   //设置头像
                     SharedPreferences sp = PrefUtils.getPref(mActivity);
                     sp.edit().remove("imageUri").commit();
-                    PrefUtils.setImage(sp, "imageUri", imageUri.toString());
+                    PrefUtils.setImage(sp, "imageUri", imageUri_crop.toString());
                 }
                 break;
             case CHOICE_PHOTO:      //选择完图片的回调
