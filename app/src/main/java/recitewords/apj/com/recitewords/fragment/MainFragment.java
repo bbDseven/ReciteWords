@@ -233,7 +233,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //设置签到里的日期和星期
         String date = DateUtil.getMonthAndDay() + "" + DateUtil.getWeek();
         holder.tv_date.setText(date);
-
         holder.iv_sign.setAlpha(150);//主界面签到那里设置透明度
         holder.linearLayout.getBackground().setAlpha(150);  //主界面学习复习按钮设置透明度
 
