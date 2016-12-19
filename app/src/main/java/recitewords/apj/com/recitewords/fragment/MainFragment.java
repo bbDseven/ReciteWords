@@ -2,6 +2,7 @@
 package recitewords.apj.com.recitewords.fragment;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -155,7 +156,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private String book_name = "CET4";
     private Book book;
     private WordExampleSentence bean_sentence;
-
+    private LearnWordBroadcast broadcast;
 
     private int mReviewWordSum;  //需要复习的单词总数
     private UserDao userDao;
@@ -211,9 +212,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         //显示需要复习的单词总数
         holder.main_tv_review_num.setText(mReviewWordSum + "");
         WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
-        Log.e("123","获取要学习的单词总数");
+        //显示要学习的单词总数
         int needLearnWordsNum = wordStudyDao.queryALLLearnWordsNum();
         holder.main_tv_learn_num.setText(""+needLearnWordsNum);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("recitewords.apj.com.recitewords.fragment.MainFragment.LearnWordBroadcast");
+        broadcast = new LearnWordBroadcast();//点击签到发出广播更新数据
+        mActivity.registerReceiver(broadcast, filter);// 注册广播
     }
 
     @Override
@@ -507,7 +513,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 if (wordStudyDao.queryALLLearnWordsNum() == 0){
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setTitle("温馨提醒：");
-                    builder.setMessage("没有单词了！");
+                    builder.setMessage("请先选择词库");
                     builder.setPositiveButton("确定", null);
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
@@ -932,6 +938,15 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     }
     public TextView getTV_review_num(){
         return holder.main_tv_review_num;
+    }
+
+    // 广播 下载完词库后，显示20个学习单词
+    class LearnWordBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e("777","接受到广播");
+            holder.main_tv_learn_num.setText(""+20);
+        }
     }
 
 }

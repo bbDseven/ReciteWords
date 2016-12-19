@@ -16,6 +16,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -122,8 +123,7 @@ public class SlidingFragment extends BaseFragment {
         LinearLayout library_book_ielts;  //雅思单词根布局
         LinearLayout library_book_toefl;  //托福单词根布局
 
-
-
+        ProgressDialog progressDialog = new ProgressDialog(mContext);
 
     }
 
@@ -159,6 +159,24 @@ public class SlidingFragment extends BaseFragment {
     private List<Book> newWordHaveLearnList;  //生词本已学习
     private List<Book> newWordHaveGraspList;  //生词本已掌握
 
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if (msg.what == 100){
+                Log.e("123收到的消息机制",""+(int)msg.obj);
+                holder.progressDialog.show();
+                holder.progressDialog.setProgress((int)msg.obj);
+                if ((int)msg.obj == 100){
+                    holder.progressDialog.dismiss();
+                    Intent intent = new Intent("recitewords.apj.com.recitewords.fragment.MainFragment.LearnWordBroadcast");
+                    mActivity.sendBroadcast(intent);//发送广播，主界面要学习的单词变成20个
+                    Intent intent1 = new Intent("recitewords.apj.com.recitewords.fragment.SlidingFragment.SignBroadcast");
+                    mActivity.sendBroadcast(intent1);//发送广播，显示词书信息
+                }
+            }
+        }
+    };
+
     public SlidingFragment(Context context) {
         this.mContext = context;
     }
@@ -189,6 +207,9 @@ public class SlidingFragment extends BaseFragment {
         holder.ll_statistics = findViewByIds(view, R.id.ll_statistics);
         holder.sliding_layout_ll = findViewByIds(view, R.id.sliding_layout_ll);
 
+        holder.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        holder.progressDialog.setTitle("文件大小1MB");
+        holder.progressDialog.setMax(100);
 
         getHeight(view);
         InitImageView();
@@ -751,17 +772,46 @@ public class SlidingFragment extends BaseFragment {
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {  //下载
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                new Thread(){
-                                    @Override
-                                    public void run() {
-                                        String url = "https://dn-2NCdWBgh.qbox.me/bdd7cd3de40bae640f79.db";
-                                        DownloadWordsUtil.DownloadBook("bdd7cd3de40bae640f79.db",url,metaData);
-                                    }
-                                }.start();
-                                //判断是否下载完毕（成功），如果下载成功，执行下面代码
-                                PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
-                                PrefUtils.setDBFlag(pref, "DOWN_LOAD_BOOK", true);
-                                setLibraryView();
+                                if (DownloadWordsUtil.isNetworkAvailable(mActivity)){       //判断是否有网络
+                                    final String packageName = "recitewords.apj.com.recitewords";
+                                    final String url = "https://dn-2NCdWBgh.qbox.me/bdd7cd3de40bae640f79.db";
+                                    final AVFile file = new AVFile("bdd7cd3de40bae640f79.db",url,metaData);
+                                    holder.progressDialog.show();
+                                    holder.progressDialog.setProgress(0);
+                                    new Thread(){
+                                        @Override
+                                        public void run() {
+                                            file.getDataInBackground(new GetDataCallback() {
+                                                @Override
+                                                public void done(byte[] bytes, AVException e) {
+                                                    try {
+                                                        File wordFile = new File("/data/data/" + packageName + "/databases/" + "ReciteWords_0.db");
+                                                        FileOutputStream fos = new FileOutputStream(wordFile);
+                                                        fos.write(bytes);
+                                                        fos.close();
+                                                        Log.e("123","下载完成。。。");
+                                                    }catch (Exception e1){
+
+                                                    }
+                                                }
+                                            }, new ProgressCallback() {
+                                                @Override
+                                                public void done(Integer integer) {
+                                                    Message message = new Message();
+                                                    message.what = 100;
+                                                    message.obj = integer;
+                                                    Log.e("123",""+integer);
+                                                    handler.sendMessage(message);
+                                                }
+                                            });
+                                        }
+                                    }.start();
+                                    //判断是否下载完毕（成功），如果下载成功，执行下面代码
+                                    PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, true);
+                                    PrefUtils.setDBFlag(pref, "DOWN_LOAD_BOOK", true);
+                                }else {
+                                    Toast.makeText(mActivity,"网络不可用",Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
                         builder.setNegativeButton("取消", null);
@@ -1326,6 +1376,8 @@ public class SlidingFragment extends BaseFragment {
             User user = userDao.query();
             holder.statistics_tv_sign.setText(user.getSign_in_continue() + "天");    //设置连续签到天数
             holder.statistics_tv_money.setText(user.getCool_money() + "枚");     //设置剩余酷币枚数
+            setLibraryView();
+            Log.e(TAG,"下载完成了，接受了广播");
         }
     }
 
