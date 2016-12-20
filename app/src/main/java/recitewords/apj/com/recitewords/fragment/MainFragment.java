@@ -506,8 +506,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 // Log.e("ha", "点击了，状态后为：" + navigateShowState);
                 break;
             case R.id.main_rl_learn:
-                BookDao bookDao = new BookDao(mActivity);
-                bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
                 //跳转到学习界面
                 WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
                 if (wordStudyDao.queryALLLearnWordsNum() == 0){
@@ -944,8 +942,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     class LearnWordBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.e("777","接受到广播");
-            holder.main_tv_learn_num.setText(""+20);
+            BookDao bookDao = new BookDao(mActivity);
+            bookDao.insertWord_study();     //从Book里获取到20个单词，再插入到word_study 表
+            WordStudyDao wordStudyDao = new WordStudyDao(mActivity);
+            holder.main_tv_learn_num.setText(""+wordStudyDao.getWordStudy().size());
         }
     }
 
