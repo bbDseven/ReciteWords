@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="recitewords.apj.com.recitewords">
 
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- ShareSDK所需权限 -->
@@ -133,6 +134,9 @@
             android:name="recitewords.apj.com.recitewords.contentprovider.BookProvider"
             android:authorities="recitewords.apj.com.recitewords"
             android:exported="true" /><!--词书表内容提供者-->
+
+        <service android:name=".service.LockService"/><!-- 注册锁屏的服务 -->
+
     </application>
 
 </manifest>

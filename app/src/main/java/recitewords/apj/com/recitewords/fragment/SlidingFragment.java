@@ -67,6 +67,7 @@ import recitewords.apj.com.recitewords.bean.User;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.UserDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
+import recitewords.apj.com.recitewords.service.LockService;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.DownloadWordsUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
@@ -389,12 +390,18 @@ public class SlidingFragment extends BaseFragment {
      * 设置SETTINGS 各个控件点击事件
      */
     public void init_SettEvent() {
+        /**
+         * 单词离线语音下载
+         * */
         holder.settings_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "下载的方法", Toast.LENGTH_SHORT).show();
             }
         });
+        /**
+         * 拼写测试
+         * */
         holder.settings_spell_test.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
             @Override
             public void onStateChanged(boolean state) {
@@ -405,8 +412,24 @@ public class SlidingFragment extends BaseFragment {
                 }
             }
         });
-
-
+        /**
+         * 锁屏学单词
+         * */
+        holder.settings_lock_learn.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
+            @Override
+            public void onStateChanged(boolean state) {
+                if (state == true){
+                    // 设置锁屏，打开锁屏的服务
+                    getActivity().startService(new Intent(mActivity, LockService.class));
+                }else {
+                    // 关闭锁屏服务
+                    getActivity().stopService(new Intent(mActivity, LockService.class));
+                }
+            }
+        });
+        /**
+         * 重置词书
+         * */
         holder.settings_Reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
