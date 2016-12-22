@@ -65,7 +65,7 @@ public class ReviewActivity extends BaseActivity implements View.OnClickListener
     private int need_review_word;  //需要复习的单词个数
     private boolean review_is_complete;   //是否已经完成了本次20个单词的复习
     private int review_word_index = 0;  //当前学习单词位置
-    private String review_mode = Mode.MODE_MEMORY_WORD;  //选择题模式
+    private String review_mode = Mode.MODE_CHOICE;  //选择题模式
     private WordReviewDao wordReviewDao;
     private List<WordReview> wordReviews;  //当前复习的20个单词
     private int answer_right;  //正确答案的位置

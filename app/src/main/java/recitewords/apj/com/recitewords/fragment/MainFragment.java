@@ -754,6 +754,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         ll_query_wordInfo.setVisibility(View.VISIBLE);//显示单词信息布局
 
         book = queryBook(data); //查询单词信息
+        if (book == null){
+            Toast.makeText(mContext, "没有单词信息！请先下载词书！", Toast.LENGTH_SHORT).show();
+            ll_query_wordInfo.setVisibility(View.GONE);
+            return;
+        }
         tv_word_soundmark.setText(book.getSoundmark_american());//设置音标
         tv_word_mean.setText(book.getWord_mean());//设置单词意思
 
