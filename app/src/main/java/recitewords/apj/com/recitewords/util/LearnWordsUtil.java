@@ -66,6 +66,8 @@ public class LearnWordsUtil {
         return options;
     }
 
+    public static boolean isPlay = false;
+
     /**
      * 从WordStudy表里 获取 20 个单词，单词的美式音标，英式音标，和单词含义
      * */

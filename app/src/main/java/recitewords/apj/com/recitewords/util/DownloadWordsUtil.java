@@ -79,4 +79,30 @@ public class DownloadWordsUtil {
         return false;
     }
 
+    /**
+     *  删除文件方法
+     * */
+    public static void deleteFile(File file){
+        if (file.isDirectory()){
+            File[] files = file.listFiles();
+            for (File f : files){
+                deleteFile(f);
+                f.delete();
+            }
+        }else {
+            file.delete();
+        }
+    }
+
+    /**
+     *  判断文件是否存在的方法
+     * */
+    public static boolean judgeFileExists(File file){
+        if (file.exists()){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
 }

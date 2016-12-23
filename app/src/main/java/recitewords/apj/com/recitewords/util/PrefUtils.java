@@ -43,4 +43,15 @@ public class PrefUtils {
     public static String getThemes(SharedPreferences sp, String key, String def_themes){
         return sp.getString(key, def_themes);
     }
+
+    //设置自动发音
+    public static void setPlayAutomatic(SharedPreferences sp, String key, boolean PlayAutomatic){
+        sp.edit().putBoolean(key, PlayAutomatic).commit();
+    }
+
+    //获取自动发音
+    public static boolean getPlayAutomatic(SharedPreferences sp, String key, boolean PlayAutomatic){
+        return sp.getBoolean(key, PlayAutomatic);
+    }
+
 }

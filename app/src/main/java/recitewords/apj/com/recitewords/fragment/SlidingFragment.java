@@ -14,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
@@ -22,7 +21,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -46,13 +44,10 @@ import net.youmi.android.normal.banner.BannerViewListener;
 import net.youmi.android.offers.OffersManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import recitewords.apj.com.recitewords.R;
 import recitewords.apj.com.recitewords.activity.LibraryAllGraspActivity;
@@ -66,11 +61,11 @@ import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.bean.User;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.UserDao;
-import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.service.LockService;
 import recitewords.apj.com.recitewords.util.DateUtil;
 import recitewords.apj.com.recitewords.util.DownloadWordsUtil;
+import recitewords.apj.com.recitewords.util.LearnWordsUtil;
 import recitewords.apj.com.recitewords.util.PrefUtils;
 import recitewords.apj.com.recitewords.view.SlideSwitch;
 
@@ -90,8 +85,8 @@ public class SlidingFragment extends BaseFragment {
         private LinearLayout ll_top;  //导航栏父控件
         private LinearLayout sliding_layout_ll; //根布局用于设置背景颜色
         //-------------------- 设置
-        TextView settings_download;  // 下载
-        TextView settings_clean;  // 清除
+        TextView settings_download,settings_downloadDone;  // 下载，下载完成
+        TextView settings_clean,settings_cacheSize;  // 清除,缓存大小
         //拼写测试开关，锁屏学单词开关，自动发音开关
         SlideSwitch settings_spell_test, settings_lock_learn, settings_automatic_play;
         LinearLayout settings_Reset;  //重置当前词书
@@ -174,6 +169,13 @@ public class SlidingFragment extends BaseFragment {
                     mActivity.sendBroadcast(intent);//发送广播，主界面要学习的单词变成20个
                     Intent intent1 = new Intent("recitewords.apj.com.recitewords.fragment.SlidingFragment.SignBroadcast");
                     mActivity.sendBroadcast(intent1);//发送广播，显示词书信息
+                }
+            }else if (msg.what == 99){
+                Log.e("123收到的消息机制",""+(int)msg.obj);
+                holder.progressDialog.show();
+                holder.progressDialog.setProgress((int)msg.obj);
+                if ((int)msg.obj == 100){
+                    holder.progressDialog.dismiss();
                 }
             }
         }
@@ -380,11 +382,24 @@ public class SlidingFragment extends BaseFragment {
      */
     public void init_SettView(View view) {
         holder.settings_download = findViewByIds(view, R.id.settings_download);//下载
+        holder.settings_downloadDone = findViewByIds(view, R.id.settings_downloadDone);//下载完成
         holder.settings_clean = findViewByIds(view, R.id.settings_clean);//清除
+        holder.settings_cacheSize = findViewByIds(view, R.id.settings_cacheSize);//缓存大小
         holder.settings_spell_test = findViewByIds(view, R.id.settings_spell_test);//拼写测试开关
         holder.settings_lock_learn = findViewByIds(view, R.id.settings_lock_learn);//锁屏学单词开关
         holder.settings_automatic_play = findViewByIds(view, R.id.settings_automatic_play);//自动发音开关
         holder.settings_Reset = findViewByIds(view, R.id.settings_Reset);  //重置当前词书
+        // 以下是根据判断文件是否存在，来显示相关内容
+        File file = new File("/sdcard/wordPlays.mp3");
+        if (DownloadWordsUtil.judgeFileExists(file)){
+            holder.settings_downloadDone.setVisibility(View.VISIBLE);
+            holder.settings_download.setVisibility(View.GONE);
+            holder.settings_cacheSize.setText("3.1MB");
+        }else {
+            holder.settings_downloadDone.setVisibility(View.GONE);
+            holder.settings_download.setVisibility(View.VISIBLE);
+            holder.settings_cacheSize.setText("0.0MB");
+        }
     }
 
     /**
@@ -397,20 +412,91 @@ public class SlidingFragment extends BaseFragment {
         holder.settings_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "下载的方法", Toast.LENGTH_SHORT).show();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                builder.setTitle("温馨提醒：");
+                builder.setMessage("是否下载离线语音");
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (DownloadWordsUtil.isNetworkAvailable(mActivity)){       //判断是否有网络
+                            final String url = "https://dn-2NCdWBgh.qbox.me/99134b9c14cafb9f760a.mp3";
+                            final AVFile file = new AVFile("99134b9c14cafb9f760a.mp3",url,metaData);
+                            holder.progressDialog.setTitle("文件大小3MB");
+                            holder.progressDialog.show();
+                            holder.progressDialog.setProgress(0);
+                            new Thread(){
+                                @Override
+                                public void run() {
+                                    file.getDataInBackground(new GetDataCallback() {
+                                        @Override
+                                        public void done(byte[] bytes, AVException e) {
+                                            try {
+                                                File wordFile = new File("/sdcard/wordPlays.mp3");
+                                                FileOutputStream fos = new FileOutputStream(wordFile);
+                                                fos.write(bytes);
+                                                fos.close();
+                                                Log.e("123","下载完成。。。");
+                                                holder.settings_download.setVisibility(View.INVISIBLE);
+                                                holder.settings_downloadDone.setVisibility(View.VISIBLE);
+                                                holder.settings_cacheSize.setText("3.1MB");
+                                            }catch (Exception e1){
+                                            }
+                                        }
+                                    }, new ProgressCallback() {
+                                        @Override
+                                        public void done(Integer integer) {
+                                            Message message = new Message();
+                                            message.what = 99;
+                                            message.obj = integer;
+                                            Log.e("123",""+integer);
+                                            handler.sendMessage(message);
+                                        }
+                                    });
+                                }
+                            }.start();
+                        }else {
+                            Toast.makeText(mActivity,"网络不可用",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("取消", null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
+        /**
+         * 清除缓存
+         * */
+        holder.settings_clean.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                builder.setTitle("温馨提醒：");
+                builder.setMessage("是否清除缓存");
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 清除缓存，删除文件
+                        File file = new File("/sdcard/wordPlays.mp3");
+                        DownloadWordsUtil.deleteFile(file);
+                        Toast.makeText(mActivity,"已清除缓存",Toast.LENGTH_SHORT).show();
+                        holder.settings_cacheSize.setText("0.0MB");
+                        holder.settings_download.setVisibility(View.VISIBLE);
+                        holder.settings_downloadDone.setVisibility(View.GONE);
+                    }
+                });
+                builder.setNegativeButton("取消", null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+        });
+
         /**
          * 拼写测试
          * */
         holder.settings_spell_test.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
             @Override
             public void onStateChanged(boolean state) {
-                if (state == true) {
-                    Toast.makeText(mContext, "拼写测试开关为开", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(mContext, "拼写测试开关为关", Toast.LENGTH_LONG).show();
-                }
             }
         });
         /**
@@ -508,6 +594,20 @@ public class SlidingFragment extends BaseFragment {
 
             }
         });
+        /**
+         *  自动发音
+         * */
+        holder.settings_automatic_play.setOnStateChangedListener(new SlideSwitch.OnStateChangedListener() {
+            @Override
+            public void onStateChanged(boolean state) {
+                if (state){
+                    LearnWordsUtil.isPlay = true;
+                }else {
+                    LearnWordsUtil.isPlay = false;
+                }
+            }
+        });
+
     }
 
     /**
@@ -625,7 +725,6 @@ public class SlidingFragment extends BaseFragment {
      */
     private void library(View view) {
         init_LibraryView(view);
-//        init__LibraryData();
     }
 
 
@@ -762,19 +861,13 @@ public class SlidingFragment extends BaseFragment {
                         public void onClick(DialogInterface dialog, int which) {
                             PrefUtils.setDBFlag(pref, AppConfig.BOOK_STATE, false);
                             setLibraryView();
-
                         }
                     });
                     builder.setNegativeButton("取消", null);
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
-                }else {  //选择该词书
-//                    File file =new File( "/data/data/recitewords.apj.com.recitewords/" +
-//                            "databases/ReciteWords_0.db");
+                }else {
                     boolean new_words = PrefUtils.getDBFlag(pref, "DOWN_LOAD_BOOK", false);
-
-
-//                    if (file.exists()){  //已下载该词书
                     if (new_words){  //已下载该词书
                         final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                         builder.setTitle("温馨提醒：");
@@ -937,8 +1030,6 @@ public class SlidingFragment extends BaseFragment {
         }
 
     }
-
-
 
     @Override
     public void initEvent() {

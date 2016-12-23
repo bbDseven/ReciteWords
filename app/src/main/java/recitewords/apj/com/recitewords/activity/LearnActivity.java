@@ -471,7 +471,9 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
         holder.learn_tv_soundMark = (TextView) holder.ll_show_word.findViewById(R.id.learn_tv_soundmark);//获取音标控件
         Log.e("显示单词的下标位置",""+order);
         holder.learn_tv_word.setText(studyWords.get(order).getWord());      //显示要学习的单词
-        MediaUtils.playWord(this,studyWords.get(order).getWord());           //播放当前单词
+        if (LearnWordsUtil.isPlay){
+            MediaUtils.playWord(this,studyWords.get(order).getWord());           //播放当前单词
+        }
         holder.learn_tv_soundMark.setText(studyWords.get(order).getSoundmark_american());  //显示单词音标
         showAsterisk(getWordAsterisk(order));        //显示单词的星号
         showFinishWords();     //显示已学习单词，剩余学习单词

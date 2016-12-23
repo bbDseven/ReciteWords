@@ -37,6 +37,13 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="下载  "/>
+            <TextView
+                android:id="@+id/settings_downloadDone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textSize="20sp"
+                android:text="下载完成 "/>
         </LinearLayout>
         <!--  横线 -->
         <View
@@ -62,6 +69,7 @@
                     android:textSize="20sp"
                     android:text="例句缓存"/>
                 <TextView
+                    android:id="@+id/settings_cacheSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
