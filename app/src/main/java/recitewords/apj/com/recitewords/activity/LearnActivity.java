@@ -374,7 +374,6 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
             case R.id.fr_learn_progress:
                 holder.progress.setVisibility(View.INVISIBLE);
                 holder.tv_word_information.setVisibility(View.VISIBLE); //显示单词词义
-                reset();
                 break;
             default:
                 break;
@@ -598,11 +597,13 @@ public class LearnActivity extends BaseActivity implements View.OnClickListener,
      * */
     private void addWordAsterisk(int order) {
         WordStudyDao wordStudyDao = new WordStudyDao(this);
+        BookDao bookDao = new BookDao(LearnActivity.this);
         int asterisk = getWordAsterisk(order);
         if (asterisk>=0 && asterisk<=3){
             wordStudyDao.updateWordAsterisk(asterisk+1,studyWords.get(order).getWord());
             if (getWordAsterisk(order) == 4){
-                setWord_is_study(studyWords.get(order).getWord());
+                setWord_is_study(studyWords.get(order).getWord());//如果星号为4，标记ord_is_study 字段变成 1，表示已学习
+                bookDao.updateDate(book_name,studyWords.get(order).getWord(), DateUtil.getNowDate("yyyy-MM-dd"));
             }
         }
     }

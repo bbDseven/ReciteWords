@@ -87,6 +87,44 @@ public class DateUtil {
         return sdf.format(new Date());
 
     }
+    /**
+     * 获取星期
+     *
+     * @return 星期英文缩写
+     */
+    public static String getWeeks() {
+        Calendar calendar = Calendar.getInstance();
+        String wDay = String.valueOf(calendar.get(Calendar.DAY_OF_WEEK));
+        if ("1".equals(wDay)) {
+            wDay = "星期日";
+        } else if ("2".equals(wDay)) {
+            wDay = "星期一";
+        } else if ("3".equals(wDay)) {
+            wDay = "星期二";
+        } else if ("4".equals(wDay)) {
+            wDay = "星期三";
+        } else if ("5".equals(wDay)) {
+            wDay = "星期四";
+        } else if ("6".equals(wDay)) {
+            wDay = "星期五";
+        } else if ("7".equals(wDay)) {
+            wDay = "星期六";
+        }
+        return wDay;
+    }
 
+
+    /**
+     * 获取手机系统时间
+     * */
+    public static String getTime(){
+        Calendar calendar = Calendar.getInstance();
+        String hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+        String minute = String.valueOf(calendar.get(Calendar.MINUTE));
+        if (calendar.get(Calendar.MINUTE)<=9){
+            minute = "0"+String.valueOf(calendar.get(Calendar.MINUTE));
+        }
+        return hour+":"+minute;
+    }
 
 }

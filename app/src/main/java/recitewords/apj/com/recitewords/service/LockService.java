@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import recitewords.apj.com.recitewords.activity.LockActivity;
 import recitewords.apj.com.recitewords.activity.MainActivity;
 
 /**
@@ -32,7 +33,7 @@ public class LockService extends Service{
     public void onCreate() {
         super.onCreate();
         Log.e("123","开启服务！");
-        zdLockIntent = new Intent(LockService.this, MainActivity.class);//锁屏状态，打开MainActivity
+        zdLockIntent = new Intent(LockService.this, LockActivity.class);//锁屏状态，打开MainActivity
         zdLockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //注册屏幕关闭广播
         IntentFilter intentFilter = new IntentFilter("android.intent.action.SCREEN_ON");

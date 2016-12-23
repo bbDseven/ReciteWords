@@ -66,6 +66,7 @@ import recitewords.apj.com.recitewords.bean.Book;
 import recitewords.apj.com.recitewords.bean.User;
 import recitewords.apj.com.recitewords.db.dao.BookDao;
 import recitewords.apj.com.recitewords.db.dao.UserDao;
+import recitewords.apj.com.recitewords.db.dao.WordStudyDao;
 import recitewords.apj.com.recitewords.globle.AppConfig;
 import recitewords.apj.com.recitewords.service.LockService;
 import recitewords.apj.com.recitewords.util.DateUtil;
